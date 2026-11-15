@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SellerLevel {
+  NEW
+  LEVEL_1
+  LEVEL_2
+  TOP_RATED
+}
+
+enum GigStatus {
+  ACTIVE
+  DRAFT
+  PAUSED
+}
+
+enum PackageTier {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String      @id @db.Uuid
+  username     String      @unique
+  fullname     String
+  imgUrl       String?
+  isSeller     Boolean     @default(false)
+  level        SellerLevel @default(NEW)
+  about        String?
+  country      String?
+  languages    String[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  gigs         Gig[]
+  buyerOrders  Order[]     @relation("BuyerOrders")
+  sellerOrders Order[]     @relation("SellerOrders")
+  reviews      Review[]
+}
+
+model Category {
+  id       String     @id @default(uuid()) @db.Uuid
+  name     String
+  slug     String     @unique
+  parentId String?    @db.Uuid
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  gigs     Gig[]
+}
+
+model Gig {
+  id          String    @id @default(uuid()) @db.Uuid
+  ownerId     String    @db.Uuid
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  categoryId  String    @db.Uuid
+  category    Category  @relation(fields: [categoryId], references: [id])
+  title       String
+  description String
+  images      String[]
+  tags        String[]
+  status      GigStatus @default(DRAFT)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  packages    Package[]
+  orders      Order[]
+  reviews     Review[]
+
+  @@index([ownerId])
+  @@index([categoryId])
+  @@index([status])
+}
+
+model Package {
+  id          String      @id @default(uuid()) @db.Uuid
+  gigId       String      @db.Uuid
+  gig         Gig         @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  tier        PackageTier
+  title       String
+  description String
+  price       Decimal     @db.Decimal(10, 2)
+  daysToMake  Int
+  revisions   Int         @default(0)
+  features    String[]
+  orders      Order[]
+
+  @@unique([gigId, tier])
+}
+
+model Order {
+  id          String      @id @default(uuid()) @db.Uuid
+  buyerId     String      @db.Uuid
+  buyer       User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId    String      @db.Uuid
+  seller      User        @relation("SellerOrders", fields: [sellerId], references: [id])
+  gigId       String      @db.Uuid
+  gig         Gig         @relation(fields: [gigId], references: [id])
+  packageId   String      @db.Uuid
+  package     Package     @relation(fields: [packageId], references: [id])
+  price       Decimal     @db.Decimal(10, 2)
+  serviceFee  Decimal     @db.Decimal(10, 2)
+  total       Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING)
+  dueAt       DateTime
+  deliveredAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  review      Review?
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+model Review {
+  id         String   @id @default(uuid()) @db.Uuid
+  orderId    String   @unique @db.Uuid
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  gigId      String   @db.Uuid
+  gig        Gig      @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  reviewerId String   @db.Uuid
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
+  rating     Int
+  text       String
+  createdAt  DateTime @default(now())
+
+  @@index([gigId])
+}
