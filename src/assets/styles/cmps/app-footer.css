@@ -1,0 +1,15 @@
+.app-footer {
+  padding-block: var(--space-lg);
+  border-top: 1px solid var(--clr-border);
+  color: var(--clr-text-light);
+}
+
+.app-footer .footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-footer .logo {
+
+}

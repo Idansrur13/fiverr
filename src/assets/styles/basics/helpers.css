@@ -1,0 +1,35 @@
+.flex {
+  display: flex;
+}
+
+.flex.column {
+  flex-direction: column;
+}
+
+.flex.align-center {
+  align-items: center;
+}
+
+.flex.justify-between {
+
+}
+
+.btn {
+
+}
+
+.btn-primary {
+
+}
+
+.btn-primary:hover {
+
+}
+
+.btn-outline {
+
+}
+
+.visually-hidden {
+
+}

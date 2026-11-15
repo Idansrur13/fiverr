@@ -6,18 +6,18 @@
 
 ## הסטאק
 
-| שכבה | טכנולוגיה |
-| --- | --- |
-| Frontend | React + Vite, Redux, SCSS |
-| Backend | Vercel Serverless Functions (תיקיית `api/`) |
-| Database | Supabase Postgres |
-| ORM | Prisma |
-| Auth | Supabase Auth (Google) |
-| קבצים ותמונות | Supabase Storage |
-| סביבה מקומית | Docker (Postgres מקומי לפיתוח ולטסטים) |
-| טסטים | Vitest, React Testing Library |
-| CI | GitHub Actions |
-| Deploy | Vercel |
+| שכבה          | טכנולוגיה                                   |
+| ------------- | ------------------------------------------- |
+| Frontend      | React + Vite, Redux, CSS                    |
+| Backend       | Vercel Serverless Functions (תיקיית `api/`) |
+| Database      | Supabase Postgres                           |
+| ORM           | Prisma                                      |
+| Auth          | Supabase Auth (Google)                      |
+| קבצים ותמונות | Supabase Storage                            |
+| סביבה מקומית  | Docker (Postgres מקומי לפיתוח ולטסטים)      |
+| טסטים         | Vitest, React Testing Library               |
+| CI            | GitHub Actions                              |
+| Deploy        | Vercel                                      |
 
 ---
 
@@ -40,12 +40,12 @@
 <name>/<feature_name>
 ```
 
-| ✅ נכון | ❌ לא נכון |
-| --- | --- |
-| `idan/google_login` | `google-login` |
-| `idan/gig_edit_form` | `idan/fix` |
+| ✅ נכון                   | ❌ לא נכון        |
+| ------------------------- | ----------------- |
+| `idan/google_login`       | `google-login`    |
+| `idan/gig_edit_form`      | `idan/fix`        |
 | `[name2]/explore_filters` | `feature/explore` |
-| `[name3]/order_status` | `[name3]/stuff` |
+| `[name3]/order_status`    | `[name3]/stuff`   |
 
 - אותיות קטנות באנגלית, מילים מופרדות ב-`_`
 - בראנץ' אחד לפיצ'ר אחד, לא לערבב כמה משימות
@@ -106,15 +106,15 @@ git push --force-with-lease
 
 פורמט: `<type>: <תיאור קצר באנגלית>`
 
-| type | מתי |
-| --- | --- |
-| `feat` | פיצ'ר חדש |
-| `fix` | תיקון באג |
-| `test` | הוספה או שינוי של טסטים |
+| type       | מתי                         |
+| ---------- | --------------------------- |
+| `feat`     | פיצ'ר חדש                   |
+| `fix`      | תיקון באג                   |
+| `test`     | הוספה או שינוי של טסטים     |
 | `refactor` | שינוי קוד בלי שינוי התנהגות |
-| `style` | עיצוב ו-SCSS |
-| `chore` | תשתית, תלויות, קונפיגורציה |
-| `docs` | מסמכים |
+| `style`    | עיצוב ו-CSS                 |
+| `chore`    | תשתית, תלויות, קונפיגורציה  |
+| `docs`     | מסמכים                      |
 
 דוגמאות: `feat: add explore filters`, `fix: order total rounding`, `test: gig reducer`.
 
@@ -134,13 +134,13 @@ git push --force-with-lease
 
 ### dev-board
 
-| עמודה | משמעות |
-| --- | --- |
-| Backlog | משימות שעוד לא תוכננו |
-| Ready | מוגדר ומוכן לעבודה |
-| In Progress | מישהו עובד על זה עכשיו |
-| In Review | יש PR פתוח שמחכה ל-review |
-| Done | מוזג ל-`main` |
+| עמודה       | משמעות                    |
+| ----------- | ------------------------- |
+| Backlog     | משימות שעוד לא תוכננו     |
+| Ready       | מוגדר ומוכן לעבודה        |
+| In Progress | מישהו עובד על זה עכשיו    |
+| In Review   | יש PR פתוח שמחכה ל-review |
+| Done        | מוזג ל-`main`             |
 
 - מזיזים את הכרטיס **בכל פעם** שהסטטוס משתנה – הבורד צריך לשקף את המצב האמיתי
 - עד 2 משימות במקביל ב-In Progress לכל אחד
@@ -159,13 +159,15 @@ git push --force-with-lease
 
 ### איפה הטסטים
 
-| סוג | כלי | מיקום |
-| --- | --- | --- |
-| לוגיקה, services, reducers | Vitest | ליד הקובץ: `gig.service.test.js` |
-| קומפוננטות | React Testing Library | ליד הקומפוננטה: `GigPreview.test.jsx` |
-| API handlers | Vitest + DB של Docker | `api/**/*.test.js` |
+| סוג                        | כלי                   | מיקום                                 |
+| -------------------------- | --------------------- | ------------------------------------- |
+| לוגיקה, services, reducers | Vitest                | ליד הקובץ: `gig.service.test.js`      |
+| קומפוננטות                 | React Testing Library | ליד הקומפוננטה: `GigPreview.test.jsx` |
+| API handlers               | Vitest + DB של Docker | `tests/api/gigs.test.js`              |
 
-טסטים של ה-API רצים מול DB מקומי ב-Docker (`fiverr_test`), **לא** מול Supabase.
+טסטים של ה-API רצים מול DB מקומי ב-Docker (`fiverr_test`), **לא** מול Supabase. לכן Docker צריך לרוץ לפני `npm test`.
+
+טסטים של ה-API נמצאים ב-`tests/api` ולא בתוך `api/`, כי כל קובץ בתוך `api/` הופך ב-Vercel ל-endpoint.
 
 ### לפני כל PR
 
@@ -232,11 +234,19 @@ PR עם CI אדום לא ממוזג.
 
 ## Docker – סביבה מקומית
 
+פעם ראשונה – יוצרים קובץ `.env` מהדוגמה:
+
+```bash
+cp .env.example .env
+```
+
 הרמת Postgres מקומי:
 
 ```bash
 docker compose up -d
 ```
+
+ה-DB רץ על פורט `5440` במחשב (ולא על 5432), כדי לא להתנגש ב-Postgres אחר שכבר רץ אצלכם. בתוך ה-container נוצרים שני databases: `fiverr` לפיתוח ו-`fiverr_test` לטסטים.
 
 הרצת migrations:
 
@@ -250,10 +260,16 @@ npx prisma migrate dev
 npm run db:seed
 ```
 
-הרצת האפליקציה עם ה-API:
+הרצת האפליקציה עם ה-API (צריך התחברות ל-Vercel וקישור לפרויקט פעם אחת עם `vercel link`):
 
 ```bash
 vercel dev
+```
+
+הרצת הפרונט בלבד:
+
+```bash
+npm run dev
 ```
 
 כיבוי:
@@ -277,10 +293,10 @@ docker compose down
 
 ### חיבור ל-Supabase
 
-| משתנה | שימוש |
-| --- | --- |
+| משתנה          | שימוש                                                                                         |
+| -------------- | --------------------------------------------------------------------------------------------- |
 | `DATABASE_URL` | חיבור דרך ה-pooler (פורט `6543`, `?pgbouncer=true&connection_limit=1`) – לפונקציות serverless |
-| `DIRECT_URL` | חיבור ישיר (פורט `5432`) – ל-migrations |
+| `DIRECT_URL`   | חיבור ישיר (פורט `5432`) – ל-migrations                                                       |
 
 ---
 
@@ -304,15 +320,15 @@ docker compose down
 
 ## קונבנציות קוד
 
-| מה | פורמט | דוגמה |
-| --- | --- | --- |
-| קומפוננטות | PascalCase | `src/cmps/GigPreview.jsx` |
-| עמודים | PascalCase + `Page` | `src/pages/ExplorePage.jsx` |
-| services | `<entity>.service.js` | `src/services/gig.service.js` |
-| Redux | `<entity>.actions.js`, `<entity>.reducer.js` | `src/store/gig.reducer.js` |
-| SCSS | `_<kebab-case>.scss` | `src/assets/styles/cmps/_gig-preview.scss` |
-| CSS classes | kebab-case | `.gig-preview` |
-| API | לפי ראוט | `api/gigs/[id].js` |
+| מה          | פורמט                                        | דוגמה                                    |
+| ----------- | -------------------------------------------- | ---------------------------------------- |
+| קומפוננטות  | PascalCase                                   | `src/cmps/GigPreview.jsx`                |
+| עמודים      | PascalCase + `Page`                          | `src/pages/ExplorePage.jsx`              |
+| services    | `<entity>.service.js`                        | `src/services/gig.service.js`            |
+| Redux       | `<entity>.actions.js`, `<entity>.reducer.js` | `src/store/gig.reducer.js`               |
+| CSS         | `<kebab-case>.css`, מיובא ב-`main.css`       | `src/assets/styles/cmps/gig-preview.css` |
+| CSS classes | kebab-case                                   | `.gig-preview`                           |
+| API         | לפי ראוט                                     | `api/gigs/[id].js`                       |
 
 - ESLint ו-Prettier מוגדרים בפרויקט – הקוד עובר אותם לפני commit
 - אין `console.log` בקוד שנכנס ל-`main`

@@ -1,0 +1,37 @@
+.app-header {
+ 
+  background-color: var(--clr-bg);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.app-header .header-content {
+ 
+}
+
+.logo {
+
+}
+
+.logo-dot {
+  color: var(--clr-primary);
+}
+
+.app-header .main-nav {
+
+}
+
+.app-header .main-nav a:hover,
+.app-header .main-nav a.active {
+  color: var(--clr-primary);
+}
+
+@media (max-width: 600px) {
+  .app-header .main-nav {
+    gap: var(--space-md);
+    font-size: var(--fs-sm);
+  }
+
+  .logo {
+    font-size: var(--fs-lg);
+  }
+}
