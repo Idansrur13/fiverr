@@ -4,7 +4,7 @@
 | -------- | ---------------------------------------------------------- | ------------- |
 | עידן     | תשתית, התחברות ומשתמשים, ניהול גיגים למוכר (Backoffice)    | `idan/`       |
 | [שם 2]   | גילוי שירותים: Header, Home, Explore, פילטרים, פרופיל מוכר | `[name2]/`    |
-| [שם 3]   | עמוד גיג, רכישה, הזמנות וביקורות                           | `[name3]/`    |
+| סולי  | עמוד גיג, רכישה, הזמנות וביקורות                           | `soli/`    |
 
 חוקי העבודה המלאים (בראנצ'ים, issues, טסטים, PR) נמצאים ב-[CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -28,7 +28,7 @@
 | פתיחת חשבון ב-Fiverr, מעבר על האתר והאפליקציה, הרשמה כמוכר | כולם   |
 | שם ייחודי ולוגו                                            | כולם   |
 | מצגת אפיון – Home, Explore, NavBar, Footer                 | [שם 2] |
-| מצגת אפיון – Details, Flow רכישה, Flow הזמנות              | [שם 3] |
+| מצגת אפיון – Details, Flow רכישה, Flow הזמנות              | סולי |
 | מצגת אפיון – Flow התחברות, Backoffice                      | עידן   |
 | איחוד המצגת והכנה להצגה לראש הצוות                         | כולם   |
 
@@ -43,8 +43,8 @@
 | CI ב-GitHub Actions: lint, test, build                                           | עידן   |
 | שלד Vite + React, מבנה תיקיות, ראוטים ועמודי דמה                                 | [שם 2] |
 | Redux store: actions, reducers לכל ישות                                          | [שם 2] |
-| מבנה CSS, פונטים, משתני צבעים, assets                                            | [שם 3] |
-| services בסיסיים: `http.service`, `gig.service`, `order.service`, `user.service` | [שם 3] |
+| מבנה CSS, פונטים, משתני צבעים, assets                                            | סולי |
+| services בסיסיים: `http.service`, `gig.service`, `order.service`, `user.service` | סולי |
 | מעבר על קובץ ה-JSON של הנתונים והתאמה ל-schema                                   | כולם   |
 | קובץ seed עם נתוני דמו (משתמשים, גיגים, ביקורות)                                 | [שם 2] |
 
@@ -108,7 +108,7 @@
 
 ---
 
-### [שם 3] – עמוד גיג, רכישה והזמנות
+### סולי – עמוד גיג, רכישה והזמנות
 
 **Frontend**
 
@@ -163,11 +163,11 @@
 | `/`                                         | `HomePage`            | [שם 2] |
 | `/explore`                                  | `ExplorePage`         | [שם 2] |
 | `/user/:id`                                 | `SellerProfilePage`   | [שם 2] |
-| `/gig/:id`                                  | `GigDetailsPage`      | [שם 3] |
-| `/checkout/:gigId`                          | `CheckoutPage`        | [שם 3] |
-| `/orders`                                   | `BuyerOrdersPage`     | [שם 3] |
-| `/orders/:id`                               | `OrderDetailsPage`    | [שם 3] |
-| `/seller/orders`                            | `SellerOrdersPage`    | [שם 3] |
+| `/gig/:id`                                  | `GigDetailsPage`      | סולי |
+| `/checkout/:gigId`                          | `CheckoutPage`        | סולי |
+| `/orders`                                   | `BuyerOrdersPage`     | סולי |
+| `/orders/:id`                               | `OrderDetailsPage`    | סולי |
+| `/seller/orders`                            | `SellerOrdersPage`    | סולי |
 | `/profile`                                  | `ProfilePage`         | עידן   |
 | `/seller/dashboard`                         | `SellerDashboardPage` | עידן   |
 | `/seller/gigs`                              | `SellerGigsPage`      | עידן   |
@@ -180,12 +180,12 @@
 | `GET /api/gigs`                                                   | רשימת גיגים עם פילטרים       | [שם 2] |
 | `GET /api/categories`                                             | קטגוריות                     | [שם 2] |
 | `GET /api/users/[id]`                                             | פרופיל מוכר ציבורי           | [שם 2] |
-| `GET /api/gigs/[id]`                                              | גיג מלא                      | [שם 3] |
-| `POST /api/orders`                                                | יצירת הזמנה                  | [שם 3] |
-| `GET /api/orders`                                                 | הזמנות לפי `role` ו-`status` | [שם 3] |
-| `GET /api/orders/[id]`                                            | הזמנה בודדת                  | [שם 3] |
-| `PATCH /api/orders/[id]/status`                                   | שינוי סטטוס                  | [שם 3] |
-| `POST /api/reviews`                                               | ביקורת                       | [שם 3] |
+| `GET /api/gigs/[id]`                                              | גיג מלא                      | סולי |
+| `POST /api/orders`                                                | יצירת הזמנה                  | סולי |
+| `GET /api/orders`                                                 | הזמנות לפי `role` ו-`status` | סולי |
+| `GET /api/orders/[id]`                                            | הזמנה בודדת                  | סולי |
+| `PATCH /api/orders/[id]/status`                                   | שינוי סטטוס                  | סולי |
+| `POST /api/reviews`                                               | ביקורת                       | סולי |
 | `GET /api/users/me` / `PATCH /api/users/me`                       | המשתמש המחובר                | עידן   |
 | `POST /api/users/me/seller`                                       | הפיכה למוכר                  | עידן   |
 | `GET /api/seller/gigs`                                            | הגיגים של המוכר              | עידן   |
@@ -196,7 +196,7 @@
 
 ## לוח זמנים
 
-| ספרינט | תאריכים       | יעד                     | עידן                                       | [שם 2]                              | [שם 3]                             |
+| ספרינט | תאריכים       | יעד                     | עידן                                       | [שם 2]                              | soli/                             |
 | ------ | ------------- | ----------------------- | ------------------------------------------ | ----------------------------------- | ---------------------------------- |
 | 0      | **/** – **/** | Product Design Approval | מצגת: התחברות, Backoffice                  | מצגת: Home, Explore                 | מצגת: Details, Flows               |
 | 1      | **/** – **/** | Technical Approval      | Repo, Docker, Prisma, Supabase, Vercel, CI | שלד, ראוטים, Redux, seed            | CSS, assets, services              |
@@ -211,11 +211,11 @@
 
 | נקודה                     | מי בונה      | מי משתמש                                      | איך לא נתקעים                                                             |
 | ------------------------- | ------------ | --------------------------------------------- | ------------------------------------------------------------------------- |
-| `AppHeader`               | [שם 2]       | עידן (`UserMenu`), [שם 3] (אינדיקציית הזמנות) | ה-Header נבנה עם מקומות שמורים, כל אחד מכניס קומפוננטה משלו               |
-| התחברות                   | עידן         | [שם 3] (רכישה), עידן (Backoffice)             | עד שה-Google login מוכן משתמשים במשתמש דמו מה-seed                        |
-| מבנה `Gig`                | עידן (כתיבה) | [שם 2], [שם 3] (קריאה)                        | נקבע ב-schema בספרינט 1, שינוי רק ב-PR מאושר                              |
-| `GigPreview` → `/gig/:id` | [שם 2]       | [שם 3]                                        | הראוט מוגדר בשלד מהיום הראשון                                             |
-| טבלת `Order`              | [שם 3]       | עידן (`GET /api/seller/stats`)                | מבנה ההזמנה נקבע ב-schema בספרינט 1, עד אז ה-Dashboard עובד על נתוני seed |
+| `AppHeader`               | [שם 2]       | עידן (`UserMenu`), סולי (אינדיקציית הזמנות) | ה-Header נבנה עם מקומות שמורים, כל אחד מכניס קומפוננטה משלו               |
+| התחברות                   | עידן         | סולי (רכישה), עידן (Backoffice)             | עד שה-Google login מוכן משתמשים במשתמש דמו מה-seed                        |
+| מבנה `Gig`                | עידן (כתיבה) | [שם 2], סולי (קריאה)                        | נקבע ב-schema בספרינט 1, שינוי רק ב-PR מאושר                              |
+| `GigPreview` → `/gig/:id` | [שם 2]       | סולי                                        | הראוט מוגדר בשלד מהיום הראשון                                             |
+| טבלת `Order`              | סולי      | עידן (`GET /api/seller/stats`)                | מבנה ההזמנה נקבע ב-schema בספרינט 1, עד אז ה-Dashboard עובד על נתוני seed |
 
 ---
 
@@ -225,5 +225,5 @@
 | ----------------------------------------- | ------ |
 | הודעות בין קונה למוכר (Supabase Realtime) | עידן   |
 | רשימת מועדפים (Wishlist)                  | [שם 2] |
-| התראות בזמן אמת על שינוי סטטוס הזמנה      | [שם 3] |
+| התראות בזמן אמת על שינוי סטטוס הזמנה      | סולי |
 | טסטי E2E ל-flow המלא: חיפוש → גיג → רכישה | כולם   |
