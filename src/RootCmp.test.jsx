@@ -28,7 +28,7 @@ describe('RootCmp', () => {
     ['/gig/123', 'Gig Details'],
     ['/orders', 'My Orders'],
     ['/seller/dashboard', 'Dashboard'],
-    ['/seller/gigs/new', 'Edit Gig'],
+    ['/seller/gigs/new', 'Create a new gig'],
   ])('renders the right page at %s', (path, heading) => {
     renderAt(path)
     expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
