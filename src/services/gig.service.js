@@ -8,6 +8,7 @@ export const gigService = {
   save,
   remove,
   getDefaultFilter,
+  getEmptyGig,
 }
 
 async function query(filterBy = {}) {
@@ -40,4 +41,24 @@ function remove(gigId) {
 
 function getDefaultFilter() {
   return { txt: '', category: '', minPrice: '', maxPrice: '', daysToMake: '' }
+}
+
+function getEmptyGig() {
+  return {
+    title: '',
+    price: '',
+    daysToMake: 3,
+    category: 'graphics-design',
+    images: ['https://picsum.photos/seed/new-gig/800/500'],
+    description: '',
+    owner: {
+      id: 'u100',
+      fullname: 'Guest Seller',
+      imgUrl: 'https://i.pravatar.cc/150?img=68',
+      level: 'NEW',
+      rating: 0,
+    },
+    reviews: [],
+    status: 'ACTIVE',
+  }
 }
