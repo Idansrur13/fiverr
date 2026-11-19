@@ -1,47 +1,55 @@
-import { useState } from 'react'
+import { useEffect,useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Home } from 'lucide-react'
 
+import { gigService } from '../services/gig.service'
 import {GigGallery} from '../cmps/GigGallery'
 import { SellerOverview } from '../cmps/SellerOverview'
 import { AboutSeller } from '../cmps/AboutSeller'
-const DEMO_GIG = {
-  title: 'I will build a modern React website',
-  description: 'Clean code, fast delivery, responsive design.',
-  rating: 5.0,
-  reviewsCount: 12,
-  images: [
-    'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800',
-    'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800',
-    'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800',
-  ],
-  category: { name: 'Web Programming', parent: { name: 'Programming & Tech' } },
-  owner: {
-    id: 'u101',
-    fullname: 'Soli Dev',
-    imgUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
-    level: 'Top Rated',
-    country: 'Israel',
-    languages: ['English', 'Hebrew'],
-    responseTime: '1 hour',
-    about: 'Full-stack developer specializing in React and modern web applications.',
-  },
-}
+
 export function GigDetailsPage() {
   const { gigId } = useParams()
-  const [gig, setGig] = useState(DEMO_GIG)
-  
-  if (!gig) return <p>Loading...</p>
+  const [gig, setGig] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    loadGig()
+  }, [gigId])
+
+  async function loadGig() {
+    setIsLoading(true)
+    try {
+      const gigData = await gigService.getById(gigId)
+      setGig(gigData || null)
+    } catch {
+      setGig(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  if (isLoading) return <p>Loading...</p>
+  if (!gig) return <p>Gig not found</p>
 const { title, description, category, owner, images, rating, reviewsCount } = gig
-  
+  const categoryName = typeof category === 'string' ? category : category?.name
+  const parentCategoryName = typeof category === 'object' ? category?.parent?.name : null
   return (
     <section className="gig-details-page">
-      <nav className="gig-breadcrumbs">
-        <Link to="/" aria-label="Home">
-          <Home size={16} /> </Link>
-        / <span>{category.parent.name}</span>
-        / <span>{category.name}</span>
-      </nav>
+      <div className="gig-details-main">
+        {categoryName && (
+          <nav className="gig-breadcrumbs">
+            <Link to="/" aria-label="Home">
+              <Home size={16} />
+            </Link>
+            {parentCategoryName && (
+              <>
+                {' / '}
+                <span>{parentCategoryName}</span>
+              </>
+            )}
+            {' / '}
+            <span>{categoryName}</span>
+          </nav>
+        )}
 
       <h1>{title}</h1>
       <SellerOverview owner={owner} rating={rating} reviewsCount={reviewsCount} />
@@ -51,7 +59,11 @@ const { title, description, category, owner, images, rating, reviewsCount } = gi
   <h2>About this gig</h2>
   <p>{description}</p>
 </section>
+
       <AboutSeller owner={owner} rating={rating} reviewsCount={reviewsCount} />
+      </div>
+      <aside className="gig-details-sidebar"></aside>
+
     </section>
   )
 }
