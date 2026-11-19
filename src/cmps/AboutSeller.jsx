@@ -21,26 +21,30 @@ export function AboutSeller({ owner, rating, reviewsCount }) {
           )}
         </div>
       </div>
+<div className="about-seller-card">
+        <div className="about-seller-details">
+          {country && (
+            <div className="about-seller-item">
+              <span className="detail-label">From</span>
+              <strong className="detail-value">{country}</strong>
+            </div>
+          )}
+          {responseTime && (
+            <div className="about-seller-item">
+              <span className="detail-label">Avg. response time</span>
+              <strong className="detail-value">{responseTime}</strong>
+            </div>
+          )}
+          {languages?.length > 0 && (
+            <div className="about-seller-item">
+              <span className="detail-label">Languages</span>
+              <strong className="detail-value">{languages.join(', ')}</strong>
+            </div>
+          )}
+        </div>
 
-      <div className="about-seller-details">
-        {country && (
-          <div className="about-seller-country">
-            <strong>From:</strong> {country}
-          </div>
-        )}
-        {responseTime && (
-            <div className="about-seller-response-time">
-            <strong>Response Time:</strong> {responseTime}
-          </div>
-        )}
-        {languages?.length > 0 && (
-          <div className="about-seller-languages">
-            <strong>Languages:</strong> {languages.join(', ')}
-          </div>
-        )}
+        {about && <p className="about-seller-bio">{about}</p>}
       </div>
-
-      {about && <p className="about-seller-bio">{about}</p>}
     </section>
   )
 }
