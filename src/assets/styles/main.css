@@ -5,6 +5,8 @@
 @import './basics/helpers.css';
 
 @import './cmps/app-header.css';
+@import './cmps/search-bar.css';
+@import './cmps/category-bar.css';
 @import './cmps/app-footer.css';
 @import './cmps/gig-form.css';
 
