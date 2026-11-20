@@ -7,6 +7,8 @@
 @import './cmps/app-header.css';
 @import './cmps/search-bar.css';
 @import './cmps/category-bar.css';
+@import './cmps/home-hero.css';
+@import './cmps/popular-services.css';
 @import './cmps/app-footer.css';
 @import './cmps/gig-form.css';
 
