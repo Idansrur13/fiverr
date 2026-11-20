@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux'
 import { GigList } from '../cmps/GigList'
 import { loadGigs } from '../store/gig.actions'
 import { categoryService } from '../services/category.service'
+import { useFilterSearchParams } from '../customHooks/useFilterSearchParams'
 
 export function ExplorePage() {
+  useFilterSearchParams()
   const gigs = useSelector((storeState) => storeState.gigModule.gigs)
   const filterBy = useSelector((storeState) => storeState.gigModule.filterBy)
   const [isLoading, setIsLoading] = useState(true)
