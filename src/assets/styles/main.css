@@ -9,6 +9,7 @@
 @import './cmps/gig-form.css';
 @import './cmps/gig-list.css';
 @import './cmps/gig-preview.css';
+@import './cmps/gig-filter.css';
 
 @import './pages/home-page.css';
 @import './pages/explore-page.css';

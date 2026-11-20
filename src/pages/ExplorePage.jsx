@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { GigList } from '../cmps/GigList'
+import { GigFilter } from '../cmps/GigFilter'
 import { loadGigs } from '../store/gig.actions'
 import { categoryService } from '../services/category.service'
 import { useFilterSearchParams } from '../customHooks/useFilterSearchParams'
@@ -36,6 +37,7 @@ export function ExplorePage() {
   return (
     <section className="explore-page">
       <h1>{getTitle(filterBy)}</h1>
+      <GigFilter />
       {isLoading && <p className="explore-page-status">Loading…</p>}
       {!isLoading && hasError && (
         <p className="explore-page-status error">Couldn't load services. Please try again.</p>
