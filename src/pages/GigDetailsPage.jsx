@@ -12,10 +12,7 @@ export function GigDetailsPage() {
   const [gig, setGig] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    loadGig()
-  }, [gigId])
-
+  useEffect(() => { 
   async function loadGig() {
     setIsLoading(true)
     try {
@@ -27,6 +24,9 @@ export function GigDetailsPage() {
       setIsLoading(false)
     }
   }
+  loadGig()
+}, [gigId])
+
   if (isLoading) return <p>Loading...</p>
   if (!gig) return <p>Gig not found</p>
 const { title, description, category, owner, images, rating, reviewsCount } = gig
