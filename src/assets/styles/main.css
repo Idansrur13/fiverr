@@ -1,12 +1,23 @@
+/*Setup*/
 @import './setup/vars.css';
 @import './setup/typography.css';
+
+/*Base*/
 @import './basics/base.css';
 @import './basics/layout.css';
 @import './basics/helpers.css';
 
+/*Components**/
 @import './cmps/app-header.css';
 @import './cmps/app-footer.css';
 @import './cmps/gig-form.css';
+@import './cmps/seller-badge.css';
 
 @import './pages/home-page.css';
 @import './pages/not-found-page.css';
+
+/*gig-details-page*/
+@import './pages/gig-details-page.css';
+@import './cmps/seller-overview.css';
+@import './cmps/gig-gallery.css';
+@import './cmps/about-seller.css';
