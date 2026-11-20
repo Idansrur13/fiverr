@@ -11,6 +11,7 @@
 @import './cmps/app-header.css';
 @import './cmps/app-footer.css';
 @import './cmps/gig-form.css';
+@import './cmps/seller-badge.css';
 
 @import './pages/home-page.css';
 @import './pages/not-found-page.css';

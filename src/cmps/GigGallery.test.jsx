@@ -1,9 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { GigGallery } from './GigGallery'
+import gigs from '../data/gigs.json'
 
 describe('GigGallery', () => {
-  const images = ['https://example.com/img1.jpg', 'https://example.com/img2.jpg']
+  const { images } = gigs.find((gig) => gig.id === 'g101')
 
   it('shows the first image as the main image', () => {
     render(<GigGallery images={images} />)

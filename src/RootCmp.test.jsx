@@ -1,13 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
 import { RootCmp } from './RootCmp'
+import { store } from './store/store'
 
 function renderAt(path) {
   return render(
-    <MemoryRouter initialEntries={[path]}>
-      <RootCmp />
-    </MemoryRouter>,
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[path]}>
+        <RootCmp />
+      </MemoryRouter>
+    </Provider>,
   )
 }
 

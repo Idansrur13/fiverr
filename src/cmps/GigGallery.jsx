@@ -1,18 +1,18 @@
-import { useState } from "react"
+import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export function GigGallery({ images = [] }) {
-    const [activeIdx, setActiveIdx] = useState(0)
-    if(!images.length) return <p>No images to display</p> //put a loader here
-    
-    function handlePrev() {
+  const [activeIdx, setActiveIdx] = useState(0)
+  if (!images.length) return <p>No images to display</p> //put a loader here
+
+  function handlePrev() {
     setActiveIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1))
   }
 
   function handleNext() {
     setActiveIdx((prev) => (prev === images.length - 1 ? 0 : prev + 1))
   }
-    return (
+  return (
     <div className="gig-gallery">
       <div className="gig-gallery-main">
         <img src={images[activeIdx]} alt={`Gig preview ${activeIdx + 1}`} />
