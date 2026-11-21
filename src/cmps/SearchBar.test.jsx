@@ -1,12 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { SearchBar } from './SearchBar'
 import { store } from '../store/store'
 import { setFilterBy } from '../store/gig.actions'
 import { gigService } from '../services/gig.service'
+
+function ExploreStub() {
+  return <h1>Explore page {useLocation().search}</h1>
+}
 
 function renderSearchBar() {
   render(
@@ -14,7 +18,7 @@ function renderSearchBar() {
       <MemoryRouter initialEntries={['/gig/g101']}>
         <Routes>
           <Route path="/gig/:gigId" element={<SearchBar />} />
-          <Route path="/explore" element={<h1>Explore page</h1>} />
+          <Route path="/explore" element={<ExploreStub />} />
         </Routes>
       </MemoryRouter>
     </Provider>,
@@ -44,7 +48,7 @@ describe('SearchBar', () => {
     await user.click(screen.getByRole('button', { name: 'Search' }))
 
     expect(getFilterBy().txt).toBe('logo')
-    expect(screen.getByRole('heading', { name: 'Explore page' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Explore page ?txt=logo' })).toBeInTheDocument()
   })
 
   it('submits on Enter key', async () => {
@@ -54,7 +58,9 @@ describe('SearchBar', () => {
     await user.type(screen.getByRole('searchbox'), 'video editing{Enter}')
 
     expect(getFilterBy().txt).toBe('video editing')
-    expect(screen.getByRole('heading', { name: 'Explore page' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Explore page ?txt=video+editing' }),
+    ).toBeInTheDocument()
   })
 
   it('navigates without a txt filter when the input is empty', async () => {
