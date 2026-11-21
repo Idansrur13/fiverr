@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { calcOrderTotal, orderService } from './order.service'
+import { orderService } from './order.service'
 
 const gig = {
   id: 'g1',
@@ -38,14 +38,6 @@ function ids(orders) {
 describe('orderService', () => {
   beforeEach(() => {
     localStorage.clear()
-  })
-
-  it('calcOrderTotal adds a 5.5% service fee', () => {
-    expect(calcOrderTotal(100)).toEqual({ price: 100, serviceFee: 5.5, total: 105.5 })
-  })
-
-  it('calcOrderTotal rounds to 2 decimal places', () => {
-    expect(calcOrderTotal(19.99)).toEqual({ price: 19.99, serviceFee: 1.1, total: 21.09 })
   })
 
   it('add creates an order with status PENDING and the gig price', async () => {

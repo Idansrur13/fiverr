@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { OrderSummary } from '../cmps/OrderSummary'
 import { gigService } from '../services/gig.service'
-import { calcOrderTotal } from '../services/order.service'
+import { calcOrderTotal } from '../services/pricing.service'
 import { userService } from '../services/user.service'
 import { addOrder } from '../store/order.actions'
 
