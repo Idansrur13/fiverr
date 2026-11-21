@@ -24,9 +24,18 @@ describe('GigPreview', () => {
   })
 
   it('renders the rating and the reviews count', () => {
-    renderPreview()
-    expect(screen.getByText(gig.owner.rating.toFixed(1))).toBeInTheDocument()
-    expect(screen.getByText(`(${gig.reviews.length})`)).toBeInTheDocument()
+    // g103: the seller's rating is 4.6, but the gig's own 4 reviews average 4.25
+    const gigWithMixedReviews = demoGigs.find((demoGig) => demoGig.id === 'g103')
+    renderPreview(gigWithMixedReviews)
+
+    expect(screen.getByText('4.3')).toBeInTheDocument()
+    expect(screen.queryByText('4.6')).not.toBeInTheDocument()
+    expect(screen.getByText('(4)')).toBeInTheDocument()
+  })
+
+  it('hides the rating when the gig has no reviews', () => {
+    renderPreview({ ...gig, reviews: [] })
+    expect(screen.queryByText(/\(\d+\)/)).not.toBeInTheDocument()
   })
 
   it('links to the gig details page', () => {

@@ -2,9 +2,13 @@ import { gigService } from '../services/gig.service'
 import { store } from './store'
 import { ADD_GIG, REMOVE_GIG, SET_FILTER_BY, SET_GIG, SET_GIGS, UPDATE_GIG } from './gig.reducer'
 
+let lastLoadGigsRequestId = 0
+
 export async function loadGigs(filterBy = store.getState().gigModule.filterBy) {
+  const requestId = ++lastLoadGigsRequestId
   const gigs = await gigService.query(filterBy)
-  store.dispatch({ type: SET_GIGS, gigs })
+  // Only the latest request writes to the store, so a slow old query can't overwrite a newer one
+  if (requestId === lastLoadGigsRequestId) store.dispatch({ type: SET_GIGS, gigs })
   return gigs
 }
 

@@ -1,15 +1,12 @@
 .app-header {
- 
   background-color: var(--clr-bg);
   border-bottom: 1px solid var(--clr-border);
 }
 
 .app-header .header-content {
- 
 }
 
 .logo {
-
 }
 
 .logo-dot {
@@ -17,7 +14,6 @@
 }
 
 .app-header .main-nav {
-
 }
 
 .app-header .main-nav a:hover,
