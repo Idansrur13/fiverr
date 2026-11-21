@@ -25,4 +25,13 @@ describe('AppHeader', () => {
     renderHeaderAt('/explore')
     expect(screen.getByRole('search')).toBeInTheDocument()
   })
+
+  it('links to the orders page and the seller dashboard', () => {
+    renderHeaderAt('/')
+    expect(screen.getByRole('link', { name: 'Orders' })).toHaveAttribute('href', '/orders')
+    expect(screen.getByRole('link', { name: 'Freelance on Fiverr' })).toHaveAttribute(
+      'href',
+      '/seller/dashboard',
+    )
+  })
 })

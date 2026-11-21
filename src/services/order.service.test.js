@@ -53,6 +53,24 @@ describe('orderService', () => {
     expect(await orderService.query()).toHaveLength(1)
   })
 
+  it('add saves the selected package and uses its price and delivery time', async () => {
+    const pkg = { id: 'p2', tier: 'STANDARD', title: 'Standard', price: 90, daysToMake: 4 }
+    const order = await orderService.add({ gig, buyer, pkg })
+
+    expect(order).toMatchObject({
+      price: 90,
+      package: { id: 'p2', tier: 'STANDARD', title: 'Standard' },
+    })
+    expect(order.dueAt - order.createdAt).toBe(4 * 24 * 60 * 60 * 1000)
+  })
+
+  it('add without a package uses the gig price and delivery time', async () => {
+    const order = await orderService.add({ gig, buyer })
+
+    expect(order.package).toBeNull()
+    expect(order.dueAt - order.createdAt).toBe(2 * 24 * 60 * 60 * 1000)
+  })
+
   it('query returns only the orders of the given buyer', async () => {
     localStorage.setItem('orderDB', JSON.stringify(storedOrders))
     const orders = await orderService.query({ buyerId: 'buyer1' })

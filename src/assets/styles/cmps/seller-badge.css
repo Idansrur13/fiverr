@@ -1,0 +1,44 @@
+.seller-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--fs-sm);
+}
+
+.seller-badge .badge-label {
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.seller-badge .badge-label.new {
+  background-color: var(--clr-bg-light);
+  color: var(--clr-text-light);
+}
+
+.seller-badge .badge-label.level-1,
+.seller-badge .badge-label.level-2,
+.seller-badge .badge-label.top-rated {
+  background-color: var(--clr-text-dark);
+  color: #fff;
+}
+
+.seller-badge .badge-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.seller-badge .star-icon {
+  color: var(--clr-star);
+}
+
+.seller-badge .rating-value {
+  color: var(--clr-star);
+}
+
+.seller-badge .reviews-count {
+  color: var(--clr-text-light);
+}

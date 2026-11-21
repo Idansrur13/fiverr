@@ -1,4 +1,5 @@
 import { storageService } from './storage.service'
+import { userService } from './user.service'
 
 const STORAGE_KEY = 'gigDB'
 
@@ -51,13 +52,7 @@ function getEmptyGig() {
     category: 'graphics-design',
     images: ['https://picsum.photos/seed/new-gig/800/500'],
     description: '',
-    owner: {
-      id: 'u100',
-      fullname: 'Guest Seller',
-      imgUrl: 'https://i.pravatar.cc/150?img=68',
-      level: 'NEW',
-      rating: 0,
-    },
+    owner: userService.getLoggedinUser(),
     reviews: [],
     status: 'ACTIVE',
   }
