@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { orderService } from './order.service'
+import { calcOrderTotal, orderService } from './order.service'
 
 const gig = {
   id: 'g1',
@@ -40,12 +40,22 @@ describe('orderService', () => {
     localStorage.clear()
   })
 
+  it('calcOrderTotal adds a 5.5% service fee', () => {
+    expect(calcOrderTotal(100)).toEqual({ price: 100, serviceFee: 5.5, total: 105.5 })
+  })
+
+  it('calcOrderTotal rounds to 2 decimal places', () => {
+    expect(calcOrderTotal(19.99)).toEqual({ price: 19.99, serviceFee: 1.1, total: 21.09 })
+  })
+
   it('add creates an order with status PENDING and the gig price', async () => {
     const order = await orderService.add({ gig, buyer })
     expect(order.id).toBeTruthy()
     expect(order).toMatchObject({
       status: 'PENDING',
       price: 50,
+      serviceFee: 2.75,
+      total: 52.75,
       buyer: { id: 'buyer1' },
       seller: { id: 'seller1' },
       gig: { id: 'g1', title: gig.title, imgUrl: 'logo-1.jpg' },
@@ -59,6 +69,8 @@ describe('orderService', () => {
 
     expect(order).toMatchObject({
       price: 90,
+      serviceFee: 4.95,
+      total: 94.95,
       package: { id: 'p2', tier: 'STANDARD', title: 'Standard' },
     })
     expect(order.dueAt - order.createdAt).toBe(4 * 24 * 60 * 60 * 1000)
