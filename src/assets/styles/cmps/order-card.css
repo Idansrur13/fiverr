@@ -5,8 +5,46 @@
   overflow: hidden;
 }
 
+.order-card-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  border-bottom: 1px solid var(--clr-border);
+  background-color: var(--clr-bg-light);
+}
+
+@media (min-width: 900px) {
+  .order-card {
+    position: sticky;
+    top: var(--space-lg);
+  }
+}
+
+.order-card-tab {
+  padding: var(--space-md) var(--space-sm);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--clr-text-light);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--clr-border);
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.order-card-tab:last-child {
+  border-right: none;
+}
+
+.order-card-tab.active {
+  background-color: var(--clr-bg);
+  color: var(--clr-text-dark);
+  border-bottom-color: var(--clr-text-dark);
+}
+
 .order-card-header,
-.order-card-time {
+.order-card-time,
+.order-card-features,
+.order-card-feedback {
   padding-inline: var(--space-lg);
 }
 
@@ -19,7 +57,7 @@
 }
 
 .order-card-price {
-  font-size: 1.5rem;
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--clr-text-dark);
 }
@@ -36,7 +74,7 @@
 
 .order-card-features {
   list-style: none;
-  padding: 0 var(--space-lg);
+  padding: 0;
   margin: 0 0 var(--space-lg);
   display: flex;
   flex-direction: column;
@@ -46,7 +84,7 @@
 .order-card-features li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   font-size: var(--fs-sm);
   color: var(--clr-text-light);
 }
@@ -77,9 +115,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  width: calc(100% - 2 * var(--space-lg));
+  width: calc(100% - var(--space-xl) - var(--space-sm));
   margin: 0 var(--space-lg) var(--space-lg);
-  padding: 12px var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
   background-color: var(--clr-text-dark);
   color: var(--clr-bg);
   font-size: var(--fs-md);
@@ -96,4 +134,19 @@
 .order-card-continue-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.order-card-feedback {
+  margin: var(--space-sm) 0 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: center;
+}
+
+.order-card-feedback.success {
+  color: var(--clr-primary);
+}
+
+.order-card-feedback.error {
+  color: var(--clr-error);
 }
