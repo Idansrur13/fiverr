@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Check, Clock } from 'lucide-react'
+import { ArrowRight, Check, Clock } from 'lucide-react'
 import { addOrder } from '../store/order.actions'
 
 export function OrderCard({ gig }) {
@@ -57,7 +57,8 @@ export function OrderCard({ gig }) {
         onClick={handleContinue}
         disabled={isCreating}
       >
-        Continue
+        <span>Continue</span>
+        <ArrowRight size={18} />
       </button>
 
       {statusMsg && (
