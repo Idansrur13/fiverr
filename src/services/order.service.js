@@ -2,7 +2,7 @@ import { storageService } from './storage.service'
 
 const STORAGE_KEY = 'orderDB'
 const DAY = 24 * 60 * 60 * 1000
-const SERVICE_FEE_RATE = 0.055
+export const SERVICE_FEE_RATE = 0.055
 
 export const orderService = {
   query,
@@ -32,17 +32,15 @@ async function query({ buyerId, sellerId, status } = {}) {
     .sort((a, b) => b.createdAt - a.createdAt)
 }
 
-function add({ gig, buyer, pkg = null, serviceFee = 0, total }) {
+function add({ gig, buyer, pkg = null }) {
   const createdAt = Date.now()
   const { price, daysToMake } = pkg || gig
-  const orderTotal = total == null ? calcOrderTotal(price) : { price, serviceFee, total }
   const order = {
     buyer: { id: buyer.id, fullname: buyer.fullname, imgUrl: buyer.imgUrl },
     seller: { id: gig.owner.id, fullname: gig.owner.fullname, imgUrl: gig.owner.imgUrl },
     gig: { id: gig.id, title: gig.title, imgUrl: gig.images[0] },
     package: pkg && { id: pkg.id, tier: pkg.tier, title: pkg.title },
-    ...orderTotal,
-    packageId: pkg?.packageId || pkg?.id || null,
+    ...calcOrderTotal(price),
     status: 'PENDING',
     createdAt,
     dueAt: createdAt + daysToMake * DAY,

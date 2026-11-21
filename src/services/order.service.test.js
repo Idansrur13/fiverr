@@ -54,6 +54,8 @@ describe('orderService', () => {
     expect(order).toMatchObject({
       status: 'PENDING',
       price: 50,
+      serviceFee: 2.75,
+      total: 52.75,
       buyer: { id: 'buyer1' },
       seller: { id: 'seller1' },
       gig: { id: 'g1', title: gig.title, imgUrl: 'logo-1.jpg' },
@@ -67,6 +69,8 @@ describe('orderService', () => {
 
     expect(order).toMatchObject({
       price: 90,
+      serviceFee: 4.95,
+      total: 94.95,
       package: { id: 'p2', tier: 'STANDARD', title: 'Standard' },
     })
     expect(order.dueAt - order.createdAt).toBe(4 * 24 * 60 * 60 * 1000)

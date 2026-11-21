@@ -11,7 +11,7 @@ export function OrderCard({ gig }) {
   if (!gig) return null
 
   const buyer = userService.getLoggedinUser()
-  const isOwnGig = buyer?.id === (gig.owner?.id || gig.ownerId)
+  const isOwnGig = buyer.id === gig.owner?.id
   const packages = gig.packages || []
   const selectedPkg = packages[selectedIdx] ?? packages[0] ?? null
   const { price, daysToMake, features = [] } = selectedPkg || gig
@@ -21,12 +21,7 @@ export function OrderCard({ gig }) {
   }
 
   function handleContinue() {
-    navigate(`/checkout/${gig.id}`, {
-      state: {
-        packageId: selectedPkg?.packageId || selectedPkg?.id || null,
-        selectedPackage: selectedPkg,
-      },
-    })
+    navigate(`/checkout/${gig.id}`, { state: { packageId: selectedPkg?.id } })
   }
 
   return (

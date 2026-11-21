@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import demoGigs from '../data/gigs.json'
 import { OrderSummary } from '../cmps/OrderSummary'
 import { gigService } from '../services/gig.service'
 import { calcOrderTotal } from '../services/order.service'
@@ -9,11 +8,12 @@ import { addOrder } from '../store/order.actions'
 
 export function CheckoutPage() {
   const { gigId } = useParams()
-  const location = useLocation()
+  const { state } = useLocation()
   const navigate = useNavigate()
   const [gig, setGig] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [loadError, setLoadError] = useState(null)
+  const [submitError, setSubmitError] = useState(null)
   const [cardholderName, setCardholderName] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -22,18 +22,15 @@ export function CheckoutPage() {
 
     async function loadGig() {
       setIsLoading(true)
-      setError(null)
+      setLoadError(null)
       setGig(null)
 
       try {
         const loadedGig = await gigService.getById(gigId)
         if (!isCancelled) setGig(loadedGig)
       } catch (err) {
-        const demoGig = demoGigs.find((item) => item.id === gigId)
-        if (!isCancelled && demoGig) {
-          setGig(demoGig)
-        } else if (!isCancelled) {
-          setError(
+        if (!isCancelled) {
+          setLoadError(
             err?.message?.startsWith('Cannot find')
               ? 'Gig not found'
               : 'Failed to load gig. Please try again later.',
@@ -51,69 +48,43 @@ export function CheckoutPage() {
   }, [gigId])
 
   if (isLoading) return <div className="loader">Loading checkout...</div>
-  if (error)
-    return (
-      <section className="checkout-page">
-        <p className="error-msg" role="alert">
-          {error}
-        </p>
-        <Link to={`/gig/${gigId}`}>Back to gig</Link>
-      </section>
-    )
   if (!gig)
     return (
       <section className="checkout-page">
         <p className="error-msg" role="alert">
-          Gig not found
+          {loadError}
         </p>
+        <Link to={`/gig/${gigId}`}>Back to gig</Link>
       </section>
     )
 
   const packages = gig.packages || []
-  const requestedPackageId = location.state?.packageId
-  const statePackage = location.state?.selectedPackage
-  const selectedPackage = packages.length
-    ? packages.find(
-        (pkg) => pkg.id === requestedPackageId || pkg.packageId === requestedPackageId,
-      ) ||
-      packages.find((pkg) => pkg.tier === statePackage?.tier) ||
-      statePackage ||
-      packages[0]
-    : null
-  const orderItem = selectedPackage
-    ? { ...gig, price: selectedPackage.price, daysToMake: selectedPackage.daysToMake }
-    : gig
-  const totals = calcOrderTotal(orderItem.price)
+  const requestedPkg = state?.packageId && packages.find((pkg) => pkg.id === state.packageId)
+  const selectedPkg = requestedPkg || packages[0] || null
+  const totals = calcOrderTotal((selectedPkg || gig).price)
   const buyer = userService.getLoggedinUser()
   const isLoggedIn = Boolean(buyer?.id)
-  const sellerId = gig.owner?.id || gig.ownerId
-  const isOwnGig = isLoggedIn && buyer.id === sellerId
+  const isOwnGig = isLoggedIn && buyer.id === gig.owner?.id
 
   async function handleSubmit(event) {
     event.preventDefault()
     if (isSubmitting || !isLoggedIn || isOwnGig) return
 
     setIsSubmitting(true)
-    setError(null)
+    setSubmitError(null)
     try {
-      const order = await addOrder({
-        gig: orderItem,
-        buyer,
-        pkg: selectedPackage,
-        serviceFee: totals.serviceFee,
-        total: totals.total,
-      })
+      const order = await addOrder({ gig, buyer, pkg: selectedPkg })
       navigate(`/orders/${order.id}`, {
         state: { paymentConfirmed: true },
       })
     } catch {
-      setError('Could not complete the order. Please try again.')
+      setSubmitError('Could not complete the order. Please try again.')
       setIsSubmitting(false)
     }
   }
 
   return (
-    <main className="checkout-page">
+    <section className="checkout-page">
       <header className="checkout-page-header">
         <h1>Checkout</h1>
         <p>Secure your order with a quick demo checkout.</p>
@@ -147,9 +118,9 @@ export function CheckoutPage() {
               You cannot order your own gig.
             </p>
           )}
-          {error && (
+          {submitError && (
             <p className="checkout-error" role="alert">
-              {error}
+              {submitError}
             </p>
           )}
 
@@ -158,11 +129,11 @@ export function CheckoutPage() {
           </button>
         </form>
 
-        <OrderSummary gig={gig} {...totals} />
+        <OrderSummary gig={gig} pkg={selectedPkg} {...totals} />
       </div>
       <Link className="checkout-back-link" to={`/gig/${gig.id}`}>
         Back to gig
       </Link>
-    </main>
+    </section>
   )
 }
