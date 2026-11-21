@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { gigService } from '../services/gig.service'
@@ -37,9 +37,9 @@ const gig = {
 }
 const buyer = { id: 'buyer-1', fullname: 'Buyer' }
 
-function renderCheckout(initialEntry = '/checkout/g101') {
+function renderCheckout(packageId) {
   return render(
-    <MemoryRouter initialEntries={[initialEntry]}>
+    <MemoryRouter initialEntries={[{ pathname: '/checkout/g101', state: { packageId } }]}>
       <Routes>
         <Route path="/checkout/:gigId" element={<CheckoutPage />} />
         <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
@@ -47,6 +47,17 @@ function renderCheckout(initialEntry = '/checkout/g101') {
       </Routes>
     </MemoryRouter>,
   )
+}
+
+async function pay() {
+  fireEvent.change(await screen.findByLabelText('Cardholder name'), {
+    target: { value: 'Demo Buyer' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Confirm & Pay' }))
+}
+
+async function getSummary() {
+  return within(await screen.findByRole('region', { name: 'Order summary' }))
 }
 
 describe('CheckoutPage', () => {
@@ -58,49 +69,117 @@ describe('CheckoutPage', () => {
   })
 
   it('loads the gig by the id in the url', async () => {
-    renderCheckout('/checkout/g101')
+    renderCheckout()
 
     expect(await screen.findByRole('heading', { name: 'Logo design gig' })).toBeInTheDocument()
     expect(gigService.getById).toHaveBeenCalledWith('g101')
   })
 
-  it('uses the bundled demo gig if the gig service is unavailable', async () => {
-    gigService.getById.mockRejectedValue(new Error('Data layer unavailable'))
+  it('shows "Gig not found" when the gig does not exist', async () => {
+    gigService.getById.mockRejectedValue(new Error('Cannot find g101 in gigDB'))
+    renderCheckout()
 
-    renderCheckout('/checkout/g101')
-
-    expect(
-      await screen.findByRole('heading', { name: /design a modern minimalist logo/i }),
-    ).toBeInTheDocument()
+    expect(await screen.findByRole('alert')).toHaveTextContent('Gig not found')
+    expect(screen.queryByRole('button', { name: 'Confirm & Pay' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to gig' })).toHaveAttribute('href', '/gig/g101')
   })
 
-  it('creates the order on Confirm & Pay', async () => {
-    renderCheckout('/checkout/g101')
+  it('shows a load error when the gig cannot be loaded', async () => {
+    gigService.getById.mockRejectedValue(new Error('Network error'))
+    renderCheckout()
 
-    fireEvent.change(await screen.findByLabelText('Cardholder name'), {
-      target: { value: 'Demo Buyer' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm & Pay' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(/failed to load gig/i)
+    expect(screen.queryByRole('button', { name: 'Confirm & Pay' })).not.toBeInTheDocument()
+  })
+
+  it('orders the package that was chosen on the gig page', async () => {
+    renderCheckout('premium')
+
+    const summary = await getSummary()
+    expect(summary.getByText('Premium')).toBeInTheDocument()
+    expect(summary.getByText('5 days')).toBeInTheDocument()
+    expect(summary.getByText('$250.00')).toBeInTheDocument()
+    expect(summary.getByText('$13.75')).toBeInTheDocument()
+    expect(summary.getByText('$263.75')).toBeInTheDocument()
+
+    await pay()
 
     await waitFor(() => {
-      expect(addOrder).toHaveBeenCalledWith({
-        gig: expect.objectContaining({ id: 'g101', price: 100, daysToMake: 3 }),
-        buyer,
-        pkg: gig.packages[0],
-        serviceFee: 5.5,
-        total: 105.5,
-      })
+      expect(addOrder).toHaveBeenCalledWith({ gig, buyer, pkg: gig.packages[1] })
+    })
+  })
+
+  it('uses the first package when no known package was chosen', async () => {
+    renderCheckout('removed-package')
+
+    const summary = await getSummary()
+    expect(summary.getByText('Basic')).toBeInTheDocument()
+    expect(summary.getByText('$105.50')).toBeInTheDocument()
+
+    await pay()
+
+    await waitFor(() => {
+      expect(addOrder).toHaveBeenCalledWith({ gig, buyer, pkg: gig.packages[0] })
     })
     expect(screen.queryByLabelText(/card number|expiration|cvv/i)).not.toBeInTheDocument()
   })
 
-  it('navigates to the order confirmation after paying', async () => {
-    renderCheckout('/checkout/g101')
+  it('orders the gig itself when it has no packages', async () => {
+    const gigWithoutPackages = { ...gig, packages: undefined }
+    gigService.getById.mockResolvedValue(gigWithoutPackages)
+    renderCheckout()
 
-    fireEvent.change(await screen.findByLabelText('Cardholder name'), {
-      target: { value: 'Demo Buyer' },
+    const summary = await getSummary()
+    expect(summary.queryByText('Package')).not.toBeInTheDocument()
+    expect(summary.getByText('3 days')).toBeInTheDocument()
+
+    await pay()
+
+    await waitFor(() => {
+      expect(addOrder).toHaveBeenCalledWith({ gig: gigWithoutPackages, buyer, pkg: null })
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm & Pay' }))
+  })
+
+  it('keeps the form and lets the buyer try again when the payment fails', async () => {
+    addOrder.mockRejectedValueOnce(new Error('Network error'))
+    renderCheckout()
+
+    await pay()
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/could not complete the order/i)
+    expect(screen.getByLabelText('Cardholder name')).toHaveValue('Demo Buyer')
+    const payBtn = screen.getByRole('button', { name: 'Confirm & Pay' })
+    expect(payBtn).toBeEnabled()
+
+    fireEvent.click(payBtn)
+
+    expect(await screen.findByRole('heading', { name: 'Order confirmation' })).toBeInTheDocument()
+    expect(addOrder).toHaveBeenCalledTimes(2)
+  })
+
+  it('creates only one order while the payment is in progress', async () => {
+    addOrder.mockReturnValue(new Promise(() => {}))
+    renderCheckout()
+
+    await pay()
+    fireEvent.click(screen.getByRole('button', { name: 'Processing...' }))
+
+    expect(screen.getByRole('button', { name: 'Processing...' })).toBeDisabled()
+    expect(addOrder).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not let the seller order their own gig', async () => {
+    userService.getLoggedinUser.mockReturnValue({ id: 'seller-1', fullname: 'Seller' })
+    renderCheckout()
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('You cannot order your own gig.')
+    expect(screen.getByRole('button', { name: 'Confirm & Pay' })).toBeDisabled()
+  })
+
+  it('navigates to the order confirmation after paying', async () => {
+    renderCheckout()
+
+    await pay()
 
     expect(await screen.findByRole('heading', { name: 'Order confirmation' })).toBeInTheDocument()
     expect(await screen.findByRole('status')).toHaveTextContent(
@@ -110,7 +189,7 @@ describe('CheckoutPage', () => {
   })
 
   it('navigates back to the gig', async () => {
-    renderCheckout('/checkout/g101')
+    renderCheckout()
 
     fireEvent.click(await screen.findByRole('link', { name: 'Back to gig' }))
 

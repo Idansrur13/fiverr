@@ -1,76 +1,104 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { userService } from '../services/user.service'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { describe, it, expect } from 'vitest'
 import { OrderCard } from './OrderCard'
+import { userService } from '../services/user.service'
+import gigs from '../data/gigs.json'
 
-vi.mock('../services/user.service', () => ({
-  userService: {
-    getLoggedinUser: vi.fn(),
+const PACKAGES = [
+  {
+    id: 'p1',
+    tier: 'BASIC',
+    title: 'Basic',
+    price: 40,
+    daysToMake: 2,
+    features: ['1 logo concept'],
   },
-}))
+  {
+    id: 'p2',
+    tier: 'STANDARD',
+    title: 'Standard',
+    price: 90,
+    daysToMake: 3,
+    features: ['3 logo concepts', 'Source files'],
+  },
+  {
+    id: 'p3',
+    tier: 'PREMIUM',
+    title: 'Premium',
+    price: 150,
+    daysToMake: 5,
+    features: ['5 logo concepts', 'Source files', 'Brand guide'],
+  },
+]
 
-const buyer = { id: 'buyer-1', fullname: 'Buyer' }
-const gig = {
-  id: 'g101',
-  title: 'Logo design gig',
-  price: 80,
-  daysToMake: 3,
-  owner: { id: 'seller-1' },
-  packages: [
-    { id: 'basic', tier: 'BASIC', title: 'Basic', price: 80, daysToMake: 3 },
-    { id: 'premium', tier: 'PREMIUM', title: 'Premium', price: 200, daysToMake: 5 },
-  ],
+const baseGig = gigs.find((gig) => gig.id === 'g101')
+const gigWithPackages = { ...baseGig, packages: PACKAGES }
+
+function CheckoutStub() {
+  const { state } = useLocation()
+  return <h1>Checkout {state?.packageId}</h1>
 }
 
-function CheckoutLocation() {
-  const location = useLocation()
-  return <output data-testid="checkout-location">{JSON.stringify(location.state)}</output>
+function renderOrderCard(gig = gigWithPackages) {
+  return render(
+    <MemoryRouter initialEntries={[`/gig/${gig.id}`]}>
+      <Routes>
+        <Route path="/gig/:gigId" element={<OrderCard gig={gig} />} />
+        <Route path="/checkout/:gigId" element={<CheckoutStub />} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
+function getContinueBtn() {
+  return screen.getByRole('button', { name: /continue/i })
 }
 
 describe('OrderCard', () => {
-  beforeEach(() => {
-    userService.getLoggedinUser.mockReturnValue(buyer)
+  it('shows the gig price and delivery time when the gig has no packages', () => {
+    renderOrderCard(baseGig)
+    expect(screen.getByText(`$${baseGig.price}`)).toBeInTheDocument()
+    expect(screen.getByText(`${baseGig.daysToMake}-day delivery`)).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Packages' })).not.toBeInTheDocument()
   })
 
-  it('navigates to checkout with the selected package', () => {
-    render(
-      <MemoryRouter initialEntries={['/gig/g101']}>
-        <Routes>
-          <Route path="/gig/:gigId" element={<OrderCard gig={gig} />} />
-          <Route
-            path="/checkout/:gigId"
-            element={
-              <>
-                <h1>Checkout</h1>
-                <CheckoutLocation />
-              </>
-            }
-          />
-        </Routes>
-      </MemoryRouter>,
-    )
+  it('shows the first package by default', () => {
+    renderOrderCard()
+    expect(screen.getByRole('button', { name: 'Basic' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('$40')).toBeInTheDocument()
+    expect(screen.getByText('2-day delivery')).toBeInTheDocument()
+    expect(screen.getByText('1 logo concept')).toBeInTheDocument()
+  })
 
+  it('switches price, delivery time and features when another package is selected', () => {
+    renderOrderCard()
     fireEvent.click(screen.getByRole('button', { name: 'Premium' }))
-    fireEvent.click(screen.getByRole('button', { name: /continue/i }))
 
-    expect(screen.getByRole('heading', { name: 'Checkout' })).toBeInTheDocument()
-    expect(screen.getByTestId('checkout-location')).toHaveTextContent(
-      JSON.stringify({
-        packageId: 'premium',
-        selectedPackage: gig.packages[1],
-      }),
-    )
+    expect(screen.getByRole('button', { name: 'Premium' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('$150')).toBeInTheDocument()
+    expect(screen.getByText('5-day delivery')).toBeInTheDocument()
+    expect(screen.getByText('Brand guide')).toBeInTheDocument()
+    expect(screen.queryByText('1 logo concept')).not.toBeInTheDocument()
   })
 
-  it('prevents the seller from ordering their own gig', () => {
-    userService.getLoggedinUser.mockReturnValue({ ...buyer, id: 'seller-1' })
-    render(
-      <MemoryRouter>
-        <OrderCard gig={gig} />
-      </MemoryRouter>,
-    )
+  it('goes to checkout with the id of the selected package', () => {
+    renderOrderCard()
 
-    expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Standard' }))
+    fireEvent.click(getContinueBtn())
+
+    expect(screen.getByRole('heading', { name: 'Checkout p2' })).toBeInTheDocument()
+  })
+
+  it('does not let the seller order their own gig', () => {
+    const ownGig = { ...gigWithPackages, owner: userService.getLoggedinUser() }
+    renderOrderCard(ownGig)
+
+    expect(screen.getByText(/can't order your own gig/i)).toBeInTheDocument()
+    expect(getContinueBtn()).toBeDisabled()
+
+    fireEvent.click(getContinueBtn())
+    expect(screen.queryByRole('heading', { name: /checkout/i })).not.toBeInTheDocument()
   })
 })
