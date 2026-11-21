@@ -51,9 +51,12 @@ export function GigDetailsPage() {
   if (error) return <div className="error-msg">{error}</div>
   if (!gig) return <div className="error-msg">Gig not found</div>
 
-  const { title, description, category, owner, images, reviews = [] } = gig
-  const rating = owner?.rating
+  const { title, description, category, owner, images } = gig
+  const reviews = Array.isArray(gig.reviews) ? gig.reviews : []
   const reviewsCount = reviews.length
+  const rating = reviewsCount
+    ? reviews.reduce((total, review) => total + review.rating, 0) / reviewsCount
+    : null
 
   const categoryName = typeof category === 'string' ? category : category?.name
   const parentCategoryName = typeof category === 'object' ? category?.parent?.name : null

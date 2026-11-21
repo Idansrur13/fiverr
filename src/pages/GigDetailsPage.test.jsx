@@ -89,14 +89,15 @@ describe('GigDetailsPage', () => {
 
   it('renders gig details using the data shape from gigs.json', async () => {
     const gig = gigs.find((item) => item.id === 'g101')
-    gigService.getById.mockResolvedValue(gig)
+    const gigWithoutOwnerRating = { ...gig, owner: { ...gig.owner, rating: undefined } }
+    gigService.getById.mockResolvedValue(gigWithoutOwnerRating)
 
     renderWithRoute('g101')
     expect(await screen.findByText(gig.title)).toBeTruthy()
     expect(screen.getByText(gig.description)).toBeTruthy()
     expect(screen.getByText('Graphics Design')).toBeTruthy()
     expect(screen.getAllByText('Top Rated Seller')).toHaveLength(2)
-    expect(screen.getAllByText(gig.owner.rating.toFixed(1))).toHaveLength(2)
+    expect(screen.getAllByText('5.0')).toHaveLength(2)
     expect(screen.getAllByText(`(${gig.reviews.length})`)).toHaveLength(2)
   })
 })

@@ -6,12 +6,19 @@ import gigs from '../data/gigs.json'
 describe('AboutSeller', () => {
   const gig = gigs.find((item) => item.id === 'g101')
   const { owner, reviews } = gig
+  const rating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length
 
-  it('renders seller details from the gigs.json owner and reviews', () => {
-    render(<AboutSeller owner={owner} rating={owner.rating} reviewsCount={reviews.length} />)
+  it('renders seller details with the average rating and review count', () => {
+    render(
+      <AboutSeller
+        owner={{ ...owner, rating: undefined }}
+        rating={rating}
+        reviewsCount={reviews.length}
+      />,
+    )
     expect(screen.getByText(owner.fullname)).toBeTruthy()
     expect(screen.getByText('Top Rated Seller')).toBeTruthy()
-    expect(screen.getByText(owner.rating.toFixed(1))).toBeTruthy()
+    expect(screen.getByText('5.0')).toBeTruthy()
     expect(screen.getByText(`(${reviews.length})`)).toBeTruthy()
   })
 })
