@@ -24,9 +24,13 @@ export function GigDetailsPage() {
       setError(null)
       try {
         await loadGig(gigId)
-      } catch {
+      } catch (err) {
         if (!isCancelled) {
-          setError('Failed to load gig. Please try again later.')
+          setError(
+            err?.code === 'NOT_FOUND'
+              ? 'Gig not found'
+              : 'Failed to load gig. Please try again later.',
+          )
         }
       } finally {
         if (!isCancelled) setIsLoading(false)

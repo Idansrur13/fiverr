@@ -53,9 +53,17 @@ describe('GigDetailsPage', () => {
   })
 
   it('shows a not found message for an unknown gig id', async () => {
-    gigService.getById.mockResolvedValue(null)
+    gigService.getById.mockRejectedValue(
+      Object.assign(new Error('Cannot find unknown-id in gigDB'), { code: 'NOT_FOUND' }),
+    )
     renderWithRoute('unknown-id')
     expect(await screen.findByText(/gig not found/i)).toBeTruthy()
+  })
+
+  it('shows a load error when the service fails for another reason', async () => {
+    gigService.getById.mockRejectedValue(new Error('Storage unavailable'))
+    renderWithRoute('g101')
+    expect(await screen.findByText(/failed to load gig/i)).toBeTruthy()
   })
 
   it('renders gig details using the data shape from gigs.json', async () => {

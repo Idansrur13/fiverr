@@ -22,7 +22,11 @@ async function query(entityType) {
 async function get(entityType, entityId) {
   const entities = await query(entityType)
   const entity = entities.find((entity) => entity.id === entityId)
-  if (!entity) throw new Error(`Cannot find ${entityId} in ${entityType}`)
+  if (!entity) {
+    const error = new Error(`Cannot find ${entityId} in ${entityType}`)
+    error.code = 'NOT_FOUND'
+    throw error
+  }
   return entity
 }
 

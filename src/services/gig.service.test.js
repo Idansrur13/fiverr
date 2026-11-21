@@ -84,7 +84,7 @@ describe('gigService', () => {
     })
 
     it('getById rejects for an unknown id', async () => {
-      await expect(gigService.getById('no-such-id')).rejects.toThrow()
+      await expect(gigService.getById('no-such-id')).rejects.toMatchObject({ code: 'NOT_FOUND' })
     })
 
     it('save creates a gig with a new id', async () => {
