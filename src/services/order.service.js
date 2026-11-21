@@ -20,16 +20,18 @@ async function query({ buyerId, sellerId, status } = {}) {
     .sort((a, b) => b.createdAt - a.createdAt)
 }
 
-function add({ gig, buyer }) {
+function add({ gig, buyer, pkg = null }) {
   const createdAt = Date.now()
+  const { price, daysToMake } = pkg || gig
   const order = {
     buyer: { id: buyer.id, fullname: buyer.fullname, imgUrl: buyer.imgUrl },
     seller: { id: gig.owner.id, fullname: gig.owner.fullname, imgUrl: gig.owner.imgUrl },
     gig: { id: gig.id, title: gig.title, imgUrl: gig.images[0] },
-    price: gig.price,
+    package: pkg && { id: pkg.id, tier: pkg.tier, title: pkg.title },
+    price,
     status: 'PENDING',
     createdAt,
-    dueAt: createdAt + gig.daysToMake * DAY,
+    dueAt: createdAt + daysToMake * DAY,
   }
   return storageService.post(STORAGE_KEY, order)
 }

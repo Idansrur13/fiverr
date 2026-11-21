@@ -1,15 +1,21 @@
 .app-header {
- 
   background-color: var(--clr-bg);
   border-bottom: 1px solid var(--clr-border);
 }
 
 .app-header .header-content {
- 
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  min-height: var(--header-height);
 }
 
 .logo {
-
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: var(--clr-text);
 }
 
 .logo-dot {
@@ -17,21 +23,97 @@
 }
 
 .app-header .main-nav {
-
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  margin-inline-start: auto;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--clr-text);
+  white-space: nowrap;
 }
 
-.app-header .main-nav a:hover,
-.app-header .main-nav a.active {
+.app-header .main-nav button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: inherit;
+}
+
+.app-header .main-nav > a:hover,
+.app-header .main-nav > a.active,
+.app-header .main-nav > button:not(.btn-join):hover {
   color: var(--clr-primary);
 }
 
-@media (max-width: 600px) {
-  .app-header .main-nav {
-    gap: var(--space-md);
-    font-size: var(--fs-sm);
+.app-header .nav-ai-icon {
+  color: var(--clr-primary);
+}
+
+.app-header .nav-divider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--clr-border);
+}
+
+.app-header .main-nav .btn-join {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  background-color: var(--clr-text-dark);
+  color: var(--clr-bg);
+  font-weight: 600;
+}
+
+.app-header .main-nav .btn-join:hover {
+  background-color: var(--clr-text);
+}
+
+.app-header .user-menu:empty {
+  display: none;
+}
+
+@media (max-width: 1400px) {
+  .app-header .main-nav .nav-ai,
+  .app-header .main-nav .nav-lang,
+  .app-header .main-nav .nav-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .app-header .header-content {
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-lg);
+    padding-block: var(--space-sm);
   }
 
+  .app-header .search-bar {
+    order: 1;
+    flex-basis: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .app-header .header-content {
+    gap: var(--space-sm) var(--space-md);
+  }
+
+  .app-header .main-nav .btn-join {
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .app-header .main-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+    gap: var(--space-xs) var(--space-md);
+    font-size: var(--fs-sm);
+  }
+}
+
+@media (max-width: 600px) {
   .logo {
-    font-size: var(--fs-lg);
+    font-size: 1.75rem;
   }
 }

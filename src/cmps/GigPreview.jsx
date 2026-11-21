@@ -11,6 +11,9 @@ const LEVEL_LABELS = {
 export function GigPreview({ gig }) {
   const { id, title, price, images = [], owner, reviews = [] } = gig
   const reviewsCount = reviews.length
+  const rating = reviewsCount
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
+    : 0
 
   return (
     <article className="gig-preview">
@@ -29,7 +32,7 @@ export function GigPreview({ gig }) {
         {reviewsCount > 0 && (
           <p className="gig-preview-rating">
             <Star size={14} className="gig-preview-star" aria-hidden="true" />
-            <span className="gig-preview-rating-value">{owner.rating.toFixed(1)}</span>
+            <span className="gig-preview-rating-value">{rating.toFixed(1)}</span>
             <span className="gig-preview-reviews-count">({reviewsCount})</span>
           </p>
         )}
