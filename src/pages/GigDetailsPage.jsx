@@ -9,6 +9,7 @@ import { store } from '../store/store'
 import { GigGallery } from '../cmps/GigGallery'
 import { SellerOverview } from '../cmps/SellerOverview'
 import { AboutSeller } from '../cmps/AboutSeller'
+import { OrderCard } from '../cmps/OrderCard'
 
 function formatCategoryName(slug) {
   return slug
@@ -68,7 +69,9 @@ export function GigDetailsPage() {
 
         <AboutSeller owner={owner} rating={rating} reviewsCount={reviewsCount} />
       </div>
-      <aside className="gig-details-sidebar"></aside>
+      <aside className="gig-details-sidebar">
+        <OrderCard gig={gig} />
+      </aside>
     </section>
   )
 }
