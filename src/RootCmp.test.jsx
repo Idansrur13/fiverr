@@ -18,7 +18,9 @@ function renderAt(path) {
 describe('RootCmp', () => {
   it('renders the home page at /', () => {
     renderAt('/')
-    expect(screen.getByRole('heading', { name: 'Home' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 1, name: /will take it from here/ }),
+    ).toBeInTheDocument()
   })
 
   it('renders the header and footer on every page', () => {
