@@ -20,15 +20,31 @@ async function query({ buyerId, sellerId, status } = {}) {
     .sort((a, b) => b.createdAt - a.createdAt)
 }
 
-function add({ gig, buyer, pkg = null }) {
+function add({
+  gig,
+  buyer,
+  pkg = null,
+  packageId = pkg?.packageId || pkg?.id || null,
+  serviceFee = 0,
+  total,
+}) {
   const createdAt = Date.now()
-  const { price, daysToMake } = pkg || gig
+  const owner = gig.owner || {}
+  const price = pkg?.price ?? gig.price
+  const daysToMake = pkg?.daysToMake ?? gig.daysToMake
   const order = {
     buyer: { id: buyer.id, fullname: buyer.fullname, imgUrl: buyer.imgUrl },
-    seller: { id: gig.owner.id, fullname: gig.owner.fullname, imgUrl: gig.owner.imgUrl },
-    gig: { id: gig.id, title: gig.title, imgUrl: gig.images[0] },
+    seller: {
+      id: owner.id || gig.ownerId,
+      fullname: owner.fullname,
+      imgUrl: owner.imgUrl,
+    },
+    gig: { id: gig.id, title: gig.title, imgUrl: gig.images?.[0] },
     package: pkg && { id: pkg.id, tier: pkg.tier, title: pkg.title },
+    packageId,
     price,
+    serviceFee,
+    total: total ?? price + serviceFee,
     status: 'PENDING',
     createdAt,
     dueAt: createdAt + daysToMake * DAY,

@@ -49,6 +49,9 @@ describe('orderService', () => {
       buyer: { id: 'buyer1' },
       seller: { id: 'seller1' },
       gig: { id: 'g1', title: gig.title, imgUrl: 'logo-1.jpg' },
+      package: null,
+      packageId: null,
+      total: 50,
     })
     expect(await orderService.query()).toHaveLength(1)
   })
@@ -60,6 +63,8 @@ describe('orderService', () => {
     expect(order).toMatchObject({
       price: 90,
       package: { id: 'p2', tier: 'STANDARD', title: 'Standard' },
+      packageId: 'p2',
+      total: 90,
     })
     expect(order.dueAt - order.createdAt).toBe(4 * 24 * 60 * 60 * 1000)
   })
@@ -69,6 +74,23 @@ describe('orderService', () => {
 
     expect(order.package).toBeNull()
     expect(order.dueAt - order.createdAt).toBe(2 * 24 * 60 * 60 * 1000)
+  })
+
+  it('stores the selected package and checkout totals', async () => {
+    const order = await orderService.add({
+      gig,
+      buyer,
+      packageId: 'package1',
+      serviceFee: 2.5,
+      total: 52.5,
+    })
+
+    expect(order).toMatchObject({
+      packageId: 'package1',
+      price: 50,
+      serviceFee: 2.5,
+      total: 52.5,
+    })
   })
 
   it('query returns only the orders of the given buyer', async () => {
