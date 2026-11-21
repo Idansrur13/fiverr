@@ -8,8 +8,9 @@ export async function loadGigs(filterBy = store.getState().gigModule.filterBy) {
   return gigs
 }
 
-export async function loadGig(gigId) {
+export async function loadGig(gigId, signal) {
   const gig = await gigService.getById(gigId)
+  if (signal?.aborted) return gig
   store.dispatch({ type: SET_GIG, gig })
   return gig
 }

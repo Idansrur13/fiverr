@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -6,6 +6,7 @@ import { GigDetailsPage } from './GigDetailsPage'
 import { gigService } from '../services/gig.service'
 import gigs from '../data/gigs.json'
 import { store } from '../store/store'
+import { SET_GIG } from '../store/gig.reducer'
 
 vi.mock('../services/gig.service', () => ({
   gigService: {
@@ -64,6 +65,26 @@ describe('GigDetailsPage', () => {
     gigService.getById.mockRejectedValue(new Error('Storage unavailable'))
     renderWithRoute('g101')
     expect(await screen.findByText(/failed to load gig/i)).toBeTruthy()
+  })
+
+  it('does not store a gig when unmounted while it is loading', async () => {
+    let resolveGig
+    gigService.getById.mockReturnValue(
+      new Promise((resolve) => {
+        resolveGig = resolve
+      }),
+    )
+    store.dispatch({ type: SET_GIG, gig: null })
+
+    const { unmount } = renderWithRoute('g101')
+    unmount()
+
+    await act(async () => {
+      resolveGig(gigs.find((item) => item.id === 'g101'))
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    expect(store.getState().gigModule.gig).toBeNull()
   })
 
   it('renders gig details using the data shape from gigs.json', async () => {

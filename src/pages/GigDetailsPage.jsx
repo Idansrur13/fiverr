@@ -18,12 +18,13 @@ export function GigDetailsPage() {
 
   useEffect(() => {
     let isCancelled = false
+    const controller = new AbortController()
 
     async function fetchGig() {
       setIsLoading(true)
       setError(null)
       try {
-        await loadGig(gigId)
+        await loadGig(gigId, controller.signal)
       } catch (err) {
         if (!isCancelled) {
           setError(
@@ -41,6 +42,7 @@ export function GigDetailsPage() {
 
     return () => {
       isCancelled = true
+      controller.abort()
       store.dispatch({ type: SET_GIG, gig: null })
     }
   }, [gigId])
