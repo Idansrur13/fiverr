@@ -1,50 +1,42 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Provider } from 'react-redux'
 import { DeliveryFilter } from './DeliveryFilter'
-import { store } from '../store/store'
-import { setFilterBy } from '../store/gig.actions'
 import { gigService } from '../services/gig.service'
 
-function renderDelivery(onClose = vi.fn()) {
+function renderDelivery(filterChanges = {}) {
+  const onSetFilter = vi.fn()
+  const onClose = vi.fn()
   render(
-    <Provider store={store}>
-      <DeliveryFilter onClose={onClose} />
-    </Provider>,
+    <DeliveryFilter
+      filterBy={{ ...gigService.getDefaultFilter(), ...filterChanges }}
+      onSetFilter={onSetFilter}
+      onClose={onClose}
+    />,
   )
-  return onClose
-}
-
-function getFilterBy() {
-  return store.getState().gigModule.filterBy
+  return { onSetFilter, onClose }
 }
 
 describe('DeliveryFilter', () => {
-  beforeEach(() => {
-    setFilterBy(gigService.getDefaultFilter())
-  })
-
   it('applies the selected delivery time', async () => {
     const user = userEvent.setup()
-    const onClose = renderDelivery()
+    const { onSetFilter, onClose } = renderDelivery()
 
     await user.click(screen.getByRole('radio', { name: 'Up to 3 days' }))
     await user.click(screen.getByRole('button', { name: 'Apply' }))
 
-    expect(getFilterBy().daysToMake).toBe('3')
+    expect(onSetFilter).toHaveBeenCalledWith({ daysToMake: '3' })
     expect(onClose).toHaveBeenCalled()
   })
 
   it('clears the delivery filter', async () => {
     const user = userEvent.setup()
-    setFilterBy({ daysToMake: '7', txt: 'logo' })
-    const onClose = renderDelivery()
+    const { onSetFilter, onClose } = renderDelivery({ daysToMake: '7' })
 
     expect(screen.getByRole('radio', { name: 'Up to 7 days' })).toBeChecked()
-    await user.click(screen.getByRole('button', { name: 'Clear all' }))
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
 
-    expect(getFilterBy()).toMatchObject({ daysToMake: '', txt: 'logo' })
+    expect(onSetFilter).toHaveBeenCalledWith({ daysToMake: '' })
     expect(onClose).toHaveBeenCalled()
   })
 })

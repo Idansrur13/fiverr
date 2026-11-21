@@ -1,23 +1,29 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { setFilterBy } from '../store/gig.actions'
 
-export function BudgetFilter({ onClose }) {
-  const filterBy = useSelector((storeState) => storeState.gigModule.filterBy)
+export function BudgetFilter({ filterBy, onSetFilter, onClose }) {
   const [minPrice, setMinPrice] = useState(filterBy.minPrice)
   const [maxPrice, setMaxPrice] = useState(filterBy.maxPrice)
+  const [isErrorShown, setIsErrorShown] = useState(false)
   const isInvalid = minPrice !== '' && maxPrice !== '' && +minPrice > +maxPrice
 
   function onApply(ev) {
     ev.preventDefault()
-    if (isInvalid) return
-    setFilterBy({ minPrice, maxPrice })
+    if (isInvalid) {
+      setIsErrorShown(true)
+      return
+    }
+    onSetFilter({ minPrice, maxPrice })
     onClose()
   }
 
   function onClear() {
-    setFilterBy({ minPrice: '', maxPrice: '' })
+    onSetFilter({ minPrice: '', maxPrice: '' })
     onClose()
+  }
+
+  // The error shows only after leaving a field, not in the middle of typing
+  function onFieldBlur() {
+    setIsErrorShown(true)
   }
 
   return (
@@ -31,6 +37,7 @@ export function BudgetFilter({ onClose }) {
             placeholder="Any"
             value={minPrice}
             onChange={(ev) => setMinPrice(ev.target.value)}
+            onBlur={onFieldBlur}
           />
         </label>
         <label>
@@ -41,19 +48,20 @@ export function BudgetFilter({ onClose }) {
             placeholder="Any"
             value={maxPrice}
             onChange={(ev) => setMaxPrice(ev.target.value)}
+            onBlur={onFieldBlur}
           />
         </label>
       </div>
-      {isInvalid && (
+      {isInvalid && isErrorShown && (
         <p className="filter-panel-error" role="alert">
           Min price can't be higher than max price
         </p>
       )}
       <div className="filter-panel-actions">
         <button type="button" className="filter-panel-clear" onClick={onClear}>
-          Clear all
+          Clear
         </button>
-        <button type="submit" className="filter-panel-apply" disabled={isInvalid}>
+        <button type="submit" className="filter-panel-apply">
           Apply
         </button>
       </div>

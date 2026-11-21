@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { setFilterBy } from '../store/gig.actions'
 
 const DELIVERY_OPTIONS = [
   { label: 'Express 24H', value: '1' },
@@ -9,18 +7,17 @@ const DELIVERY_OPTIONS = [
   { label: 'Anytime', value: '' },
 ]
 
-export function DeliveryFilter({ onClose }) {
-  const storeDaysToMake = useSelector((storeState) => storeState.gigModule.filterBy.daysToMake)
-  const [daysToMake, setDaysToMake] = useState(String(storeDaysToMake))
+export function DeliveryFilter({ filterBy, onSetFilter, onClose }) {
+  const [daysToMake, setDaysToMake] = useState(String(filterBy.daysToMake))
 
   function onApply(ev) {
     ev.preventDefault()
-    setFilterBy({ daysToMake })
+    onSetFilter({ daysToMake })
     onClose()
   }
 
   function onClear() {
-    setFilterBy({ daysToMake: '' })
+    onSetFilter({ daysToMake: '' })
     onClose()
   }
 
@@ -42,7 +39,7 @@ export function DeliveryFilter({ onClose }) {
       </fieldset>
       <div className="filter-panel-actions">
         <button type="button" className="filter-panel-clear" onClick={onClear}>
-          Clear all
+          Clear
         </button>
         <button type="submit" className="filter-panel-apply">
           Apply

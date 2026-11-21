@@ -1,63 +1,71 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Provider } from 'react-redux'
 import { BudgetFilter } from './BudgetFilter'
-import { store } from '../store/store'
-import { setFilterBy } from '../store/gig.actions'
 import { gigService } from '../services/gig.service'
 
-function renderBudget(onClose = vi.fn()) {
+function renderBudget(filterChanges = {}) {
+  const onSetFilter = vi.fn()
+  const onClose = vi.fn()
   render(
-    <Provider store={store}>
-      <BudgetFilter onClose={onClose} />
-    </Provider>,
+    <BudgetFilter
+      filterBy={{ ...gigService.getDefaultFilter(), ...filterChanges }}
+      onSetFilter={onSetFilter}
+      onClose={onClose}
+    />,
   )
-  return onClose
-}
-
-function getFilterBy() {
-  return store.getState().gigModule.filterBy
+  return { onSetFilter, onClose }
 }
 
 describe('BudgetFilter', () => {
-  beforeEach(() => {
-    setFilterBy(gigService.getDefaultFilter())
-  })
-
   it('applies min and max price to the filter', async () => {
     const user = userEvent.setup()
-    const onClose = renderBudget()
+    const { onSetFilter, onClose } = renderBudget()
 
     await user.type(screen.getByLabelText('Min.'), '50')
     await user.type(screen.getByLabelText('Max.'), '100')
     await user.click(screen.getByRole('button', { name: 'Apply' }))
 
-    expect(getFilterBy()).toMatchObject({ minPrice: '50', maxPrice: '100' })
+    expect(onSetFilter).toHaveBeenCalledWith({ minPrice: '50', maxPrice: '100' })
     expect(onClose).toHaveBeenCalled()
   })
 
   it('shows an error when min is greater than max', async () => {
     const user = userEvent.setup()
-    const onClose = renderBudget()
+    const { onSetFilter, onClose } = renderBudget()
 
     await user.type(screen.getByLabelText('Min.'), '200')
     await user.type(screen.getByLabelText('Max.'), '100')
+    await user.tab()
 
     expect(screen.getByRole('alert')).toHaveTextContent("Min price can't be higher than max price")
-    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled()
-    expect(getFilterBy()).toMatchObject({ minPrice: '', maxPrice: '' })
+
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(onSetFilter).not.toHaveBeenCalled()
     expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('does not show the error in the middle of typing', async () => {
+    const user = userEvent.setup()
+    renderBudget({ minPrice: '50' })
+
+    // Typing "100" passes through "1" and "10", which are smaller than 50
+    await user.type(screen.getByLabelText('Max.'), '1')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+    await user.type(screen.getByLabelText('Max.'), '00')
+    await user.tab()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   it('clears the budget filter', async () => {
     const user = userEvent.setup()
-    setFilterBy({ minPrice: '50', maxPrice: '100', category: 'music-audio' })
-    const onClose = renderBudget()
+    const { onSetFilter, onClose } = renderBudget({ minPrice: '50', maxPrice: '100' })
 
-    await user.click(screen.getByRole('button', { name: 'Clear all' }))
+    expect(screen.getByLabelText('Min.')).toHaveValue(50)
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
 
-    expect(getFilterBy()).toMatchObject({ minPrice: '', maxPrice: '', category: 'music-audio' })
+    expect(onSetFilter).toHaveBeenCalledWith({ minPrice: '', maxPrice: '' })
     expect(onClose).toHaveBeenCalled()
   })
 })
