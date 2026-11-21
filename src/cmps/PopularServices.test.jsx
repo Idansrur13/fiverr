@@ -1,12 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PopularServices } from './PopularServices'
 import { store } from '../store/store'
 import { setFilterBy } from '../store/gig.actions'
 import { gigService } from '../services/gig.service'
+
+function ExploreStub() {
+  return <h1>Explore page {useLocation().search}</h1>
+}
 
 function renderServices() {
   render(
@@ -14,7 +18,7 @@ function renderServices() {
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<PopularServices />} />
-          <Route path="/explore" element={<h1>Explore page</h1>} />
+          <Route path="/explore" element={<ExploreStub />} />
         </Routes>
       </MemoryRouter>
     </Provider>,
@@ -45,7 +49,9 @@ describe('PopularServices', () => {
     const { filterBy } = store.getState().gigModule
     expect(filterBy.category).toBe('graphics-design')
     expect(filterBy.txt).toBe('logo')
-    expect(screen.getByRole('heading', { name: 'Explore page' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Explore page ?txt=logo&category=graphics-design' }),
+    ).toBeInTheDocument()
   })
 
   it('gives every service its own non-empty list of gigs', async () => {

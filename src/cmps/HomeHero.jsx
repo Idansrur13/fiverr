@@ -17,7 +17,8 @@ export function HomeHero() {
 
   function onTagClick(tag) {
     setFilterBy({ txt: tag, category: '' })
-    navigate('/explore')
+    // The filter goes in the URL, which is what Explore reads (#28)
+    navigate(`/explore?${new URLSearchParams({ txt: tag })}`)
   }
 
   return (

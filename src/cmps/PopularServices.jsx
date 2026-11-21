@@ -28,7 +28,8 @@ export function PopularServices() {
 
   function onServiceClick({ category, txt }) {
     setFilterBy({ category, txt })
-    navigate('/explore')
+    // The filter goes in the URL, which is what Explore reads (#28)
+    navigate(`/explore?${new URLSearchParams({ txt, category })}`)
   }
 
   return (
