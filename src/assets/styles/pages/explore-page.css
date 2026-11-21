@@ -1,0 +1,13 @@
+.explore-page h1 {
+  margin-block-end: var(--space-sm);
+}
+
+.explore-page-count,
+.explore-page-status {
+  margin-block-end: var(--space-lg);
+  color: var(--clr-text-light);
+}
+
+.explore-page-status.error {
+  color: var(--clr-error);
+}

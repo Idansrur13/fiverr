@@ -15,11 +15,14 @@
 @import './cmps/popular-services.css';
 @import './cmps/app-footer.css';
 @import './cmps/gig-form.css';
+@import './cmps/gig-list.css';
+@import './cmps/gig-preview.css';
 @import './cmps/seller-badge.css';
 @import './cmps/order-card.css';
 @import './cmps/package-selector.css';
 
 @import './pages/home-page.css';
+@import './pages/explore-page.css';
 @import './pages/not-found-page.css';
 @import './pages/seller-gigs-page.css';
 
