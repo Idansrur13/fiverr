@@ -18,8 +18,8 @@ export function GigPreview({ gig }) {
 
   return (
     <article className="gig-preview">
+      <ImgCarousel images={images} alt={title} linkTo={`/gig/${id}`} />
       <Link to={`/gig/${id}`} className="gig-preview-link">
-        <ImgCarousel images={images} alt={title} />
         <div className="gig-preview-seller">
           <img className="gig-preview-avatar" src={owner.imgUrl} alt="" />
           <span className="gig-preview-seller-name">{owner.fullname}</span>

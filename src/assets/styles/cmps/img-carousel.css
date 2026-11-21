@@ -5,6 +5,10 @@
   border-radius: var(--radius-md);
 }
 
+.img-carousel-link {
+  display: block;
+}
+
 .img-carousel-img {
   width: 100%;
   aspect-ratio: 16 / 10;

@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const SWIPE_MIN_DISTANCE = 40
 
-export function ImgCarousel({ images = [], alt = '' }) {
+export function ImgCarousel({ images = [], alt = '', linkTo }) {
   const [currentIdx, setCurrentIdx] = useState(0)
   const touchStartX = useRef(null)
   const isSwiping = useRef(false)
@@ -14,12 +15,13 @@ export function ImgCarousel({ images = [], alt = '' }) {
   }
 
   function onControlClick(ev, idx) {
-    ev.preventDefault()
     ev.stopPropagation()
     showImage(idx)
   }
 
   function onTouchStart(ev) {
+    // A real swipe sends no click, so the flag must be reset at every new touch
+    isSwiping.current = false
     touchStartX.current = ev.touches[0].clientX
   }
 
@@ -46,7 +48,13 @@ export function ImgCarousel({ images = [], alt = '' }) {
       onTouchEnd={onTouchEnd}
       onClickCapture={onClickCapture}
     >
-      <img className="img-carousel-img" src={images[currentIdx]} alt={alt} />
+      {linkTo ? (
+        <Link to={linkTo} className="img-carousel-link">
+          <img className="img-carousel-img" src={images[currentIdx]} alt={alt} />
+        </Link>
+      ) : (
+        <img className="img-carousel-img" src={images[currentIdx]} alt={alt} />
+      )}
 
       {hasManyImages && (
         <>

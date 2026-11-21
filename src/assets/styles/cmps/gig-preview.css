@@ -1,3 +1,9 @@
+.gig-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
 .gig-preview-link {
   display: flex;
   flex-direction: column;

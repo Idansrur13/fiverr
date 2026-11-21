@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { ImgCarousel } from './ImgCarousel'
 import demoGigs from '../data/gigs.json'
 
@@ -90,5 +91,31 @@ describe('ImgCarousel', () => {
     fireEvent.touchEnd(carousel, { changedTouches: [{ clientX: 100 }] })
 
     expect(getShownImage()).toHaveAttribute('src', images[1])
+  })
+
+  it('opens the link on the first tap after a swipe', () => {
+    render(
+      <MemoryRouter initialEntries={['/explore']}>
+        <Routes>
+          <Route
+            path="/explore"
+            element={<ImgCarousel images={images} alt={title} linkTo="/gig/g101" />}
+          />
+          <Route path="/gig/:gigId" element={<h1>Gig page</h1>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    const carousel = screen.getByRole('link').parentElement
+
+    // A real swipe: the finger moves, and the browser sends no click
+    fireEvent.touchStart(carousel, { touches: [{ clientX: 200 }] })
+    fireEvent.touchEnd(carousel, { changedTouches: [{ clientX: 100 }] })
+
+    // Then a tap on the image
+    fireEvent.touchStart(carousel, { touches: [{ clientX: 150 }] })
+    fireEvent.touchEnd(carousel, { changedTouches: [{ clientX: 150 }] })
+    fireEvent.click(getShownImage())
+
+    expect(screen.getByRole('heading', { name: 'Gig page' })).toBeInTheDocument()
   })
 })
