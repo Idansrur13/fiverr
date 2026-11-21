@@ -52,4 +52,9 @@
     grid-template-columns: minmax(0, 1fr) 380px;
     align-items: start;
   }
+
+  .gig-details-sidebar {
+    position: sticky;
+    top: var(--space-lg);
+  }
 }

@@ -1,31 +1,37 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Check, Clock } from 'lucide-react'
 import { addOrder } from '../store/order.actions'
+import { userService } from '../services/user.service'
+import { PackageSelector } from './PackageSelector'
 
 export function OrderCard({ gig }) {
+  const navigate = useNavigate()
   const [selectedIdx, setSelectedIdx] = useState(0)
   const [isCreating, setIsCreating] = useState(false)
-  const [statusMsg, setStatusMsg] = useState(null)
-  const loggedInUser = useSelector((state) => state.userModule?.user)
+  const [errorMsg, setErrorMsg] = useState(null)
 
   if (!gig) return null
 
+  const buyer = userService.getLoggedinUser()
+  const isOwnGig = buyer.id === gig.owner?.id
   const packages = gig.packages || []
-  const activePkg = packages.length > 0 ? packages[selectedIdx] : gig
-  const features = activePkg.features || []
+  const selectedPkg = packages[selectedIdx] || null
+  const { price, daysToMake, features = [] } = selectedPkg || gig
+
+  function onSelectPackage(idx) {
+    setSelectedIdx(idx)
+    setErrorMsg(null)
+  }
 
   async function handleContinue() {
     setIsCreating(true)
-    setStatusMsg(null)
+    setErrorMsg(null)
     try {
-      const buyer = loggedInUser || { id: 'u-guest', fullname: 'Guest Buyer', imgUrl: '' }
-      const gigToOrder = { ...gig, price: activePkg.price, daysToMake: activePkg.daysToMake }
-      await addOrder({ gig: gigToOrder, buyer })
-      setStatusMsg({ type: 'success', text: 'Order created successfully!' })
+      await addOrder({ gig, buyer, pkg: selectedPkg })
+      navigate('/orders')
     } catch {
-      setStatusMsg({ type: 'error', text: 'Failed to create order. Please try again.' })
-    } finally {
+      setErrorMsg('Failed to create order. Please try again.')
       setIsCreating(false)
     }
   }
@@ -33,28 +39,15 @@ export function OrderCard({ gig }) {
   return (
     <div className="order-card">
       {packages.length > 1 && (
-        <div className="order-card-tabs" role="tablist">
-          {packages.map((pkg, idx) => (
-            <button
-              key={pkg.id || pkg.tier || idx}
-              type="button"
-              role="tab"
-              aria-selected={idx === selectedIdx}
-              className={`order-card-tab ${idx === selectedIdx ? 'active' : ''}`}
-              onClick={() => setSelectedIdx(idx)}
-            >
-              {pkg.title || pkg.tier}
-            </button>
-          ))}
-        </div>
+        <PackageSelector packages={packages} selectedIdx={selectedIdx} onSelect={onSelectPackage} />
       )}
       <div className="order-card-header">
-        <span className="order-card-price">${activePkg.price}</span>
+        <span className="order-card-price">${price}</span>
       </div>
 
       <div className="order-card-time">
         <Clock size={16} />
-        <span>{activePkg.daysToMake}-day delivery</span>
+        <span>{daysToMake}-day delivery</span>
       </div>
 
       {features.length > 0 && (
@@ -68,21 +61,22 @@ export function OrderCard({ gig }) {
         </ul>
       )}
 
+      {isOwnGig && <p className="order-card-note">You can&apos;t order your own gig</p>}
+      {errorMsg && (
+        <p className="order-card-error" role="alert">
+          {errorMsg}
+        </p>
+      )}
+
       <button
         type="button"
         className="order-card-continue-btn"
         onClick={handleContinue}
-        disabled={isCreating}
+        disabled={isCreating || isOwnGig}
       >
         <span>Continue</span>
         <ArrowRight size={18} />
       </button>
-
-      {statusMsg && (
-        <p className={`order-card-feedback ${statusMsg.type}`} role="status">
-          {statusMsg.text}
-        </p>
-      )}
     </div>
   )
 }
