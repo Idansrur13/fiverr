@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Check, Clock } from 'lucide-react'
+import { ArrowRight, Check, Clock, Info } from 'lucide-react'
 import { userService } from '../services/user.service'
 import { PackageSelector } from './PackageSelector'
 
@@ -66,15 +66,40 @@ function OrderCardContent({ gig, packagesKey }) {
         {(selectedPackage) => {
           const activePkg = selectedPackage || gig
           const features = activePkg.features || []
+          const currency = activePkg.currency || gig.currency
+          const currencySymbol =
+            activePkg.currencySymbol ||
+            gig.currencySymbol ||
+            (currency === 'ILS' || currency === '₪' ? '₪' : '$')
+          const packageTitle = selectedPackage
+            ? activePkg.title || activePkg.tier || 'Package'
+            : null
+          const description = selectedPackage?.description
+          const price = activePkg.price ?? gig.price
 
           return (
-            <>
-              <div className="order-card-header">
-                <span className="order-card-price">${activePkg.price}</span>
+            <div className="order-card-content">
+              {packageTitle && <h2 className="order-card-package-title">{packageTitle}</h2>}
+              <div className="order-card-price-row">
+                <span className="order-card-price">
+                  {currencySymbol}
+                  {price}
+                </span>
+                <span
+                  className="order-card-price-info"
+                  title="Includes taxes and service fees"
+                  role="img"
+                  aria-label="Pricing information"
+                >
+                  <Info size={16} aria-hidden="true" />
+                </span>
               </div>
+              <p className="order-card-fees">Includes taxes and service fees</p>
+
+              {description && <p className="order-card-description">{description}</p>}
 
               <div className="order-card-time">
-                <Clock size={16} />
+                <Clock size={16} aria-hidden="true" />
                 <span>{activePkg.daysToMake}-day delivery</span>
               </div>
 
@@ -82,7 +107,7 @@ function OrderCardContent({ gig, packagesKey }) {
                 <ul className="order-card-features">
                   {features.map((feature, idx) => (
                     <li key={feature + idx}>
-                      <Check size={16} />
+                      <Check size={16} aria-hidden="true" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -96,7 +121,7 @@ function OrderCardContent({ gig, packagesKey }) {
                 disabled={!isLoggedIn || isOwnGig}
               >
                 <span>{isOwnGig ? 'Your gig' : 'Continue'}</span>
-                <ArrowRight size={18} />
+                <ArrowRight size={18} aria-hidden="true" />
               </button>
 
               {visibleStatus && (
@@ -117,7 +142,7 @@ function OrderCardContent({ gig, packagesKey }) {
                   You cannot order your own gig.
                 </p>
               )}
-            </>
+            </div>
           )
         }}
       </PackageSelector>

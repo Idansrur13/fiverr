@@ -6,8 +6,20 @@ import { PackageSelector } from './PackageSelector'
 
 const gig = gigs.find((item) => item.id === 'g101')
 const packages = [
-  { id: 'package-basic', tier: 'BASIC', title: 'Basic', price: 45, daysToMake: 2 },
-  { id: 'package-premium', tier: 'PREMIUM', title: 'Premium', price: 90, daysToMake: 4 },
+  {
+    id: 'package-basic',
+    tier: 'BASIC',
+    title: 'Basic brand identity package',
+    price: 45,
+    daysToMake: 2,
+  },
+  {
+    id: 'package-premium',
+    tier: 'PREMIUM',
+    title: 'Premium complete brand identity package',
+    price: 90,
+    daysToMake: 4,
+  },
 ]
 
 describe('PackageSelector', () => {
@@ -37,6 +49,17 @@ describe('PackageSelector', () => {
     expect(basicButton).toHaveAttribute('aria-pressed', 'false')
     expect(screen.getByText(`${gig.title}: $90`)).toBeInTheDocument()
     expect(onSelectionChange).toHaveBeenCalledOnce()
+  })
+
+  it('uses short title-cased tier labels instead of long package titles', () => {
+    render(
+      <PackageSelector packages={packages}>
+        {(selectedPackage) => <p>{selectedPackage.title}</p>}
+      </PackageSelector>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Basic' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Premium' })).toBeInTheDocument()
   })
 
   it('falls back to the first package if the selected index no longer exists', () => {

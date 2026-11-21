@@ -19,8 +19,33 @@ const baseGig = gigs.find((item) => item.id === 'g101')
 const gig = {
   ...baseGig,
   packages: [
-    { id: 'package-basic', tier: 'BASIC', title: 'Basic', price: 50, daysToMake: 2 },
-    { id: 'package-premium', tier: 'PREMIUM', title: 'Premium', price: 100, daysToMake: 4 },
+    {
+      id: 'package-basic',
+      tier: 'BASIC',
+      title: 'Basic',
+      price: 50,
+      daysToMake: 2,
+      description: 'A clean starter package.',
+      features: ['One design concept'],
+    },
+    {
+      id: 'package-standard',
+      tier: 'STANDARD',
+      title: 'Standard',
+      price: 150,
+      daysToMake: 3,
+      description: 'A polished package for growing brands.',
+      features: ['Three design concepts'],
+    },
+    {
+      id: 'package-premium',
+      tier: 'PREMIUM',
+      title: 'Premium',
+      price: 250,
+      daysToMake: 4,
+      description: 'A complete, premium design package.',
+      features: ['Five design concepts'],
+    },
   ],
 }
 
@@ -62,8 +87,26 @@ describe('OrderCard', () => {
 
   it('renders the selected package price and delivery time', () => {
     renderOrderCard()
+    expect(screen.getByRole('heading', { name: 'Basic' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Package selection' }).children).toHaveLength(3)
+    expect(screen.getByRole('img', { name: 'Pricing information' })).toBeInTheDocument()
     expect(screen.getByText('$50')).toBeInTheDocument()
+    expect(screen.getByText('Includes taxes and service fees')).toBeInTheDocument()
+    expect(screen.getByText('A clean starter package.')).toBeInTheDocument()
     expect(screen.getByText('2-day delivery')).toBeInTheDocument()
+    expect(screen.getByText('One design concept')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument()
+  })
+
+  it('switches the full package details when another tier is selected', () => {
+    renderOrderCard()
+    fireEvent.click(screen.getByRole('button', { name: 'Premium' }))
+
+    expect(screen.getByRole('heading', { name: 'Premium' })).toBeInTheDocument()
+    expect(screen.getByText('$250')).toBeInTheDocument()
+    expect(screen.getByText('A complete, premium design package.')).toBeInTheDocument()
+    expect(screen.getByText('4-day delivery')).toBeInTheDocument()
+    expect(screen.getByText('Five design concepts')).toBeInTheDocument()
   })
 
   it('navigates to checkout with the selected package', () => {
@@ -76,7 +119,7 @@ describe('OrderCard', () => {
     expect(navigation.state.packageId).toBe('package-premium')
     expect(navigation.state.selectedPackage).toMatchObject({
       tier: 'PREMIUM',
-      price: 100,
+      price: 250,
       daysToMake: 4,
     })
   })
@@ -100,7 +143,7 @@ describe('OrderCard', () => {
   it('resets the package selection when the gig changes', () => {
     const { rerender } = renderOrderCard()
     fireEvent.click(screen.getByRole('button', { name: 'Premium' }))
-    expect(screen.getByText('$100')).toBeInTheDocument()
+    expect(screen.getByText('$250')).toBeInTheDocument()
 
     const nextGig = {
       ...gig,
@@ -131,7 +174,7 @@ describe('OrderCard', () => {
     )
 
     expect(screen.getByText('$25')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'New package' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'New Package' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
@@ -140,7 +183,7 @@ describe('OrderCard', () => {
   it('resets the package selection when the package list shrinks', () => {
     const { rerender } = renderOrderCard()
     fireEvent.click(screen.getByRole('button', { name: 'Premium' }))
-    expect(screen.getByText('$100')).toBeInTheDocument()
+    expect(screen.getByText('$250')).toBeInTheDocument()
 
     const renderUpdatedGig = (updatedGig) =>
       rerender(

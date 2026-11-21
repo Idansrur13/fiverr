@@ -1,5 +1,13 @@
 import { useState } from 'react'
 
+function getPackageLabel(pkg) {
+  const label = pkg.label || pkg.tier
+  const fallbackTitle = pkg.title?.trim().split(/\s+/).slice(0, 2).join(' ')
+  const text = (label || fallbackTitle || 'Package').replace(/[_-]+/g, ' ').trim().toLowerCase()
+
+  return text.replace(/(^|\s)[a-z]/g, (part) => part.toUpperCase())
+}
+
 export function PackageSelector(props) {
   const { packages = [] } = props
   const packagesKey = packages
@@ -22,7 +30,12 @@ function PackageSelectorState({ packages, children, onSelectionChange }) {
   return (
     <>
       {packages.length > 1 && (
-        <div className="order-card-tabs" role="group" aria-label="Package selection">
+        <div
+          className="order-card-tabs"
+          role="group"
+          aria-label="Package selection"
+          style={{ '--package-count': packages.length }}
+        >
           {packages.map((pkg, idx) => (
             <button
               key={pkg.id || pkg.packageId || pkg.tier || idx}
@@ -31,7 +44,7 @@ function PackageSelectorState({ packages, children, onSelectionChange }) {
               aria-pressed={idx === activeIdx}
               onClick={() => handleSelect(idx)}
             >
-              {pkg.title || pkg.tier}
+              {getPackageLabel(pkg)}
             </button>
           ))}
         </div>
