@@ -11,7 +11,8 @@ export function OrderCard({ gig }) {
 
   if (!gig) return null
 
-  const activePkg = gig.packages?.length > 0 ? gig.packages[selectedIdx] : gig
+  const packages = gig.packages || []
+  const activePkg = packages.length > 0 ? packages[selectedIdx] : gig
   const features = activePkg.features || []
 
   async function handleContinue() {
@@ -31,6 +32,22 @@ export function OrderCard({ gig }) {
 
   return (
     <div className="order-card">
+      {packages.length > 1 && (
+        <div className="order-card-tabs" role="tablist">
+          {packages.map((pkg, idx) => (
+            <button
+              key={pkg.id || pkg.tier || idx}
+              type="button"
+              role="tab"
+              aria-selected={idx === selectedIdx}
+              className={`order-card-tab ${idx === selectedIdx ? 'active' : ''}`}
+              onClick={() => setSelectedIdx(idx)}
+            >
+              {pkg.title || pkg.tier}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="order-card-header">
         <span className="order-card-price">${activePkg.price}</span>
       </div>
