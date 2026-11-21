@@ -235,6 +235,8 @@ npx prisma migrate dev
 npm run db:seed
 ```
 
+ב-production לא מריצים את זה מהמחשב. ב-GitHub נכנסים ל-**Actions** → **Seed database** → **Run workflow**, ומקלידים `seed` בשדה האישור. ה-workflow מריץ קודם את ה-migrations ואחר כך את ה-seed, ואפשר להריץ אותו שוב בלי שייווצרו כפילויות. הוא צריך את הסודות `DATABASE_URL` ו-`DIRECT_URL` ב-**Settings** → **Secrets and variables** → **Actions**.
+
 ✅ **בדיקה:** פותחים את Prisma Studio ורואים את הטבלאות, ובטבלת `Category` יש נתונים:
 
 ```bash
