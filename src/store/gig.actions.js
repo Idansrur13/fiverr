@@ -2,9 +2,9 @@ import { gigService } from '../services/gig.service'
 import { store } from './store'
 import { ADD_GIG, REMOVE_GIG, SET_FILTER_BY, SET_GIG, SET_GIGS, UPDATE_GIG } from './gig.reducer'
 
-export async function loadGigs(filterBy = store.getState().gigModule.filterBy) {
+export async function loadGigs(filterBy = store.getState().gigModule.filterBy, signal) {
   const gigs = await gigService.query(filterBy)
-  store.dispatch({ type: SET_GIGS, gigs })
+  if (!signal?.aborted) store.dispatch({ type: SET_GIGS, gigs })
   return gigs
 }
 

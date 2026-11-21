@@ -100,4 +100,25 @@ describe('GigDetailsPage', () => {
     expect(screen.getAllByText('5.0')).toHaveLength(2)
     expect(screen.getAllByText(`(${gig.reviews.length})`)).toHaveLength(2)
   })
+
+  it('uses category slugs from the API data in breadcrumb links', async () => {
+    gigService.getById.mockResolvedValue({
+      ...gigs.find((item) => item.id === 'g101'),
+      category: {
+        name: 'Design & Branding',
+        slug: 'design-branding-services',
+        parent: { name: 'Graphics & Design', slug: 'graphics-design' },
+      },
+    })
+
+    renderWithRoute('g101')
+
+    expect(await screen.findByText('Design & Branding')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Graphics & Design' }).getAttribute('href')).toBe(
+      '/explore?category=graphics-design',
+    )
+    expect(screen.getByRole('link', { name: 'Design & Branding' }).getAttribute('href')).toBe(
+      '/explore?category=design-branding-services',
+    )
+  })
 })

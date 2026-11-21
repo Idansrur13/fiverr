@@ -60,6 +60,12 @@ export function GigDetailsPage() {
 
   const categoryName = typeof category === 'string' ? category : category?.name
   const parentCategoryName = typeof category === 'object' ? category?.parent?.name : null
+  const categorySlug =
+    (typeof category === 'object' ? category?.slug : null) || createCategorySlug(categoryName)
+  const parentCategorySlug =
+    typeof category === 'object'
+      ? category?.parent?.slug || createCategorySlug(parentCategoryName)
+      : null
 
   function formatCategoryName(name) {
     if (!name) return ''
@@ -67,6 +73,10 @@ export function GigDetailsPage() {
       .split('-')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
+  }
+
+  function createCategorySlug(name) {
+    return name?.trim().toLowerCase().replace(/\s+/g, '-') || ''
   }
 
   return (
@@ -80,15 +90,13 @@ export function GigDetailsPage() {
             {parentCategoryName && (
               <>
                 <span className="separator"> / </span>
-                <Link
-                  to={`/explore?category=${category.parent.name.toLowerCase().replace(' ', '-')}`}
-                >
+                <Link to={`/explore?category=${encodeURIComponent(parentCategorySlug)}`}>
                   {formatCategoryName(parentCategoryName)}
                 </Link>
               </>
             )}
             <span className="separator"> / </span>
-            <Link to={`/explore?category=${categoryName.toLowerCase().replace(' ', '-')}`}>
+            <Link to={`/explore?category=${encodeURIComponent(categorySlug)}`}>
               {formatCategoryName(categoryName)}
             </Link>
           </nav>
