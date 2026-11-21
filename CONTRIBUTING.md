@@ -12,7 +12,7 @@
 | Backend       | Vercel Serverless Functions (תיקיית `api/`) |
 | Database      | Supabase Postgres                           |
 | ORM           | Prisma                                      |
-| Auth          | Supabase Auth (Google)                      |
+| Auth          | Supabase Auth (מייל וסיסמה)                 |
 | קבצים ותמונות | Supabase Storage                            |
 | סביבה מקומית  | Docker (Postgres מקומי לפיתוח ולטסטים)      |
 | טסטים         | Vitest, React Testing Library               |
@@ -42,7 +42,7 @@
 
 | ✅ נכון                   | ❌ לא נכון        |
 | ------------------------- | ----------------- |
-| `idan/google_login`       | `google-login`    |
+| `idan/user_profile`       | `user-profile`    |
 | `idan/gig_edit_form`      | `idan/fix`        |
 | `[name2]/explore_filters` | `feature/explore` |
 | `[name3]/order_status`    | `[name3]/stuff`   |
@@ -63,7 +63,7 @@ git pull origin main
 ```
 
 ```bash
-git checkout -b idan/google_login
+git checkout -b idan/user_profile
 ```
 
 עובדים, ועושים commit-ים קטנים לאורך הדרך:
@@ -73,7 +73,7 @@ git add .
 ```
 
 ```bash
-git commit -m "feat: add google login button"
+git commit -m "feat: add user profile page"
 ```
 
 לפני ה-PR מעדכנים מול `main`:
@@ -91,7 +91,7 @@ npm run check
 ```
 
 ```bash
-git push -u origin idan/google_login
+git push -u origin idan/user_profile
 ```
 
 אם הבראנץ' כבר נדחף לפני ה-rebase, דוחפים עם:
@@ -126,7 +126,7 @@ git push --force-with-lease
 
 כל משימה, גדולה או קטנה, נפתחת כ-issue **לפני** שמתחילים לעבוד עליה.
 
-- **כותרת:** קצרה וברורה – `Google login`, `Explore filters by budget`
+- **כותרת:** קצרה וברורה – `User profile page`, `Explore filters by budget`
 - **תיאור:** מה צריך לעשות ומתי זה נחשב גמור
 - **Assignee:** מי שעובד על זה
 - **Labels:** `frontend`, `backend`, `db`, `infra`, `design`, `bug`, `blocked`
@@ -183,7 +183,7 @@ npm run check
 
 ### פתיחת PR
 
-- **כותרת:** באותו פורמט של commit – `feat: google login`
+- **כותרת:** באותו פורמט של commit – `feat: user profile page`
 - **תיאור:**
   - מה נעשה ולמה
   - `Closes #12` – קישור ל-issue (סוגר אותו אוטומטית במיזוג)

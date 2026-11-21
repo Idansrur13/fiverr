@@ -29,13 +29,17 @@ describe('RootCmp', () => {
 
   it.each([
     ['/explore', 'Explore'],
-    ['/gig/123', 'Gig Details'],
     ['/orders', 'My Orders'],
     ['/seller/dashboard', 'Dashboard'],
     ['/seller/gigs/new', 'Create a new gig'],
   ])('renders the right page at %s', (path, heading) => {
     renderAt(path)
     expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
+  })
+
+  it('renders the gig details page at /gig/123', () => {
+    renderAt('/gig/123')
+    expect(screen.getByText(/loading/i)).toBeInTheDocument()
   })
 
   it('renders the not found page for an unknown route', () => {

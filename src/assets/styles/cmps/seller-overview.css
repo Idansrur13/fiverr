@@ -1,0 +1,27 @@
+.seller-overview {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.seller-overview-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.seller-overview-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.seller-overview-name {
+  font-weight: 700;
+  color: var(--clr-text-dark);
+}
