@@ -8,8 +8,8 @@ export async function loadOrders(filterBy) {
   return orders
 }
 
-export async function addOrder({ gig, buyer }) {
-  const order = await orderService.add({ gig, buyer })
+export async function addOrder({ gig, buyer, pkg }) {
+  const order = await orderService.add({ gig, buyer, pkg })
   store.dispatch({ type: ADD_ORDER, order })
   return order
 }

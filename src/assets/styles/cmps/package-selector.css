@@ -1,0 +1,29 @@
+.package-selector {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  border-bottom: 1px solid var(--clr-border);
+  background-color: var(--clr-bg-light);
+}
+
+.package-selector button {
+  padding: var(--space-md) 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--clr-text-light);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--clr-border);
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.package-selector button:last-child {
+  border-right: none;
+}
+
+.package-selector button[aria-pressed='true'] {
+  background-color: var(--clr-bg);
+  color: var(--clr-text-dark);
+  border-bottom-color: var(--clr-text-dark);
+}
