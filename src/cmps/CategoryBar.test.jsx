@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { CategoryBar } from './CategoryBar'
 import { store } from '../store/store'
@@ -19,6 +19,10 @@ const CATEGORY_NAMES = [
   'AI Services',
 ]
 
+function ExploreStub() {
+  return <h1>Explore page {useLocation().search}</h1>
+}
+
 function renderCategoryBar(path = '/') {
   render(
     <Provider store={store}>
@@ -26,7 +30,7 @@ function renderCategoryBar(path = '/') {
         <CategoryBar />
         <Routes>
           <Route path="/" element={<h1>Home page</h1>} />
-          <Route path="/explore" element={<h1>Explore page</h1>} />
+          <Route path="/explore" element={<ExploreStub />} />
         </Routes>
       </MemoryRouter>
     </Provider>,
@@ -55,7 +59,9 @@ describe('CategoryBar', () => {
     const { filterBy } = store.getState().gigModule
     expect(filterBy.category).toBe('programming-tech')
     expect(filterBy.txt).toBe('')
-    expect(screen.getByRole('heading', { name: 'Explore page' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Explore page ?category=programming-tech' }),
+    ).toBeInTheDocument()
   })
 
   it('marks the selected category as active', () => {

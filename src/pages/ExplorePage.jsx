@@ -6,9 +6,8 @@ import { categoryService } from '../services/category.service'
 import { useFilterSearchParams } from '../customHooks/useFilterSearchParams'
 
 export function ExplorePage() {
-  useFilterSearchParams()
+  const [filterBy] = useFilterSearchParams()
   const gigs = useSelector((storeState) => storeState.gigModule.gigs)
-  const filterBy = useSelector((storeState) => storeState.gigModule.filterBy)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 

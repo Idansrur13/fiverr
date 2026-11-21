@@ -1,17 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { setFilterBy } from '../store/gig.actions'
+import { categoryService } from '../services/category.service'
+import { utilService } from '../services/util.service'
 
-const CATEGORIES = [
-  { name: 'Graphics & Design', slug: 'graphics-design' },
-  { name: 'Programming & Tech', slug: 'programming-tech' },
-  { name: 'Digital Marketing', slug: 'digital-marketing' },
-  { name: 'Video & Animation', slug: 'video-animation' },
-  { name: 'Writing & Translation', slug: 'writing-translation' },
-  { name: 'Music & Audio', slug: 'music-audio' },
-  { name: 'Business', slug: 'business' },
-  { name: 'AI Services', slug: 'ai-services' },
-]
+const CATEGORIES = categoryService.getCategories()
 
 export function CategoryBar() {
   const selectedCategory = useSelector((storeState) => storeState.gigModule.filterBy.category)
@@ -21,7 +14,7 @@ export function CategoryBar() {
 
   function onSelectCategory(slug) {
     setFilterBy({ category: slug, txt: '' })
-    navigate('/explore')
+    navigate(utilService.getExploreUrl({ category: slug }))
   }
 
   return (

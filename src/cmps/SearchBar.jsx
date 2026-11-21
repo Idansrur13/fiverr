@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Search } from 'lucide-react'
 import { setFilterBy } from '../store/gig.actions'
+import { utilService } from '../services/util.service'
 
 export function SearchBar() {
   const filterTxt = useSelector((storeState) => storeState.gigModule.filterBy.txt)
@@ -12,7 +13,7 @@ export function SearchBar() {
   function onSubmit(ev) {
     ev.preventDefault()
     setFilterBy({ txt: txt.trim(), category: '' })
-    navigate('/explore')
+    navigate(utilService.getExploreUrl({ txt }))
   }
 
   return (
