@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { prisma } from '../../api/_lib/prisma.js'
 import { seed } from '../../prisma/seed.js'
-import { loadDemoGigs, toUuid } from '../../prisma/seed-data.js'
+import { buildSeedData, loadDemoGigs, toUuid } from '../../prisma/seed-data.js'
 
 const demoGigs = loadDemoGigs()
 const demoReviews = demoGigs.flatMap((gig) => gig.reviews)
@@ -26,6 +26,23 @@ async function countRows() {
   ])
   return { users, gigs, packages, orders, reviews, categories }
 }
+
+describe('buildSeedData', () => {
+  it('keeps a seller as a seller when they also review another gig', () => {
+    const sellerGig = demoGigs[0]
+    const otherGig = demoGigs.find((gig) => gig.owner.id !== sellerGig.owner.id)
+    const review = { ...otherGig.reviews[0], by: { ...sellerGig.owner, country: 'Israel' } }
+
+    const { users } = buildSeedData([{ ...otherGig, reviews: [review] }, sellerGig])
+    const seller = users.find((user) => user.username === sellerGig.owner.id)
+
+    expect(seller).toMatchObject({
+      isSeller: true,
+      level: sellerGig.owner.level,
+      country: 'Israel',
+    })
+  })
+})
 
 describe('prisma seed', () => {
   beforeAll(async () => {
@@ -64,7 +81,7 @@ describe('prisma seed', () => {
     })
   })
 
-  it('creates three packages for every gig', async () => {
+  it('creates three packages with features for every gig', async () => {
     const gigs = await prisma.gig.findMany({ include: { packages: true } })
 
     gigs.forEach((gig) => {
@@ -77,6 +94,7 @@ describe('prisma seed', () => {
         STANDARD: demoGig.price * 2,
         PREMIUM: demoGig.price * 3,
       })
+      gig.packages.forEach((pkg) => expect(pkg.features.length).toBeGreaterThan(0))
     })
   })
 
@@ -92,11 +110,25 @@ describe('prisma seed', () => {
     })
   })
 
-  it('does not create duplicates when run twice', async () => {
-    const countsAfterFirstRun = await countRows()
+  it('dates every order after its gig was created and before its delivery', async () => {
+    const orders = await prisma.order.findMany({ include: { gig: true } })
 
-    await seed(prisma, demoGigs)
+    expect(orders).toHaveLength(demoReviews.length)
+    orders.forEach((order) => {
+      expect(order.createdAt.getTime()).toBeGreaterThanOrEqual(order.gig.createdAt.getTime())
+      expect(order.createdAt.getTime()).toBeLessThan(order.deliveredAt.getTime())
+      expect(order.deliveredAt.getTime()).toBeLessThanOrEqual(order.dueAt.getTime())
+    })
+  })
+
+  it('updates the existing rows instead of creating duplicates when run again', async () => {
+    const countsAfterFirstRun = await countRows()
+    const [firstGig, ...otherGigs] = demoGigs
+
+    await seed(prisma, [{ ...firstGig, title: 'An updated demo title' }, ...otherGigs])
 
     expect(await countRows()).toEqual(countsAfterFirstRun)
+    const gig = await prisma.gig.findUnique({ where: { id: toUuid(firstGig.id) } })
+    expect(gig.title).toBe('An updated demo title')
   })
 })

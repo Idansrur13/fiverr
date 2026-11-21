@@ -1,19 +1,8 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
+import { calcOrderTotal, roundToCents } from '../src/services/pricing.service.js'
 
 const DAY = 24 * 60 * 60 * 1000
-const SERVICE_FEE_RATE = 0.055
-
-export const CATEGORIES = [
-  { name: 'Graphics & Design', slug: 'graphics-design' },
-  { name: 'Programming & Tech', slug: 'programming-tech' },
-  { name: 'Digital Marketing', slug: 'digital-marketing' },
-  { name: 'Video & Animation', slug: 'video-animation' },
-  { name: 'Writing & Translation', slug: 'writing-translation' },
-  { name: 'Music & Audio', slug: 'music-audio' },
-  { name: 'Business', slug: 'business' },
-  { name: 'AI Services', slug: 'ai-services' },
-]
 
 const PACKAGE_TIERS = [
   {
@@ -23,6 +12,7 @@ const PACKAGE_TIERS = [
     priceFactor: 1,
     extraDays: 0,
     revisions: 1,
+    features: ['Commercial use'],
   },
   {
     tier: 'STANDARD',
@@ -31,14 +21,16 @@ const PACKAGE_TIERS = [
     priceFactor: 2,
     extraDays: 2,
     revisions: 3,
+    features: ['Commercial use', 'Source files'],
   },
   {
     tier: 'PREMIUM',
     title: 'Premium',
-    description: 'The full package with unlimited revisions',
+    description: 'The full package with priority support',
     priceFactor: 3,
     extraDays: 4,
-    revisions: 99,
+    revisions: 5,
+    features: ['Commercial use', 'Source files', 'Priority support'],
   },
 ]
 
@@ -62,12 +54,31 @@ export function toUuid(demoId) {
   ].join('-')
 }
 
-function roundMoney(amount) {
-  return Math.round(amount * 100) / 100
+function toSeller(owner) {
+  return {
+    id: toUuid(owner.id),
+    username: owner.id,
+    fullname: owner.fullname,
+    imgUrl: owner.imgUrl,
+    isSeller: true,
+    level: owner.level,
+  }
+}
+
+function toBuyer(reviewer) {
+  return {
+    id: toUuid(reviewer.id),
+    username: reviewer.id,
+    fullname: reviewer.fullname,
+    imgUrl: reviewer.imgUrl,
+    isSeller: false,
+    level: 'NEW',
+    country: reviewer.country,
+  }
 }
 
 export function buildSeedData(demoGigs) {
-  const users = new Map()
+  const users = new Map(demoGigs.map(({ owner }) => [owner.id, toSeller(owner)]))
   const gigs = []
   const packages = []
   const orders = []
@@ -75,15 +86,6 @@ export function buildSeedData(demoGigs) {
 
   for (const demoGig of demoGigs) {
     const { owner } = demoGig
-    users.set(owner.id, {
-      id: toUuid(owner.id),
-      username: owner.id,
-      fullname: owner.fullname,
-      imgUrl: owner.imgUrl,
-      isSeller: true,
-      level: owner.level,
-    })
-
     const gigId = toUuid(demoGig.id)
     gigs.push({
       id: gigId,
@@ -97,40 +99,26 @@ export function buildSeedData(demoGigs) {
       createdAt: new Date(demoGig.createdAt),
     })
 
-    for (const { tier, title, description, priceFactor, extraDays, revisions } of PACKAGE_TIERS) {
+    for (const { priceFactor, extraDays, ...tierFields } of PACKAGE_TIERS) {
       packages.push({
-        id: toUuid(`${demoGig.id}-${tier}`),
+        id: toUuid(`${demoGig.id}-${tierFields.tier}`),
         gigId,
-        tier,
-        title,
-        description,
-        price: roundMoney(demoGig.price * priceFactor),
+        ...tierFields,
+        price: roundToCents(demoGig.price * priceFactor),
         daysToMake: demoGig.daysToMake + extraDays,
-        revisions,
-        features: [],
       })
     }
 
     // Every review needs a completed order, made on the BASIC package
     for (const demoReview of demoGig.reviews) {
       const reviewer = demoReview.by
-      users.set(reviewer.id, {
-        id: toUuid(reviewer.id),
-        username: reviewer.id,
-        fullname: reviewer.fullname,
-        imgUrl: reviewer.imgUrl,
-        isSeller: false,
-        level: 'NEW',
-        country: reviewer.country,
-      })
+      users.set(reviewer.id, { ...toBuyer(reviewer), ...users.get(reviewer.id) })
 
       // Realistic dates: ordered, delivered on time, and reviewed a day after delivery
       const reviewedAt = demoReview.createdAt
       const deliveredAt = reviewedAt - DAY
-      const createdAt = deliveredAt - demoGig.daysToMake * DAY
+      const createdAt = Math.max(deliveredAt - demoGig.daysToMake * DAY, demoGig.createdAt)
       const orderId = toUuid(`order-${demoReview.id}`)
-      const price = roundMoney(demoGig.price)
-      const serviceFee = roundMoney(price * SERVICE_FEE_RATE)
 
       orders.push({
         id: orderId,
@@ -138,9 +126,7 @@ export function buildSeedData(demoGigs) {
         sellerId: toUuid(owner.id),
         gigId,
         packageId: toUuid(`${demoGig.id}-BASIC`),
-        price,
-        serviceFee,
-        total: roundMoney(price + serviceFee),
+        ...calcOrderTotal(demoGig.price),
         status: 'COMPLETED',
         createdAt: new Date(createdAt),
         dueAt: new Date(createdAt + demoGig.daysToMake * DAY),
