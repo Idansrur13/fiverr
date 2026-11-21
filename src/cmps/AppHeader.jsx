@@ -26,6 +26,9 @@ export function AppHeader() {
           <NavLink to="/seller/dashboard" className="nav-freelance">
             Freelance on Fiverr
           </NavLink>
+          <NavLink to="/orders" className="nav-orders">
+            Orders
+          </NavLink>
           <button type="button" className="nav-lang">
             <Globe size={18} />
             EN
