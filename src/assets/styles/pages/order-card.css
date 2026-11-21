@@ -1,0 +1,131 @@
+.order-card {
+  border: 1px solid #e4e5e7;
+  border-radius: 4px;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+.order-card-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  border-bottom: 1px solid #e4e5e7;
+  background-color: #fafafa;
+}
+@media (min-width: 900px) {
+  .order-card {
+    position: sticky;
+    top: 24px;
+  }
+}
+.order-card-tab {
+  padding: 16px 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #74767e;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #e4e5e7;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+.order-card-tab:last-child {
+  border-right: none;
+}
+
+.order-card-tab.active {
+  background-color: #ffffff;
+  color: #222325;
+  border-bottom-color: #222325;
+}
+.order-card-header,
+.order-card-time,
+.order-card-features,
+.order-card-feedback {
+  padding-inline: 24px;
+}
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-top: 24px;
+}
+
+.order-card-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222325;
+}
+
+.order-card-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #404145;
+  margin-bottom: 16px;
+}
+
+.order-card-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-card-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #62646a;
+}
+
+.order-card-features svg {
+  color: #222325;
+  flex-shrink: 0;
+}
+
+.order-card-continue-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 48px);
+  margin: 0 24px 24px;
+  padding: 12px 24px;
+  background-color: #222325;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.order-card-continue-btn:hover:not(:disabled) {
+  background-color: #404145;
+}
+
+.order-card-continue-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.order-card-feedback {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.order-card-feedback.success {
+  color: #1dbf73;
+}
+
+.order-card-feedback.error {
+  color: #d93025;
+}

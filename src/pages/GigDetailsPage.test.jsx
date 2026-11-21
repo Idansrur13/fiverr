@@ -85,4 +85,17 @@ describe('GigDetailsPage', () => {
     expect(screen.getAllByText(gig.owner.rating.toFixed(1))).toHaveLength(2)
     expect(screen.getAllByText(`(${gig.reviews.length})`)).toHaveLength(2)
   })
+
+  it('renders the order card inside the sidebar without a nested aside', async () => {
+    gigService.getById.mockResolvedValue(gig)
+    const { container } = renderWithRoute('g101')
+
+    expect(await screen.findByText('$45')).toBeInTheDocument()
+    const sidebar = container.querySelector('.gig-details-sidebar')
+    const orderCard = sidebar.querySelector('.order-card')
+
+    expect(orderCard).toBeInTheDocument()
+    expect(orderCard.tagName).toBe('DIV')
+    expect(sidebar.querySelector('aside')).toBeNull()
+  })
 })
