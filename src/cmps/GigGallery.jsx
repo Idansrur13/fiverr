@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export function GigGallery({ images = [] }) {
   const [activeIdx, setActiveIdx] = useState(0)
-  if (!images.length) return <p>No images to display</p> //put a loader here
+  if (!images.length) return <p>No images to display</p>
 
   function handlePrev() {
     setActiveIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1))
