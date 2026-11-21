@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
@@ -7,6 +7,7 @@ import { HomeHero } from './HomeHero'
 import { store } from '../store/store'
 import { setFilterBy } from '../store/gig.actions'
 import { gigService } from '../services/gig.service'
+import demoGigs from '../data/gigs.json'
 
 function renderHero() {
   render(
@@ -50,10 +51,22 @@ describe('HomeHero', () => {
     setFilterBy({ category: 'music-audio' })
     renderHero()
 
-    await user.click(screen.getByRole('button', { name: 'logo design' }))
+    await user.click(screen.getByRole('button', { name: 'logo' }))
 
-    expect(getFilterBy().txt).toBe('logo design')
+    expect(getFilterBy().txt).toBe('logo')
     expect(getFilterBy().category).toBe('')
     expect(screen.getByRole('heading', { name: 'Explore page' })).toBeInTheDocument()
+  })
+
+  it('has only tags that find at least one gig in the demo data', () => {
+    renderHero()
+    const tags = within(screen.getByRole('list')).getAllByRole('button')
+
+    expect(tags.length).toBeGreaterThan(0)
+    tags.forEach((tag) => {
+      const tagTxt = tag.textContent.trim().toLowerCase()
+      const matches = demoGigs.filter((gig) => gig.title.toLowerCase().includes(tagTxt))
+      expect(matches.length, `tag "${tagTxt}"`).toBeGreaterThan(0)
+    })
   })
 })

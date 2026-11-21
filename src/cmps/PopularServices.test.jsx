@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
@@ -44,7 +44,26 @@ describe('PopularServices', () => {
 
     const { filterBy } = store.getState().gigModule
     expect(filterBy.category).toBe('graphics-design')
-    expect(filterBy.txt).toBe('')
+    expect(filterBy.txt).toBe('logo')
     expect(screen.getByRole('heading', { name: 'Explore page' })).toBeInTheDocument()
+  })
+
+  it('gives every service its own non-empty list of gigs', async () => {
+    const user = userEvent.setup()
+    renderServices()
+    const names = screen.getAllByRole('button').map((button) => button.textContent.trim())
+    const resultsByService = {}
+
+    for (const name of names) {
+      cleanup()
+      renderServices()
+      await user.click(screen.getByRole('button', { name }))
+      const gigs = await gigService.query(store.getState().gigModule.filterBy)
+      expect(gigs.length, `"${name}" finds no gigs`).toBeGreaterThan(0)
+      resultsByService[name] = gigs.map((gig) => gig.id).join(',')
+    }
+
+    const uniqueLists = new Set(Object.values(resultsByService))
+    expect(uniqueLists.size).toBe(names.length)
   })
 })

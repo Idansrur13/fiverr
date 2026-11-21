@@ -4,9 +4,10 @@ import { SearchBar } from './SearchBar'
 import { setFilterBy } from '../store/gig.actions'
 
 const POPULAR_TAGS = [
-  'website development',
-  'logo design',
-  'video editing',
+  // Every tag matches at least one title in src/data/gigs.json
+  'logo',
+  'website',
+  'video',
   'wordpress',
   'voice over',
 ]
