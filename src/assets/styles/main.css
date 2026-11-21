@@ -15,6 +15,7 @@
 
 @import './pages/home-page.css';
 @import './pages/not-found-page.css';
+@import './pages/seller-gigs-page.css';
 
 /*gig-details-page*/
 @import './pages/gig-details-page.css';
