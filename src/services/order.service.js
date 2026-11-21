@@ -7,6 +7,19 @@ const DAY = 24 * 60 * 60 * 1000
 export const orderService = {
   query,
   add,
+  updateStatus,
+}
+
+const NEXT_STATUSES_BY_STATUS = {
+  PENDING: ['IN_PROGRESS', 'CANCELLED'],
+  IN_PROGRESS: ['DELIVERED'],
+  DELIVERED: ['COMPLETED'],
+  COMPLETED: [],
+  CANCELLED: [],
+}
+
+export function getNextStatuses(status) {
+  return NEXT_STATUSES_BY_STATUS[status] || []
 }
 
 async function query({ buyerId, sellerId, status } = {}) {
@@ -19,6 +32,14 @@ async function query({ buyerId, sellerId, status } = {}) {
         (!status || order.status === status),
     )
     .sort((a, b) => b.createdAt - a.createdAt)
+}
+
+async function updateStatus(orderId, status) {
+  const order = await storageService.get(STORAGE_KEY, orderId)
+  if (!getNextStatuses(order.status).includes(status)) {
+    throw new Error(`Cannot change order status from ${order.status} to ${status}`)
+  }
+  return storageService.put(STORAGE_KEY, { ...order, status })
 }
 
 function add({ gig, buyer, pkg = null }) {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { orderService } from './order.service'
+import { getNextStatuses, orderService } from './order.service'
 
 const gig = {
   id: 'g1',
@@ -85,5 +85,42 @@ describe('orderService', () => {
     localStorage.setItem('orderDB', JSON.stringify(storedOrders))
     const orders = await orderService.query({ status: 'COMPLETED' })
     expect(ids(orders)).toEqual(['o2', 'o3'])
+  })
+
+  it('getNextStatuses allows approve and reject for PENDING', () => {
+    expect(getNextStatuses('PENDING')).toEqual(['IN_PROGRESS', 'CANCELLED'])
+  })
+
+  it('getNextStatuses allows deliver for IN_PROGRESS', () => {
+    expect(getNextStatuses('IN_PROGRESS')).toEqual(['DELIVERED'])
+  })
+
+  it('getNextStatuses allows complete for DELIVERED', () => {
+    expect(getNextStatuses('DELIVERED')).toEqual(['COMPLETED'])
+  })
+
+  it('getNextStatuses returns nothing for COMPLETED and CANCELLED', () => {
+    expect(getNextStatuses('COMPLETED')).toEqual([])
+    expect(getNextStatuses('CANCELLED')).toEqual([])
+  })
+
+  it('updateStatus saves a valid transition', async () => {
+    localStorage.setItem('orderDB', JSON.stringify(storedOrders))
+
+    const updatedOrder = await orderService.updateStatus('o1', 'IN_PROGRESS')
+
+    expect(updatedOrder.status).toBe('IN_PROGRESS')
+    expect((await orderService.query()).find((order) => order.id === 'o1').status).toBe(
+      'IN_PROGRESS',
+    )
+  })
+
+  it('updateStatus rejects an invalid transition', async () => {
+    localStorage.setItem('orderDB', JSON.stringify(storedOrders))
+
+    await expect(orderService.updateStatus('o1', 'COMPLETED')).rejects.toThrow(
+      'Cannot change order status from PENDING to COMPLETED',
+    )
+    expect((await orderService.query()).find((order) => order.id === 'o1').status).toBe('PENDING')
   })
 })
