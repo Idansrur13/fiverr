@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Home } from 'lucide-react'
 
+import demoGigs from '../data/gigs.json'
 import { loadGig } from '../store/gig.actions'
 import { SET_GIG } from '../store/gig.reducer'
 import { store } from '../store/store'
@@ -10,6 +11,9 @@ import { GigGallery } from '../cmps/GigGallery'
 import { SellerOverview } from '../cmps/SellerOverview'
 import { AboutSeller } from '../cmps/AboutSeller'
 import { OrderCard } from '../cmps/OrderCard'
+import { ReviewList } from '../cmps/ReviewList'
+import { ReviewStats } from '../cmps/ReviewStats'
+import { reviewService } from '../services/review.service'
 
 function formatCategoryName(slug) {
   return slug
@@ -41,9 +45,10 @@ export function GigDetailsPage() {
   if (loadedGigId !== gigId) return <div className="loader">Loading...</div>
   if (gig?.id !== gigId) return <div className="error-msg">Gig not found</div>
 
-  const { title, description, category, owner, images, reviews = [] } = gig
-  const rating = owner?.rating
-  const reviewsCount = reviews.length
+  const { title, description, category, owner, images } = gig
+  const demoReviews = demoGigs.find((demoGig) => demoGig.id === gigId)?.reviews
+  const reviews = Array.isArray(gig.reviews) ? gig.reviews : demoReviews || []
+  const { avg: rating, total: reviewsCount } = reviewService.getStats(reviews)
 
   return (
     <section className="gig-details-page">
@@ -65,6 +70,12 @@ export function GigDetailsPage() {
         <section className="gig-about">
           <h2>About this gig</h2>
           <p>{description}</p>
+        </section>
+
+        <section className="gig-reviews" aria-labelledby="gig-reviews-title">
+          <h2 id="gig-reviews-title">Reviews</h2>
+          <ReviewStats reviews={reviews} />
+          <ReviewList reviews={reviews} />
         </section>
 
         <AboutSeller owner={owner} rating={rating} reviewsCount={reviewsCount} />

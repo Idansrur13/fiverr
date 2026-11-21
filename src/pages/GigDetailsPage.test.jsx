@@ -82,8 +82,10 @@ describe('GigDetailsPage', () => {
     expect(categoryLink).toHaveAttribute('href', '/explore?category=graphics-design')
 
     expect(screen.getAllByText('Top Rated Seller')).toHaveLength(2)
-    expect(screen.getAllByText(gig.owner.rating.toFixed(1))).toHaveLength(2)
+    expect(screen.getAllByText('5.0')).toHaveLength(3)
     expect(screen.getAllByText(`(${gig.reviews.length})`)).toHaveLength(2)
+    expect(screen.getByRole('heading', { name: 'Reviews' })).toBeInTheDocument()
+    expect(screen.getByText(gig.reviews[0].txt)).toBeInTheDocument()
   })
 
   it('renders the order card inside the sidebar without a nested aside', async () => {
