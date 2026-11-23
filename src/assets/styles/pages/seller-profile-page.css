@@ -1,0 +1,121 @@
+/* Desktop: the seller card on the side. Mobile: the card above the gigs. */
+.seller-profile-page {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-xl);
+}
+
+.seller-profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.seller-profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.seller-profile-card h1 {
+  font-size: var(--fs-lg);
+  color: var(--clr-text-dark);
+  overflow-wrap: anywhere;
+}
+
+.seller-profile-level {
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
+  background-color: var(--clr-bg-light);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--clr-text-dark);
+}
+
+.seller-profile-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--clr-text-light);
+}
+
+.seller-profile-rating strong {
+  color: var(--clr-text-dark);
+}
+
+.seller-profile-star {
+  fill: var(--clr-star);
+  color: var(--clr-star);
+}
+
+.seller-profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  margin-block-start: var(--space-sm);
+  padding-block-start: var(--space-md);
+  border-top: 1px solid var(--clr-border);
+  text-align: start;
+}
+
+.seller-profile-details div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.seller-profile-details dt {
+  color: var(--clr-text-light);
+}
+
+.seller-profile-details dd {
+  font-weight: 600;
+  color: var(--clr-text-dark);
+  text-align: end;
+}
+
+.seller-profile-about {
+  width: 100%;
+  padding-block-start: var(--space-md);
+  border-top: 1px solid var(--clr-border);
+  color: var(--clr-text);
+  text-align: start;
+}
+
+.seller-profile-gigs h2 {
+  margin-block-end: var(--space-lg);
+}
+
+/* Less room than on Explore, so as many columns as fit (one on a phone) */
+.seller-profile-gigs .gig-list {
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+}
+
+.seller-profile-empty,
+.seller-profile-status {
+  color: var(--clr-text-light);
+}
+
+.seller-profile-status h1 {
+  margin-block-end: var(--space-sm);
+  color: var(--clr-text-dark);
+}
+
+.seller-profile-status.error {
+  color: var(--clr-error);
+}
+
+@media (max-width: 768px) {
+  .seller-profile-page {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+  }
+}

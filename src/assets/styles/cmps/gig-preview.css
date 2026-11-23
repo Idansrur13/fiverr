@@ -18,6 +18,17 @@
   font-size: var(--fs-sm);
 }
 
+.gig-preview-seller-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.gig-preview-seller-link:hover .gig-preview-seller-name {
+  text-decoration: underline;
+}
+
 .gig-preview-avatar {
   width: 24px;
   height: 24px;

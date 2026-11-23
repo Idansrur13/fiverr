@@ -1,6 +1,7 @@
 import { createHandler } from '../_lib/http.js'
 import { prisma } from '../_lib/prisma.js'
 import { buildGigWhere, findGigIdsPage, getGigPaging } from '../_lib/gig-filter.js'
+import { GIG_PREVIEW_INCLUDE, toGigPreview } from '../_lib/gig-preview.js'
 
 export default createHandler({
   async GET(req, res) {
@@ -13,12 +14,7 @@ export default createHandler({
 
     const gigs = await prisma.gig.findMany({
       where: { id: { in: ids } },
-      include: {
-        owner: { select: { id: true, fullname: true, imgUrl: true, level: true } },
-        category: { select: { slug: true } },
-        packages: { where: { tier: 'BASIC' }, select: { price: true, daysToMake: true } },
-        reviews: { select: { rating: true } },
-      },
+      include: GIG_PREVIEW_INCLUDE,
     })
     // findMany doesn't keep the order of `ids`, so put the gigs back in the sorted order
     const gigsById = new Map(gigs.map((gig) => [gig.id, gig]))
@@ -27,18 +23,3 @@ export default createHandler({
     return res.status(200).json({ gigs: sortedGigs.map(toGigPreview), total, page, pageCount })
   },
 })
-
-// The same shape GigPreview already uses with the demo data, so the frontend doesn't change
-function toGigPreview(gig) {
-  const [basicPackage] = gig.packages
-  return {
-    id: gig.id,
-    title: gig.title,
-    images: gig.images,
-    category: gig.category.slug,
-    price: basicPackage ? Number(basicPackage.price) : null,
-    daysToMake: basicPackage ? basicPackage.daysToMake : null,
-    owner: gig.owner,
-    reviews: gig.reviews,
-  }
-}

@@ -81,7 +81,7 @@ describe('GigDetailsPage', () => {
     const categoryLink = within(breadcrumbs).getByRole('link', { name: 'Graphics Design' })
     expect(categoryLink).toHaveAttribute('href', '/explore?category=graphics-design')
 
-    expect(screen.getAllByText('Top Rated Seller')).toHaveLength(2)
+    expect(screen.getAllByText('Top Rated')).toHaveLength(2)
     expect(screen.getAllByText('5.0')).toHaveLength(3)
     expect(screen.getAllByText(`(${gig.reviews.length})`)).toHaveLength(2)
     expect(screen.getByRole('heading', { name: 'Reviews' })).toBeInTheDocument()

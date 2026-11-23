@@ -1,13 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
 import { ImgCarousel } from './ImgCarousel'
-
-const LEVEL_LABELS = {
-  NEW: 'New Seller',
-  LEVEL_1: 'Level 1',
-  LEVEL_2: 'Level 2',
-  TOP_RATED: 'Top Rated',
-}
+import { userService } from '../services/user.service'
 
 export function GigPreview({ gig }) {
   const { id, title, price, images = [], owner, reviews = [] } = gig
@@ -15,20 +9,24 @@ export function GigPreview({ gig }) {
   const rating = reviewsCount
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
     : 0
+  const levelLabel = userService.getLevelLabel(owner.level)
 
   return (
     <article className="gig-preview">
       <ImgCarousel images={images} alt={title} linkTo={`/gig/${id}`} />
-      <Link to={`/gig/${id}`} className="gig-preview-link">
-        <div className="gig-preview-seller">
+      {/* The seller and the gig are two links side by side, never one inside the other */}
+      <div className="gig-preview-seller">
+        <Link to={`/user/${owner.id}`} className="gig-preview-seller-link">
           <img className="gig-preview-avatar" src={owner.imgUrl} alt="" />
           <span className="gig-preview-seller-name">{owner.fullname}</span>
-          {LEVEL_LABELS[owner.level] && (
-            <span className={`gig-preview-level ${owner.level === 'TOP_RATED' ? 'top-rated' : ''}`}>
-              {LEVEL_LABELS[owner.level]}
-            </span>
-          )}
-        </div>
+        </Link>
+        {levelLabel && (
+          <span className={`gig-preview-level ${owner.level === 'TOP_RATED' ? 'top-rated' : ''}`}>
+            {levelLabel}
+          </span>
+        )}
+      </div>
+      <Link to={`/gig/${id}`} className="gig-preview-link">
         <h3 className="gig-preview-title">{title}</h3>
         {reviewsCount > 0 && (
           <p className="gig-preview-rating">
