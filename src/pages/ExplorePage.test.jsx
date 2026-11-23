@@ -12,6 +12,8 @@ import { setFilterBy } from '../store/gig.actions'
 import { gigService } from '../services/gig.service'
 import demoGigs from '../data/gigs.json'
 
+const PAGE_SIZE = 12
+
 // Changes that the "Change filter" button sends through the hook, set per test
 let filterChanges = {}
 
@@ -75,11 +77,16 @@ describe('ExplorePage', () => {
     vi.restoreAllMocks()
   })
 
-  it('loads and shows gigs from the store', async () => {
+  it('loads and shows the first page of gigs from the store', async () => {
     renderPage()
 
-    expect(await screen.findAllByRole('article')).toHaveLength(demoGigs.length)
-    expect(store.getState().gigModule.gigs).toHaveLength(demoGigs.length)
+    expect(await screen.findAllByRole('article')).toHaveLength(PAGE_SIZE)
+    expect(store.getState().gigModule.gigs).toHaveLength(PAGE_SIZE)
+    expect(store.getState().gigModule.pageInfo).toEqual({
+      total: demoGigs.length,
+      page: 1,
+      pageCount: Math.ceil(demoGigs.length / PAGE_SIZE),
+    })
   })
 
   it('shows the number of results', async () => {
@@ -167,7 +174,7 @@ describe('ExplorePage', () => {
   })
 
   it('queries only with the filter from the url, never with an empty filter first', async () => {
-    const querySpy = vi.spyOn(gigService, 'query')
+    const querySpy = vi.spyOn(gigService, 'queryPage')
     renderPage('/explore?category=music-audio')
 
     await screen.findAllByRole('article')
@@ -206,5 +213,53 @@ describe('ExplorePage', () => {
     ).toBeInTheDocument()
     const logoGigs = demoGigs.filter((gig) => gig.title.toLowerCase().includes('logo'))
     expect(await screen.findAllByRole('article')).toHaveLength(logoGigs.length)
+  })
+
+  it('opens sorted and on the page from the url', async () => {
+    renderPage('/explore?sortBy=newest&page=2')
+
+    const newestGigs = [...demoGigs].sort((a, b) => b.createdAt - a.createdAt)
+    const previews = await screen.findAllByRole('article')
+    expect(previews).toHaveLength(demoGigs.length - PAGE_SIZE)
+    newestGigs.slice(PAGE_SIZE).forEach((gig, idx) => {
+      expect(previews[idx]).toHaveTextContent(gig.title)
+    })
+    expect(screen.getByRole('combobox', { name: 'Sort by:' })).toHaveValue('newest')
+    expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('aria-current', 'page')
+    // The count is the total, not only this page
+    expect(screen.getByText(`${demoGigs.length} services available`)).toBeInTheDocument()
+  })
+
+  it('moves to another page from the pagination, without page 1 in the url', async () => {
+    const user = userEvent.setup()
+    renderPage('/explore?sortBy=newest')
+    await screen.findAllByRole('article')
+
+    await user.click(screen.getByRole('button', { name: 'Next page' }))
+    expect(getUrlSearch()).toBe('?sortBy=newest&page=2')
+
+    await user.click(screen.getByRole('button', { name: '1' }))
+    expect(getUrlSearch()).toBe('?sortBy=newest')
+  })
+
+  it('resets to page 1 when the filter changes', async () => {
+    const user = userEvent.setup()
+    renderPage('/explore?page=2')
+    await screen.findAllByRole('article')
+    expect(store.getState().gigModule.pageInfo.page).toBe(2)
+
+    await user.click(screen.getByRole('button', { name: 'Budget' }))
+    await user.type(screen.getByLabelText('Max.'), '1000')
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+    expect(getUrlSearch()).toBe('?maxPrice=1000')
+    expect(await screen.findByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page')
+    expect(store.getState().gigModule.pageInfo.page).toBe(1)
+
+    // A sort change goes back to page 1 too
+    await user.click(screen.getByRole('button', { name: '2' }))
+    expect(getUrlSearch()).toBe('?maxPrice=1000&page=2')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Sort by:' }), 'Newest arrivals')
+    expect(getUrlSearch()).toBe('?maxPrice=1000&sortBy=newest')
   })
 })

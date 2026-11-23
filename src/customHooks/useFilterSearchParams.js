@@ -19,8 +19,9 @@ export function useFilterSearchParams() {
     setFilterBy(filterBy)
   }, [filterBy])
 
+  // Any change that doesn't set the page (a filter or the sort) goes back to page 1
   const setFilterParams = useCallback(
-    (changes) => setSearchParams(utilService.getFilterQuery({ ...filterBy, ...changes })),
+    (changes) => setSearchParams(utilService.getFilterQuery({ ...filterBy, page: '', ...changes })),
     [filterBy, setSearchParams],
   )
 

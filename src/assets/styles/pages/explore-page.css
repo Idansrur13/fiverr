@@ -2,6 +2,19 @@
   margin-block-end: var(--space-sm);
 }
 
+/* Filters on the left, sort on the right. The filter row keeps its own bottom margin. */
+.explore-page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0 var(--space-md);
+}
+
+.explore-page-toolbar .sort-by {
+  margin-block-end: var(--space-md);
+}
+
 .explore-page-count,
 .explore-page-status {
   margin-block-end: var(--space-lg);

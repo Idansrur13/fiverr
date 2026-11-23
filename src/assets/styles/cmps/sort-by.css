@@ -1,0 +1,17 @@
+.sort-by {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--clr-text-light);
+  white-space: nowrap;
+}
+
+.sort-by select {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  background-color: var(--clr-bg);
+  color: var(--clr-text-dark);
+  font-weight: 600;
+  cursor: pointer;
+}

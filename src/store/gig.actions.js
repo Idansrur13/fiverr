@@ -1,6 +1,14 @@
 import { gigService } from '../services/gig.service'
 import { store } from './store'
-import { ADD_GIG, REMOVE_GIG, SET_FILTER_BY, SET_GIG, SET_GIGS, UPDATE_GIG } from './gig.reducer'
+import {
+  ADD_GIG,
+  REMOVE_GIG,
+  SET_FILTER_BY,
+  SET_GIG,
+  SET_GIGS,
+  SET_GIGS_PAGE,
+  UPDATE_GIG,
+} from './gig.reducer'
 
 let lastLoadGigsRequestId = 0
 
@@ -10,6 +18,15 @@ export async function loadGigs(filterBy = store.getState().gigModule.filterBy) {
   // Only the latest request writes to the store, so a slow old query can't overwrite a newer one
   if (requestId === lastLoadGigsRequestId) store.dispatch({ type: SET_GIGS, gigs })
   return gigs
+}
+
+// Explore: one sorted page + the total. Shares the request id with loadGigs, because both
+// write `gigs`, so the latest request of either one wins.
+export async function loadGigsPage(filterBy) {
+  const requestId = ++lastLoadGigsRequestId
+  const gigsPage = await gigService.queryPage(filterBy)
+  if (requestId === lastLoadGigsRequestId) store.dispatch({ type: SET_GIGS_PAGE, gigsPage })
+  return gigsPage
 }
 
 export async function loadGig(gigId) {

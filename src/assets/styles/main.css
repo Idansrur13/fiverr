@@ -19,6 +19,8 @@
 @import './cmps/gig-preview.css';
 @import './cmps/img-carousel.css';
 @import './cmps/gig-filter.css';
+@import './cmps/sort-by.css';
+@import './cmps/pagination.css';
 @import './cmps/seller-badge.css';
 @import './cmps/order-card.css';
 @import './cmps/package-selector.css';
