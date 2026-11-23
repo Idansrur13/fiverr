@@ -156,4 +156,49 @@ describe('SellerOrdersPage', () => {
       within(table).getAllByText('I will design a modern minimalist logo for your brand'),
     ).toHaveLength(2)
   })
+
+  it('finds seller orders with flat sellerId when there is no logged in user', async () => {
+    vi.spyOn(userService, 'getLoggedinUser').mockReturnValue(null)
+    localStorage.setItem(
+      'orderDB',
+      JSON.stringify([
+        {
+          ...makeOrder({
+            id: 'selected-seller',
+            buyerName: 'Selected Seller Buyer',
+            createdAt: '2026-01-20T12:00:00.000Z',
+          }),
+          seller: undefined,
+          sellerId: 'u-seller-1',
+        },
+        {
+          ...makeOrder({
+            id: 'another-seller',
+            buyerName: 'Another Seller Buyer',
+            createdAt: '2026-01-19T12:00:00.000Z',
+          }),
+          seller: undefined,
+          sellerId: 'u-seller-2',
+        },
+      ]),
+    )
+
+    renderPage()
+
+    const table = await screen.findByRole('table')
+    expect(within(table).getByText('Selected Seller Buyer')).toBeInTheDocument()
+    expect(within(table).queryByText('Another Seller Buyer')).not.toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Pending 1' })).toBeInTheDocument()
+  })
+
+  it('uses seller orders from the store when the service returns no orders', async () => {
+    localStorage.setItem('orderDB', JSON.stringify([]))
+    store.dispatch({ type: SET_ORDERS, orders: [testOrders[0]] })
+
+    renderPage()
+
+    const table = await screen.findByRole('table')
+    expect(within(table).getByText('Old Buyer')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Pending 1' })).toBeInTheDocument()
+  })
 })

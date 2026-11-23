@@ -86,4 +86,34 @@ describe('orderService', () => {
     const orders = await orderService.query({ status: 'COMPLETED' })
     expect(ids(orders)).toEqual(['o2', 'o3'])
   })
+
+  it('query supports flat and nested seller ids and sorts numeric and string dates', async () => {
+    localStorage.setItem(
+      'orderDB',
+      JSON.stringify([
+        {
+          id: 'flat-old',
+          sellerId: 'seller1',
+          status: 'PENDING',
+          createdAt: '2026-01-20T12:00:00.000Z',
+        },
+        {
+          id: 'nested-new',
+          seller: { id: 'seller1' },
+          status: 'PENDING',
+          createdAt: 1769032800000,
+        },
+        {
+          id: 'other-seller',
+          sellerId: 'seller2',
+          status: 'PENDING',
+          createdAt: '2026-01-22T12:00:00.000Z',
+        },
+      ]),
+    )
+
+    const orders = await orderService.query({ sellerId: 'seller1' })
+
+    expect(orders.map((order) => order.id)).toEqual(['nested-new', 'flat-old'])
+  })
 })

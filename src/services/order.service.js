@@ -14,11 +14,11 @@ async function query({ buyerId, sellerId, status } = {}) {
   return orders
     .filter(
       (order) =>
-        (!buyerId || order.buyer.id === buyerId) &&
-        (!sellerId || order.seller.id === sellerId) &&
+        (!buyerId || (order.buyer?.id || order.buyerId) === buyerId) &&
+        (!sellerId || (order.sellerId || order.seller?.id) === sellerId) &&
         (!status || order.status === status),
     )
-    .sort((a, b) => b.createdAt - a.createdAt)
+    .sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt))
 }
 
 function add({ gig, buyer, pkg = null }) {
@@ -35,4 +35,9 @@ function add({ gig, buyer, pkg = null }) {
     dueAt: createdAt + daysToMake * DAY,
   }
   return storageService.post(STORAGE_KEY, order)
+}
+
+function getTimestamp(value) {
+  const timestamp = typeof value === 'number' ? value : Date.parse(value)
+  return Number.isFinite(timestamp) ? timestamp : 0
 }

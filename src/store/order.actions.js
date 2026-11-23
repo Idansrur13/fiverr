@@ -2,7 +2,7 @@ import { orderService } from '../services/order.service'
 import { store } from './store'
 import { ADD_ORDER, SET_ORDERS } from './order.reducer'
 
-export async function loadOrders(filterBy) {
+export async function loadOrders(filterBy = {}) {
   const orders = await orderService.query(filterBy)
   store.dispatch({ type: SET_ORDERS, orders })
   return orders

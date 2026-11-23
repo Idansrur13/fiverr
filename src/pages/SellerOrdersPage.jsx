@@ -14,48 +14,83 @@ const STATUS_TABS = [
 ]
 
 export function SellerOrdersPage() {
-  const loggedinUser = userService.getLoggedinUser()
+  const loggedinUser = userService.getLoggedinUser?.() || null
+  const loggedinUserId = loggedinUser?.id || ''
   const orders = useSelector((state) => state.orderModule.orders)
-  const cachedOrdersRef = useRef(orders.filter((order) => order.seller?.id === loggedinUser.id))
+  const cachedOrdersRef = useRef(orders)
   const [selectedStatus, setSelectedStatus] = useState('PENDING')
   const [isLoading, setIsLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState('')
   const [fallbackOrders, setFallbackOrders] = useState([])
   const [isShowingDemo, setIsShowingDemo] = useState(false)
+  const [sellerId, setSellerId] = useState(
+    loggedinUserId || getSellerIdFromOrders(orders) || getFirstDemoSellerId(),
+  )
+
+  useEffect(() => {
+    cachedOrdersRef.current = orders
+  }, [orders])
 
   useEffect(() => {
     let isCancelled = false
+    const cachedOrders = cachedOrdersRef.current
 
-    loadOrders({ sellerId: loggedinUser.id })
+    loadOrders(loggedinUserId ? { sellerId: loggedinUserId } : {})
       .then((loadedOrders) => {
-        if (isCancelled || loadedOrders.length) return
-        setFallback(loggedinUser.id)
+        if (isCancelled) return
+        const resolvedSellerId =
+          loggedinUserId ||
+          getSellerIdFromOrders(loadedOrders) ||
+          getSellerIdFromOrders(cachedOrders) ||
+          getFirstDemoSellerId()
+        const matchingOrders = loadedOrders.filter((order) =>
+          isOrderForSeller(order, resolvedSellerId),
+        )
+        const cachedMatchingOrders = cachedOrders.filter((order) =>
+          isOrderForSeller(order, resolvedSellerId),
+        )
+
+        setSellerId(resolvedSellerId)
+        setFallback(matchingOrders.length ? matchingOrders : cachedMatchingOrders, resolvedSellerId)
+        setErrorMsg('')
       })
       .catch(() => {
         if (isCancelled) return
-        setErrorMsg('Could not load your orders. Showing demo orders when available.')
-        setFallback(loggedinUser.id)
+        const resolvedSellerId =
+          loggedinUserId || getSellerIdFromOrders(cachedOrders) || getFirstDemoSellerId()
+        const matchingOrders = cachedOrders.filter((order) =>
+          isOrderForSeller(order, resolvedSellerId),
+        )
+
+        setSellerId(resolvedSellerId)
+        setErrorMsg('Could not refresh your orders. Showing available saved or demo orders.')
+        setFallback(matchingOrders, resolvedSellerId)
       })
       .finally(() => {
         if (!isCancelled) setIsLoading(false)
       })
 
-    function setFallback(sellerId) {
-      const cachedOrders = cachedOrdersRef.current
-      const demoOrders = cachedOrders.length ? cachedOrders : getDemoOrders(sellerId)
+    function setFallback(matchingOrders, fallbackSellerId) {
+      if (matchingOrders.length) {
+        setFallbackOrders(matchingOrders)
+        setIsShowingDemo(false)
+        return
+      }
+
+      const demoOrders = getDemoOrders(fallbackSellerId)
       setFallbackOrders(demoOrders)
-      setIsShowingDemo(!cachedOrders.length && demoOrders.length > 0)
+      setIsShowingDemo(demoOrders.length > 0)
     }
 
     return () => {
       isCancelled = true
     }
-  }, [loggedinUser.id])
+  }, [loggedinUserId])
 
-  const sellerOrders = orders.filter((order) => order.seller?.id === loggedinUser.id)
+  const sellerOrders = orders.filter((order) => isOrderForSeller(order, sellerId))
   const sourceOrders = sellerOrders.length ? sellerOrders : fallbackOrders
   const sortedOrders = [...sourceOrders].sort(
-    (first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime(),
+    (first, second) => getTimestamp(second.createdAt) - getTimestamp(first.createdAt),
   )
   const visibleOrders = sortedOrders.filter((order) => order.status === selectedStatus)
   const selectedTab = STATUS_TABS.find((tab) => tab.status === selectedStatus)
@@ -117,6 +152,27 @@ export function SellerOrdersPage() {
       </section>
     </section>
   )
+}
+
+function getOrderSellerId(order) {
+  return order?.sellerId || order?.seller?.id
+}
+
+function getSellerIdFromOrders(orders) {
+  return getOrderSellerId(orders.find((order) => getOrderSellerId(order)))
+}
+
+function isOrderForSeller(order, sellerId) {
+  return Boolean(sellerId) && getOrderSellerId(order) === sellerId
+}
+
+function getTimestamp(value) {
+  const timestamp = typeof value === 'number' ? value : Date.parse(value)
+  return Number.isFinite(timestamp) ? timestamp : 0
+}
+
+function getFirstDemoSellerId() {
+  return demoGigs.find((gig) => gig.owner?.id)?.owner.id || ''
 }
 
 function getDemoOrders(sellerId) {
