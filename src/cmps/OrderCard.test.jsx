@@ -60,12 +60,12 @@ describe('OrderCard', () => {
     renderOrderCard(baseGig)
     expect(screen.getByText(`$${baseGig.price}`)).toBeInTheDocument()
     expect(screen.getByText(`${baseGig.daysToMake}-day delivery`)).toBeInTheDocument()
-    expect(screen.queryByRole('group', { name: 'Packages' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('tablist', { name: 'Packages' })).not.toBeInTheDocument()
   })
 
   it('shows the first package by default', () => {
     renderOrderCard()
-    expect(screen.getByRole('button', { name: 'Basic' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('tab', { name: 'Basic' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('$40')).toBeInTheDocument()
     expect(screen.getByText('2-day delivery')).toBeInTheDocument()
     expect(screen.getByText('1 logo concept')).toBeInTheDocument()
@@ -73,19 +73,19 @@ describe('OrderCard', () => {
 
   it('switches price, delivery time and features when another package is selected', () => {
     renderOrderCard()
-    fireEvent.click(screen.getByRole('button', { name: 'Premium' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Premium' }))
 
-    expect(screen.getByRole('button', { name: 'Premium' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('tab', { name: 'Premium' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('$150')).toBeInTheDocument()
     expect(screen.getByText('5-day delivery')).toBeInTheDocument()
     expect(screen.getByText('Brand guide')).toBeInTheDocument()
     expect(screen.queryByText('1 logo concept')).not.toBeInTheDocument()
   })
 
-  it('goes to checkout with the id of the selected package', () => {
+  it('sends the selected package id when ordering', () => {
     renderOrderCard()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Standard' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Standard' }))
     fireEvent.click(getContinueBtn())
 
     expect(screen.getByRole('heading', { name: 'Checkout p2' })).toBeInTheDocument()

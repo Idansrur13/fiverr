@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { OrderSummary } from '../cmps/OrderSummary'
 import { gigService } from '../services/gig.service'
 import { calcOrderTotal } from '../services/pricing.service'
@@ -9,6 +9,7 @@ import { addOrder } from '../store/order.actions'
 export function CheckoutPage() {
   const { gigId } = useParams()
   const { state } = useLocation()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [gig, setGig] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -59,7 +60,14 @@ export function CheckoutPage() {
     )
 
   const packages = gig.packages || []
-  const requestedPkg = state?.packageId && packages.find((pkg) => pkg.id === state.packageId)
+  const requestedPackage = state?.packageId || searchParams.get('package')
+  const requestedPkg =
+    requestedPackage &&
+    packages.find(
+      (pkg) =>
+        pkg.id === requestedPackage ||
+        String(pkg.tier || '').toUpperCase() === String(requestedPackage).toUpperCase(),
+    )
   const selectedPkg = requestedPkg || packages[0] || null
   const totals = calcOrderTotal((selectedPkg || gig).price)
   const buyer = userService.getLoggedinUser()
