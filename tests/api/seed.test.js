@@ -2,18 +2,11 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { prisma } from '../../api/_lib/prisma.js'
 import { seed } from '../../prisma/seed.js'
 import { buildSeedData, loadDemoGigs, toUuid } from '../../prisma/seed-data.js'
+import { clearSeededTables } from './helpers.js'
 
 const demoGigs = loadDemoGigs()
 const demoReviews = demoGigs.flatMap((gig) => gig.reviews)
 const sellerIds = [...new Set(demoGigs.map((gig) => gig.owner.id))]
-
-async function clearSeededTables() {
-  await prisma.review.deleteMany()
-  await prisma.order.deleteMany()
-  await prisma.package.deleteMany()
-  await prisma.gig.deleteMany()
-  await prisma.user.deleteMany()
-}
 
 async function countRows() {
   const [users, gigs, packages, orders, reviews, categories] = await Promise.all([
@@ -46,12 +39,12 @@ describe('buildSeedData', () => {
 
 describe('prisma seed', () => {
   beforeAll(async () => {
-    await clearSeededTables()
+    await clearSeededTables(prisma)
     await seed(prisma, demoGigs)
   })
 
   afterAll(async () => {
-    await clearSeededTables()
+    await clearSeededTables(prisma)
     await prisma.$disconnect()
   })
 

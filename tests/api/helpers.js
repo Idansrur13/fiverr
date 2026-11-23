@@ -1,3 +1,12 @@
+// Removes everything the seed creates (categories stay), in an order that respects the relations
+export async function clearSeededTables(prisma) {
+  await prisma.review.deleteMany()
+  await prisma.order.deleteMany()
+  await prisma.package.deleteMany()
+  await prisma.gig.deleteMany()
+  await prisma.user.deleteMany()
+}
+
 export function createMockReq({ method = 'GET', query = {}, body, headers = {} } = {}) {
   return { method, query, body, headers }
 }
