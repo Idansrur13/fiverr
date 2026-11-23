@@ -1,18 +1,37 @@
+import { useCallback, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { ChevronDown, Globe, Sparkles } from 'lucide-react'
+import { ChevronDown, Globe, Menu, Sparkles } from 'lucide-react'
 import { UserMenu } from './UserMenu'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
+import { MobileMenu } from './MobileMenu'
 
 export function AppHeader() {
   const { pathname } = useLocation()
   const filterTxt = useSelector((storeState) => storeState.gigModule.filterBy.txt)
   const isHomePage = pathname === '/'
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menuBtnRef = useRef(null)
+
+  const closeMenu = useCallback(({ returnFocus = false } = {}) => {
+    setIsMenuOpen(false)
+    if (returnFocus) menuBtnRef.current?.focus()
+  }, [])
 
   return (
     <header className="app-header full main-layout">
       <div className="header-content">
+        <button
+          type="button"
+          className="btn-menu"
+          ref={menuBtnRef}
+          aria-label="Open menu"
+          aria-expanded={isMenuOpen}
+          onClick={() => setIsMenuOpen(true)}
+        >
+          <Menu size={24} />
+        </button>
         <Link to="/" className="logo">
           fiverr<span className="logo-dot">.</span>
         </Link>
@@ -44,6 +63,7 @@ export function AppHeader() {
         <UserMenu />
       </div>
       <CategoryBar />
+      {isMenuOpen && <MobileMenu onClose={closeMenu} />}
     </header>
   )
 }
