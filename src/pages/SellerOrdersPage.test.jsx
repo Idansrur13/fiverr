@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
@@ -77,10 +77,6 @@ describe('SellerOrdersPage', () => {
     store.dispatch({ type: SET_ORDERS, orders: [] })
   })
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   it('shows only the orders of the logged in seller', async () => {
     renderPage()
 
@@ -135,25 +131,5 @@ describe('SellerOrdersPage', () => {
 
     expect(screen.getByText('No cancelled orders to show')).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
-  })
-
-  it('uses matching demo orders when no stored orders are available', async () => {
-    vi.spyOn(userService, 'getLoggedinUser').mockReturnValue({
-      ...seller,
-      id: 'u101',
-      fullname: 'Maya Cohen',
-    })
-    localStorage.setItem('orderDB', JSON.stringify([]))
-    store.dispatch({ type: SET_ORDERS, orders: [] })
-
-    const user = userEvent.setup()
-    renderPage()
-
-    expect(await screen.findByRole('status')).toHaveTextContent('Showing demo orders.')
-    await user.click(screen.getByRole('tab', { name: 'Completed 8' }))
-    const table = screen.getByRole('table')
-    expect(
-      within(table).getAllByText('I will design a modern minimalist logo for your brand'),
-    ).toHaveLength(2)
   })
 })

@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import demoGigs from '../data/gigs.json'
 import { OrderTable } from '../cmps/OrderTable'
 import { userService } from '../services/user.service'
 import { loadOrders } from '../store/order.actions'
@@ -16,35 +15,16 @@ const STATUS_TABS = [
 export function SellerOrdersPage() {
   const loggedinUser = userService.getLoggedinUser()
   const orders = useSelector((state) => state.orderModule.orders)
-  const cachedOrdersRef = useRef(orders.filter((order) => order.seller?.id === loggedinUser.id))
   const [selectedStatus, setSelectedStatus] = useState('PENDING')
   const [isLoading, setIsLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState('')
-  const [demoOrders, setDemoOrders] = useState([])
-  const [isShowingDemo, setIsShowingDemo] = useState(false)
 
   useEffect(() => {
     let isCancelled = false
 
     loadOrders({ sellerId: loggedinUser.id })
-      .then((loadedOrders) => {
-        if (isCancelled) return
-        if (!loadedOrders.length) {
-          const fallbackOrders = cachedOrdersRef.current.length
-            ? cachedOrdersRef.current
-            : getDemoOrders(loggedinUser.id)
-          setDemoOrders(fallbackOrders)
-          setIsShowingDemo(!cachedOrdersRef.current.length && fallbackOrders.length > 0)
-        }
-      })
       .catch(() => {
-        if (isCancelled) return
-        setErrorMsg('Could not load your orders. Showing demo orders when available.')
-        const fallbackOrders = cachedOrdersRef.current.length
-          ? cachedOrdersRef.current
-          : getDemoOrders(loggedinUser.id)
-        setDemoOrders(fallbackOrders)
-        setIsShowingDemo(!cachedOrdersRef.current.length && fallbackOrders.length > 0)
+        if (!isCancelled) setErrorMsg('Could not load your orders. Please try again.')
       })
       .finally(() => {
         if (!isCancelled) setIsLoading(false)
@@ -56,8 +36,7 @@ export function SellerOrdersPage() {
   }, [loggedinUser.id])
 
   const sellerOrders = orders.filter((order) => order.seller?.id === loggedinUser.id)
-  const sourceOrders = sellerOrders.length ? sellerOrders : demoOrders
-  const sortedOrders = [...sourceOrders].sort(
+  const sortedOrders = [...sellerOrders].sort(
     (first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime(),
   )
   const visibleOrders = sortedOrders.filter((order) => order.status === selectedStatus)
@@ -95,11 +74,6 @@ export function SellerOrdersPage() {
           {errorMsg}
         </p>
       )}
-      {isShowingDemo && (
-        <p className="seller-orders-demo-note" role="status">
-          Showing demo orders.
-        </p>
-      )}
 
       <section
         id="seller-orders-panel"
@@ -120,20 +94,4 @@ export function SellerOrdersPage() {
       </section>
     </section>
   )
-}
-
-function getDemoOrders(sellerId) {
-  return demoGigs
-    .filter((gig) => gig.owner?.id === sellerId)
-    .flatMap((gig) =>
-      (gig.reviews || []).map((review) => ({
-        id: `demo-order-${review.id}`,
-        buyer: review.by,
-        seller: gig.owner,
-        gig: { id: gig.id, title: gig.title, imgUrl: gig.images?.[0] },
-        price: gig.price,
-        status: 'COMPLETED',
-        createdAt: review.createdAt - 2 * 24 * 60 * 60 * 1000,
-      })),
-    )
 }

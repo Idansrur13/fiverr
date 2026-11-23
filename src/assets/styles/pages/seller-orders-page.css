@@ -60,10 +60,6 @@
   color: var(--clr-error);
 }
 
-.seller-orders-demo-note {
-  color: var(--clr-text-light);
-}
-
 .seller-orders-panel {
   min-width: 0;
   background-color: var(--clr-bg);
