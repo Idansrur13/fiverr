@@ -1,15 +1,13 @@
-.gig-preview-link {
+.gig-preview {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-.gig-preview-img {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--clr-border);
+.gig-preview-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
 }
 
 .gig-preview-seller {

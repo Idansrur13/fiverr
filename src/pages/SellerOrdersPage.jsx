@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { OrderTable } from '../cmps/OrderTable'
 import { userService } from '../services/user.service'
 import { loadOrders, updateOrderStatus } from '../store/order.actions'
 
 const STATUS_TABS = [
-  { status: 'ALL', label: 'All' },
   { status: 'PENDING', label: 'Pending' },
   { status: 'IN_PROGRESS', label: 'In progress' },
   { status: 'DELIVERED', label: 'Delivered' },
@@ -36,64 +35,64 @@ export function SellerOrdersPage() {
     }
   }, [loggedinUser.id])
 
-  const handleUpdateStatus = useCallback(async (orderId, status) => {
+  async function onUpdateOrderStatus(orderId, status) {
     const updatedOrder = await updateOrderStatus(orderId, status)
     setSelectedStatus(updatedOrder.status)
-    return updatedOrder
-  }, [])
+  }
 
-  const visibleOrders =
-    selectedStatus === 'ALL' ? orders : orders.filter((order) => order.status === selectedStatus)
+  const sellerOrders = orders.filter((order) => order.seller?.id === loggedinUser.id)
+  const sortedOrders = [...sellerOrders].sort(
+    (first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime(),
+  )
+  const visibleOrders = sortedOrders.filter((order) => order.status === selectedStatus)
   const selectedTab = STATUS_TABS.find((tab) => tab.status === selectedStatus)
 
   function getOrdersCount(status) {
-    return status === 'ALL'
-      ? orders.length
-      : orders.filter((order) => order.status === status).length
+    return sortedOrders.filter((order) => order.status === status).length
   }
 
   return (
-    <section className="orders-page">
-      <header className="orders-page-header">
+    <section className="seller-orders-page">
+      <header className="seller-orders-header">
         <h1>Manage Orders</h1>
       </header>
 
-      <div className="status-tabs order-status-tabs" role="tablist" aria-label="Order status">
+      <div className="seller-order-tabs" role="tablist" aria-label="Order status">
         {STATUS_TABS.map(({ status, label }) => (
           <button
             key={status}
             id={`seller-order-tab-${status.toLowerCase()}`}
             type="button"
             role="tab"
-            className="status-tab"
+            className="seller-order-tab"
             aria-selected={status === selectedStatus}
             aria-controls="seller-orders-panel"
             onClick={() => setSelectedStatus(status)}
           >
-            {label} <span className="tab-count">{getOrdersCount(status)}</span>
+            {label} <span className="seller-order-tab-count">{getOrdersCount(status)}</span>
           </button>
         ))}
       </div>
 
       {errorMsg && (
-        <p className="orders-page-error" role="alert">
+        <p className="seller-orders-error" role="alert">
           {errorMsg}
         </p>
       )}
 
       <section
         id="seller-orders-panel"
-        className="orders-page-panel"
+        className="seller-orders-panel"
         role="tabpanel"
         aria-labelledby={`seller-order-tab-${selectedStatus.toLowerCase()}`}
       >
-        <h2 className="orders-panel-title">{selectedTab.label} orders</h2>
+        <h2 className="seller-orders-panel-title">{selectedTab.label} orders</h2>
         {isLoading ? (
-          <p className="orders-panel-message">Loading orders...</p>
+          <p className="seller-orders-message">Loading orders...</p>
         ) : visibleOrders.length ? (
-          <OrderTable orders={visibleOrders} onUpdateStatus={handleUpdateStatus} />
+          <OrderTable orders={visibleOrders} onUpdateStatus={onUpdateOrderStatus} />
         ) : (
-          <p className="orders-panel-message">
+          <p className="seller-orders-message">
             No {selectedTab.label.toLowerCase()} orders to show
           </p>
         )}

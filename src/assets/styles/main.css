@@ -17,6 +17,8 @@
 @import './cmps/gig-form.css';
 @import './cmps/gig-list.css';
 @import './cmps/gig-preview.css';
+@import './cmps/img-carousel.css';
+@import './cmps/gig-filter.css';
 @import './cmps/seller-badge.css';
 @import './cmps/order-card.css';
 @import './cmps/package-selector.css';
@@ -25,6 +27,7 @@
 @import './pages/explore-page.css';
 @import './pages/not-found-page.css';
 @import './pages/seller-gigs-page.css';
+@import './pages/seller-orders-page.css';
 @import './pages/checkout-page.css';
 @import './pages/order-pages.css';
 

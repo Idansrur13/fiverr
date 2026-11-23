@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
+import { ImgCarousel } from './ImgCarousel'
 
 const LEVEL_LABELS = {
   NEW: 'New Seller',
@@ -17,8 +18,8 @@ export function GigPreview({ gig }) {
 
   return (
     <article className="gig-preview">
+      <ImgCarousel images={images} alt={title} linkTo={`/gig/${id}`} />
       <Link to={`/gig/${id}`} className="gig-preview-link">
-        <img className="gig-preview-img" src={images[0]} alt={title} />
         <div className="gig-preview-seller">
           <img className="gig-preview-avatar" src={owner.imgUrl} alt="" />
           <span className="gig-preview-seller-name">{owner.fullname}</span>
