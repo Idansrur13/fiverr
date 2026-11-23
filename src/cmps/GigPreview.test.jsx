@@ -40,6 +40,15 @@ describe('GigPreview', () => {
 
   it('links to the gig details page', () => {
     renderPreview()
-    expect(screen.getByRole('link')).toHaveAttribute('href', `/gig/${gig.id}`)
+    const links = screen.getAllByRole('link')
+    expect(links.length).toBeGreaterThan(0)
+    links.forEach((link) => expect(link).toHaveAttribute('href', `/gig/${gig.id}`))
+  })
+
+  it('keeps the carousel buttons outside the links', () => {
+    renderPreview()
+    screen.getAllByRole('button').forEach((button) => {
+      expect(button.closest('a')).toBeNull()
+    })
   })
 })
