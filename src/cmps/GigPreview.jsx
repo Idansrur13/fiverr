@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
 import { ImgCarousel } from './ImgCarousel'
+import { WishlistButton } from './WishlistButton'
 import { userService } from '../services/user.service'
 
 export function GigPreview({ gig }) {
@@ -13,7 +14,11 @@ export function GigPreview({ gig }) {
 
   return (
     <article className="gig-preview">
-      <ImgCarousel images={images} alt={title} linkTo={`/gig/${id}`} />
+      {/* The heart sits on the image, next to the image link and not inside it */}
+      <div className="gig-preview-media">
+        <ImgCarousel images={images} alt={title} linkTo={`/gig/${id}`} />
+        <WishlistButton gigId={id} />
+      </div>
       {/* The seller and the gig are two links side by side, never one inside the other */}
       <div className="gig-preview-seller">
         <Link to={`/user/${owner.id}`} className="gig-preview-seller-link">

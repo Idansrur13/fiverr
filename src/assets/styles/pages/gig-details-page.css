@@ -24,6 +24,24 @@
   color: var(--clr-text-light);
 }
 
+.gig-details-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.gig-details-title-row h1 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.gig-details-title-row .wishlist-button {
+  flex-shrink: 0;
+  border: 1px solid var(--clr-border);
+  box-shadow: none;
+}
+
 .gig-details-page h1 {
   font-size: var(--fs-xl);
   font-weight: 600;

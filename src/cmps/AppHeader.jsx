@@ -1,6 +1,6 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { ChevronDown, Globe, Sparkles } from 'lucide-react'
+import { ChevronDown, Globe, Heart, Sparkles } from 'lucide-react'
 import { UserMenu } from './UserMenu'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
@@ -28,6 +28,11 @@ export function AppHeader() {
           </NavLink>
           <NavLink to="/orders" className="nav-orders">
             Orders
+          </NavLink>
+          {/* Moves into UserMenu after #33 */}
+          <NavLink to="/wishlist" className="nav-wishlist">
+            <Heart size={18} aria-hidden="true" />
+            Wishlist
           </NavLink>
           <button type="button" className="nav-lang">
             <Globe size={18} />

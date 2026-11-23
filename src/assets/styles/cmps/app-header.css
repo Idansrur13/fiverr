@@ -46,6 +46,12 @@
   color: var(--clr-primary);
 }
 
+.app-header .nav-wishlist {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
 .app-header .nav-ai-icon {
   color: var(--clr-primary);
 }

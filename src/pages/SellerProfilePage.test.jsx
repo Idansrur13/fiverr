@@ -2,8 +2,10 @@ import { StrictMode } from 'react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { Provider } from 'react-redux'
 import { SellerProfilePage } from './SellerProfilePage'
 import { userService } from '../services/user.service'
+import { store } from '../store/store'
 import demoGigs from '../data/gigs.json'
 
 const SELLER_ID = 'u101'
@@ -13,11 +15,13 @@ const seller = sellerGigs[0].owner
 function renderProfile(userId = SELLER_ID) {
   render(
     <StrictMode>
-      <MemoryRouter initialEntries={[`/user/${userId}`]}>
-        <Routes>
-          <Route path="/user/:userId" element={<SellerProfilePage />} />
-        </Routes>
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[`/user/${userId}`]}>
+          <Routes>
+            <Route path="/user/:userId" element={<SellerProfilePage />} />
+          </Routes>
+        </MemoryRouter>
+      </Provider>
     </StrictMode>,
   )
 }

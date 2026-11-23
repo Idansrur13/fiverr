@@ -1,14 +1,18 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
 import { GigList } from './GigList'
+import { store } from '../store/store'
 import demoGigs from '../data/gigs.json'
 
 function renderList(gigs) {
   render(
-    <MemoryRouter>
-      <GigList gigs={gigs} />
-    </MemoryRouter>,
+    <Provider store={store}>
+      <MemoryRouter>
+        <GigList gigs={gigs} />
+      </MemoryRouter>
+    </Provider>,
   )
 }
 
