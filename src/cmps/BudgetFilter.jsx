@@ -21,6 +21,11 @@ export function BudgetFilter({ filterBy, onSetFilter, onClose }) {
     onClose()
   }
 
+  function onFieldChange(setPrice, value) {
+    setPrice(value)
+    setIsErrorShown(false)
+  }
+
   // The error shows only after leaving a field, not in the middle of typing
   function onFieldBlur() {
     setIsErrorShown(true)
@@ -36,7 +41,7 @@ export function BudgetFilter({ filterBy, onSetFilter, onClose }) {
             min="0"
             placeholder="Any"
             value={minPrice}
-            onChange={(ev) => setMinPrice(ev.target.value)}
+            onChange={(ev) => onFieldChange(setMinPrice, ev.target.value)}
             onBlur={onFieldBlur}
           />
         </label>
@@ -47,7 +52,7 @@ export function BudgetFilter({ filterBy, onSetFilter, onClose }) {
             min="0"
             placeholder="Any"
             value={maxPrice}
-            onChange={(ev) => setMaxPrice(ev.target.value)}
+            onChange={(ev) => onFieldChange(setMaxPrice, ev.target.value)}
             onBlur={onFieldBlur}
           />
         </label>
@@ -61,7 +66,7 @@ export function BudgetFilter({ filterBy, onSetFilter, onClose }) {
         <button type="button" className="filter-panel-clear" onClick={onClear}>
           Clear
         </button>
-        <button type="submit" className="filter-panel-apply">
+        <button type="submit" className="filter-panel-apply" disabled={isInvalid}>
           Apply
         </button>
       </div>

@@ -39,6 +39,7 @@ describe('BudgetFilter', () => {
     await user.tab()
 
     expect(screen.getByRole('alert')).toHaveTextContent("Min price can't be higher than max price")
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled()
 
     await user.click(screen.getByRole('button', { name: 'Apply' }))
     expect(onSetFilter).not.toHaveBeenCalled()
@@ -56,6 +57,20 @@ describe('BudgetFilter', () => {
     await user.type(screen.getByLabelText('Max.'), '00')
     await user.tab()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('does not show the error while typing max after leaving min', async () => {
+    const user = userEvent.setup()
+    renderBudget()
+
+    await user.type(screen.getByLabelText('Min.'), '50')
+    await user.type(screen.getByLabelText('Max.'), '1')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+    await user.type(screen.getByLabelText('Max.'), '00')
+    await user.tab()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeEnabled()
   })
 
   it('clears the budget filter', async () => {
