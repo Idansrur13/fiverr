@@ -178,6 +178,21 @@ describe('ExplorePage', () => {
     })
   })
 
+  it('applies the budget panel to the url and the results', async () => {
+    const user = userEvent.setup()
+    renderPage()
+    await screen.findAllByRole('article')
+
+    await user.click(screen.getByRole('button', { name: 'Budget' }))
+    await user.type(screen.getByLabelText('Min.'), '50')
+    await user.type(screen.getByLabelText('Max.'), '100')
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+
+    expect(getUrlSearch()).toBe('?minPrice=50&maxPrice=100')
+    const expectedGigs = demoGigs.filter((gig) => gig.price >= 50 && gig.price <= 100)
+    expect(await screen.findByText(`${expectedGigs.length} services available`)).toBeInTheDocument()
+  })
+
   it('keeps the filter of a header search from another page (in StrictMode)', async () => {
     const user = userEvent.setup()
     // Start on a gig page, so Explore mounts fresh after the search, like in Idan's report
