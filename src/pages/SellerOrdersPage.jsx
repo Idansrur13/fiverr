@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { OrderTable } from '../cmps/OrderTable'
 import { userService } from '../services/user.service'
-import { loadOrders } from '../store/order.actions'
+import { loadOrders, updateOrderStatus } from '../store/order.actions'
 
 const STATUS_TABS = [
   { status: 'PENDING', label: 'Pending' },
@@ -34,6 +34,11 @@ export function SellerOrdersPage() {
       isCancelled = true
     }
   }, [loggedinUser.id])
+
+  async function onUpdateOrderStatus(orderId, status) {
+    const updatedOrder = await updateOrderStatus(orderId, status)
+    setSelectedStatus(updatedOrder.status)
+  }
 
   const sellerOrders = orders.filter((order) => order.seller?.id === loggedinUser.id)
   const sortedOrders = [...sellerOrders].sort(
@@ -85,7 +90,7 @@ export function SellerOrdersPage() {
         {isLoading ? (
           <p className="seller-orders-message">Loading orders...</p>
         ) : visibleOrders.length ? (
-          <OrderTable orders={visibleOrders} />
+          <OrderTable orders={visibleOrders} onUpdateStatus={onUpdateOrderStatus} />
         ) : (
           <p className="seller-orders-message">
             No {selectedTab.label.toLowerCase()} orders to show
