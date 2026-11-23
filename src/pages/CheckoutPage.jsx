@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'reac
 import { OrderSummary } from '../cmps/OrderSummary'
 import { gigService } from '../services/gig.service'
 import { calcOrderTotal } from '../services/pricing.service'
+import { findPackage } from '../services/package.service'
 import { userService } from '../services/user.service'
 import { addOrder } from '../store/order.actions'
 
@@ -60,14 +61,7 @@ export function CheckoutPage() {
     )
 
   const packages = gig.packages || []
-  const requestedPackage = state?.packageId || searchParams.get('package')
-  const requestedPkg =
-    requestedPackage &&
-    packages.find(
-      (pkg) =>
-        pkg.id === requestedPackage ||
-        String(pkg.tier || '').toUpperCase() === String(requestedPackage).toUpperCase(),
-    )
+  const requestedPkg = findPackage(packages, state?.packageId || searchParams.get('package'))
   const selectedPkg = requestedPkg || packages[0] || null
   const totals = calcOrderTotal((selectedPkg || gig).price)
   const buyer = userService.getLoggedinUser()

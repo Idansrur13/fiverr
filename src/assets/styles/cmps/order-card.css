@@ -5,57 +5,6 @@
   overflow: hidden;
 }
 
-.order-card-header,
-.order-card-time {
-  padding-inline: var(--space-lg);
-}
-
-.order-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-md);
-  padding-top: var(--space-lg);
-}
-
-.order-card-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--clr-text-dark);
-}
-
-.order-card-time {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  color: var(--clr-text);
-  margin-bottom: var(--space-md);
-}
-
-.order-card-features {
-  list-style: none;
-  padding: 0 var(--space-lg);
-  margin: 0 0 var(--space-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.order-card-features li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: var(--fs-sm);
-  color: var(--clr-text-light);
-}
-
-.order-card-features svg {
-  color: var(--clr-text-dark);
-  flex-shrink: 0;
-}
-
 .order-card-note,
 .order-card-error {
   margin: 0 var(--space-lg) var(--space-md);

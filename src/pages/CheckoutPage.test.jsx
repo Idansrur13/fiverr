@@ -37,9 +37,9 @@ const gig = {
 }
 const buyer = { id: 'buyer-1', fullname: 'Buyer' }
 
-function renderCheckout(packageId) {
+function renderCheckout(packageId, search = '') {
   return render(
-    <MemoryRouter initialEntries={[{ pathname: '/checkout/g101', state: { packageId } }]}>
+    <MemoryRouter initialEntries={[{ pathname: '/checkout/g101', search, state: { packageId } }]}>
       <Routes>
         <Route path="/checkout/:gigId" element={<CheckoutPage />} />
         <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
@@ -101,6 +101,19 @@ describe('CheckoutPage', () => {
     expect(summary.getByText('$250.00')).toBeInTheDocument()
     expect(summary.getByText('$13.75')).toBeInTheDocument()
     expect(summary.getByText('$263.75')).toBeInTheDocument()
+
+    await pay()
+
+    await waitFor(() => {
+      expect(addOrder).toHaveBeenCalledWith({ gig, buyer, pkg: gig.packages[1] })
+    })
+  })
+
+  it('orders the package from the url when it was not passed in the state', async () => {
+    renderCheckout(undefined, '?package=PREMIUM')
+
+    const summary = await getSummary()
+    expect(summary.getByText('Premium')).toBeInTheDocument()
 
     await pay()
 

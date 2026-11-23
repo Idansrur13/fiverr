@@ -1,12 +1,9 @@
-.package-selector {
-  border-bottom: 1px solid var(--clr-border);
-}
-
 .package-selector-tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   width: 100%;
   background-color: var(--clr-bg-light);
+  border-bottom: 1px solid var(--clr-border);
 }
 
 .package-selector-tabs button {
@@ -50,39 +47,17 @@
   color: var(--clr-text-dark);
 }
 
-.package-selector-price-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-xs);
-}
-
 .package-selector-price {
+  margin: 0 0 var(--space-md);
   font-size: var(--fs-xl);
   line-height: 1;
   font-weight: 700;
   color: var(--clr-text-dark);
 }
 
-.package-selector-info {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  color: var(--clr-text-light);
-  border: 1px solid var(--clr-text-light);
-  border-radius: 50%;
-}
-
-.package-selector-tax-note,
 .package-selector-description,
 .package-selector-revisions {
   color: var(--clr-text-light);
-}
-
-.package-selector-tax-note {
-  margin: var(--space-xs) 0 var(--space-md);
-  font-size: var(--fs-xs);
 }
 
 .package-selector-description {

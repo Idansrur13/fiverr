@@ -77,6 +77,12 @@ describe('PackageSelector', () => {
     expect(onSelect).toHaveBeenLastCalledWith(2)
   })
 
+  it('writes a single revision without a plural s', () => {
+    render(<PackageSelector packages={PACKAGES} selectedIdx={0} onSelect={() => {}} />)
+
+    expect(screen.getByText('1 revision')).toBeInTheDocument()
+  })
+
   it('hides the tabs for a single package', () => {
     render(<PackageSelector packages={[PACKAGES[0]]} selectedIdx={0} onSelect={() => {}} />)
 

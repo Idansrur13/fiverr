@@ -36,13 +36,18 @@ const baseGig = gigs.find((gig) => gig.id === 'g101')
 const gigWithPackages = { ...baseGig, packages: PACKAGES }
 
 function CheckoutStub() {
-  const { state } = useLocation()
-  return <h1>Checkout {state?.packageId}</h1>
+  const { state, search } = useLocation()
+  return (
+    <>
+      <h1>Checkout {state?.packageId}</h1>
+      <p>{search}</p>
+    </>
+  )
 }
 
-function renderOrderCard(gig = gigWithPackages) {
+function renderOrderCard(gig = gigWithPackages, path = `/gig/${gig.id}`) {
   return render(
-    <MemoryRouter initialEntries={[`/gig/${gig.id}`]}>
+    <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/gig/:gigId" element={<OrderCard gig={gig} />} />
         <Route path="/checkout/:gigId" element={<CheckoutStub />} />
@@ -61,6 +66,15 @@ describe('OrderCard', () => {
     expect(screen.getByText(`$${baseGig.price}`)).toBeInTheDocument()
     expect(screen.getByText(`${baseGig.daysToMake}-day delivery`)).toBeInTheDocument()
     expect(screen.queryByRole('tablist', { name: 'Packages' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument()
+    expect(screen.queryByText(/revision/)).not.toBeInTheDocument()
+  })
+
+  it('selects the package from the url', () => {
+    renderOrderCard(gigWithPackages, `/gig/${gigWithPackages.id}?package=PREMIUM`)
+
+    expect(screen.getByRole('tab', { name: 'Premium' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText('$150')).toBeInTheDocument()
   })
 
   it('shows the first package by default', () => {
@@ -89,6 +103,7 @@ describe('OrderCard', () => {
     fireEvent.click(getContinueBtn())
 
     expect(screen.getByRole('heading', { name: 'Checkout p2' })).toBeInTheDocument()
+    expect(screen.getByText('?package=STANDARD')).toBeInTheDocument()
   })
 
   it('does not let the seller order their own gig', () => {
