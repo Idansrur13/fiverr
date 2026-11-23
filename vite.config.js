@@ -25,7 +25,10 @@ export default defineConfig({
           environment: 'node',
           include: ['tests/api/**/*.test.js'],
           globalSetup: ['./tests/api.global-setup.js'],
-          fileParallelism: false,
+          // The API tests share one DB, so their files must run one after another.
+          // `fileParallelism: false` is ignored inside a project, so a single fork is used instead.
+          pool: 'forks',
+          poolOptions: { forks: { singleFork: true } },
         },
       },
     ],
