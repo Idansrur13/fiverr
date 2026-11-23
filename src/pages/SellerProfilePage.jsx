@@ -49,6 +49,7 @@ export function SellerProfilePage() {
   const { fullname, imgUrl, level, about, country, languages, createdAt, rating, reviewsCount } =
     seller
   const levelLabel = userService.getLevelLabel(level)
+  const hasDetails = Boolean(country || languages.length || createdAt)
 
   return (
     <section className="seller-profile-page">
@@ -64,26 +65,28 @@ export function SellerProfilePage() {
           </p>
         )}
 
-        <dl className="seller-profile-details">
-          {country && (
-            <div>
-              <dt>From</dt>
-              <dd>{country}</dd>
-            </div>
-          )}
-          {languages.length > 0 && (
-            <div>
-              <dt>Languages</dt>
-              <dd>{languages.join(', ')}</dd>
-            </div>
-          )}
-          {createdAt && (
-            <div>
-              <dt>Member since</dt>
-              <dd>{formatMemberSince(createdAt)}</dd>
-            </div>
-          )}
-        </dl>
+        {hasDetails && (
+          <dl className="seller-profile-details">
+            {country && (
+              <div>
+                <dt>From</dt>
+                <dd>{country}</dd>
+              </div>
+            )}
+            {languages.length > 0 && (
+              <div>
+                <dt>Languages</dt>
+                <dd>{languages.join(', ')}</dd>
+              </div>
+            )}
+            {createdAt && (
+              <div>
+                <dt>Member since</dt>
+                <dd>{formatMemberSince(createdAt)}</dd>
+              </div>
+            )}
+          </dl>
+        )}
         {about && <p className="seller-profile-about">{about}</p>}
       </aside>
 

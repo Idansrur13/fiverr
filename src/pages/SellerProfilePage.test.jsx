@@ -44,6 +44,28 @@ describe('SellerProfilePage', () => {
     expect(within(card).getByText('Top Rated')).toBeInTheDocument()
     expect(within(card).getByText(avgRating.toFixed(1))).toBeInTheDocument()
     expect(within(card).getByText(`(${sellerReviews.length} reviews)`)).toBeInTheDocument()
+    // The demo sellers have no country, languages or join date, so no empty details block
+    expect(card.querySelector('.seller-profile-details')).toBeNull()
+  })
+
+  it('renders the seller details block when the seller has details', async () => {
+    vi.spyOn(userService, 'getById').mockResolvedValue({
+      ...seller,
+      country: 'Israel',
+      languages: ['Hebrew', 'English'],
+      createdAt: '2024-03-10T00:00:00.000Z',
+      about: 'Brand designer.',
+      rating: 4.5,
+      reviewsCount: 8,
+      gigs: [],
+    })
+    renderProfile()
+
+    expect(await screen.findByText('Israel')).toBeInTheDocument()
+    expect(screen.getByText('Hebrew, English')).toBeInTheDocument()
+    expect(screen.getByText('Mar 2024')).toBeInTheDocument()
+    expect(screen.getByText('Brand designer.')).toBeInTheDocument()
+    expect(screen.getByText(`${seller.fullname} has no active gigs right now.`)).toBeInTheDocument()
   })
 
   it('renders the seller gigs', async () => {
