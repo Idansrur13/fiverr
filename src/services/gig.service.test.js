@@ -113,4 +113,51 @@ describe('gigService', () => {
       await expect(gigService.getById('g3')).rejects.toThrow()
     })
   })
+
+  describe('queryPage', () => {
+    function getAvgRating(gig) {
+      return gig.reviews.reduce((sum, review) => sum + review.rating, 0) / gig.reviews.length
+    }
+
+    it('sorts by rating, then reviews count, by default', async () => {
+      const { gigs } = await gigService.queryPage({ ...gigService.getDefaultFilter(), page: '1' })
+      const [best] = [...demoGigs].sort(
+        (a, b) =>
+          getAvgRating(b) - getAvgRating(a) ||
+          b.reviews.length - a.reviews.length ||
+          b.createdAt - a.createdAt,
+      )
+
+      expect(gigs[0].id).toBe(best.id)
+      gigs.slice(1).forEach((gig, idx) => {
+        expect(getAvgRating(gig)).toBeLessThanOrEqual(getAvgRating(gigs[idx]))
+      })
+    })
+
+    it('sorts by reviews count for best selling and by date for newest', async () => {
+      const bestSelling = await gigService.queryPage({ sortBy: 'best-selling' })
+      const counts = bestSelling.gigs.map((gig) => gig.reviews.length)
+      expect(counts).toEqual([...counts].sort((a, b) => b - a))
+
+      const newest = await gigService.queryPage({ sortBy: 'newest' })
+      const newestIds = [...demoGigs].sort((a, b) => b.createdAt - a.createdAt).map((g) => g.id)
+      expect(newest.gigs.map((gig) => gig.id)).toEqual(newestIds.slice(0, 12))
+    })
+
+    it('returns the requested page, the total and the page count', async () => {
+      const newestIds = [...demoGigs].sort((a, b) => b.createdAt - a.createdAt).map((g) => g.id)
+
+      const secondPage = await gigService.queryPage({ sortBy: 'newest', page: '2' })
+      expect(secondPage).toMatchObject({ total: demoGigs.length, page: 2, pageCount: 2 })
+      expect(secondPage.gigs.map((gig) => gig.id)).toEqual(newestIds.slice(12, 24))
+
+      // A page that doesn't exist returns the closest one
+      expect((await gigService.queryPage({ page: '99' })).page).toBe(2)
+      expect((await gigService.queryPage({ page: 'abc' })).page).toBe(1)
+
+      const filtered = await gigService.queryPage({ category: 'music-audio' })
+      const musicGigs = demoGigs.filter((gig) => gig.category === 'music-audio')
+      expect(filtered).toMatchObject({ total: musicGigs.length, page: 1, pageCount: 1 })
+    })
+  })
 })

@@ -2,9 +2,11 @@ import { storageService } from './storage.service'
 import { userService } from './user.service'
 
 const STORAGE_KEY = 'gigDB'
+const PAGE_SIZE = 12
 
 export const gigService = {
   query,
+  queryPage,
   getById,
   save,
   remove,
@@ -27,6 +29,44 @@ async function query(filterBy = {}) {
   )
 }
 
+// The same sort + paging as GET /api/gigs, so Explore can switch to the API with one line.
+// No sortBy = recommended. A page after the last one returns the last page.
+async function queryPage(filterBy = {}) {
+  const gigs = sortGigs(await query(filterBy), filterBy.sortBy)
+  const total = gigs.length
+  const pageCount = Math.ceil(total / PAGE_SIZE)
+  const page = Math.min(Math.max(parseInt(filterBy.page) || 1, 1), Math.max(pageCount, 1))
+  const start = (page - 1) * PAGE_SIZE
+  return { gigs: gigs.slice(start, start + PAGE_SIZE), total, page, pageCount }
+}
+
+// Ties always end with the newest gig, like the API
+function sortGigs(gigs, sortBy) {
+  const comparers = {
+    recommended: [getAvgRating, (gig) => gig.reviews?.length ?? 0],
+    // The demo data has no orders per gig. Every review comes from a completed order
+    // (that's how the DB seed builds them), so the reviews count stands in for it.
+    'best-selling': [(gig) => gig.reviews?.length ?? 0],
+    newest: [],
+  }
+  const getters = [...(comparers[sortBy] ?? comparers.recommended), (gig) => gig.createdAt ?? 0]
+
+  return [...gigs].sort((a, b) => {
+    for (const getValue of getters) {
+      const diff = getValue(b) - getValue(a)
+      if (diff) return diff
+    }
+    return 0
+  })
+}
+
+// A gig with no reviews comes after every rated gig (like NULLS LAST in the API)
+function getAvgRating(gig) {
+  const reviews = gig.reviews ?? []
+  if (!reviews.length) return -1
+  return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+}
+
 function getById(gigId) {
   return storageService.get(STORAGE_KEY, gigId)
 }
@@ -41,7 +81,15 @@ function remove(gigId) {
 }
 
 function getDefaultFilter() {
-  return { txt: '', category: '', minPrice: '', maxPrice: '', daysToMake: '' }
+  return {
+    txt: '',
+    category: '',
+    minPrice: '',
+    maxPrice: '',
+    daysToMake: '',
+    sortBy: '',
+    page: '',
+  }
 }
 
 function getEmptyGig() {

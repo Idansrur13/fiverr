@@ -1,20 +1,30 @@
 import { createHandler } from '../_lib/http.js'
 import { prisma } from '../_lib/prisma.js'
-import { buildGigWhere } from '../_lib/gig-filter.js'
+import { buildGigWhere, findGigIdsPage, getGigPaging } from '../_lib/gig-filter.js'
 
 export default createHandler({
   async GET(req, res) {
+    const where = { ...buildGigWhere(req.query), status: 'ACTIVE' }
+    const { ids, total, page, pageCount } = await findGigIdsPage(
+      prisma,
+      where,
+      getGigPaging(req.query),
+    )
+
     const gigs = await prisma.gig.findMany({
-      where: { ...buildGigWhere(req.query), status: 'ACTIVE' },
+      where: { id: { in: ids } },
       include: {
         owner: { select: { id: true, fullname: true, imgUrl: true, level: true } },
         category: { select: { slug: true } },
         packages: { where: { tier: 'BASIC' }, select: { price: true, daysToMake: true } },
         reviews: { select: { rating: true } },
       },
-      orderBy: { createdAt: 'desc' },
     })
-    return res.status(200).json(gigs.map(toGigPreview))
+    // findMany doesn't keep the order of `ids`, so put the gigs back in the sorted order
+    const gigsById = new Map(gigs.map((gig) => [gig.id, gig]))
+    const sortedGigs = ids.map((id) => gigsById.get(id)).filter(Boolean)
+
+    return res.status(200).json({ gigs: sortedGigs.map(toGigPreview), total, page, pageCount })
   },
 })
 

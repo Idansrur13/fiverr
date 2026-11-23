@@ -1,14 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { GigList } from '../cmps/GigList'
 import { GigFilter } from '../cmps/GigFilter'
-import { loadGigs } from '../store/gig.actions'
+import { SortBy } from '../cmps/SortBy'
+import { Pagination } from '../cmps/Pagination'
+import { loadGigsPage } from '../store/gig.actions'
 import { categoryService } from '../services/category.service'
 import { useFilterSearchParams } from '../customHooks/useFilterSearchParams'
 
 export function ExplorePage() {
   const [filterBy, setFilterParams] = useFilterSearchParams()
   const gigs = useSelector((storeState) => storeState.gigModule.gigs)
+  const { total, page, pageCount } = useSelector((storeState) => storeState.gigModule.pageInfo)
+  const pageRef = useRef(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
@@ -19,7 +23,7 @@ export function ExplorePage() {
       setIsLoading(true)
       setHasError(false)
       try {
-        await loadGigs(filterBy)
+        await loadGigsPage(filterBy)
       } catch {
         if (!ignore) setHasError(true)
       } finally {
@@ -33,10 +37,19 @@ export function ExplorePage() {
     }
   }, [filterBy])
 
+  // Page 1 isn't written to the URL, like every other default
+  function onChangePage(newPage) {
+    setFilterParams({ page: newPage > 1 ? String(newPage) : '' })
+    pageRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
-    <section className="explore-page">
+    <section className="explore-page" ref={pageRef}>
       <h1>{getTitle(filterBy)}</h1>
-      <GigFilter filterBy={filterBy} onSetFilter={setFilterParams} />
+      <div className="explore-page-toolbar">
+        <GigFilter filterBy={filterBy} onSetFilter={setFilterParams} />
+        <SortBy filterBy={filterBy} onSetFilter={setFilterParams} />
+      </div>
       {isLoading && <p className="explore-page-status">Loading…</p>}
       {!isLoading && hasError && (
         <p className="explore-page-status error">Couldn't load services. Please try again.</p>
@@ -44,9 +57,10 @@ export function ExplorePage() {
       {!isLoading && !hasError && (
         <>
           <p className="explore-page-count">
-            {gigs.length} {gigs.length === 1 ? 'service' : 'services'} available
+            {total} {total === 1 ? 'service' : 'services'} available
           </p>
           <GigList gigs={gigs} />
+          <Pagination page={page} pageCount={pageCount} onChangePage={onChangePage} />
         </>
       )}
     </section>

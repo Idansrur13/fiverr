@@ -9,11 +9,12 @@ import { clearSeededTables, createMockReq, createMockRes } from './helpers.js'
 const demoGigs = loadDemoGigs()
 const PAUSED_GIG_ID = toUuid('test-paused-gig')
 
+// One big page, so these tests see every matching gig
 async function getGigs(query = {}) {
   const res = createMockRes()
-  await gigsHandler(createMockReq({ query }), res)
+  await gigsHandler(createMockReq({ query: { pageSize: '100', ...query } }), res)
   expect(res.statusCode).toBe(200)
-  return res.body
+  return res.body.gigs
 }
 
 beforeAll(async () => {
@@ -95,6 +96,17 @@ describe('GET /api/gigs', () => {
 
     expect(expectedIds.length).toBeGreaterThan(0)
     expect(gigs.map((gig) => gig.id).sort()).toEqual(expectedIds.sort())
+  })
+
+  it('returns one page with the total and the page count', async () => {
+    const res = createMockRes()
+    await gigsHandler(createMockReq({ query: { sortBy: 'newest', page: '2' } }), res)
+
+    const newestIds = [...demoGigs]
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .map((gig) => toUuid(gig.id))
+    expect(res.body).toMatchObject({ total: demoGigs.length, page: 2, pageCount: 2 })
+    expect(res.body.gigs.map((gig) => gig.id)).toEqual(newestIds.slice(12, 24))
   })
 })
 

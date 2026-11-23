@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { gigReducer, SET_GIGS, ADD_GIG, UPDATE_GIG, REMOVE_GIG, SET_FILTER_BY } from './gig.reducer'
+import {
+  gigReducer,
+  SET_GIGS,
+  SET_GIGS_PAGE,
+  ADD_GIG,
+  UPDATE_GIG,
+  REMOVE_GIG,
+  SET_FILTER_BY,
+} from './gig.reducer'
 import { gigService } from '../services/gig.service'
 
 const gigs = [
@@ -10,7 +18,19 @@ const gigs = [
 describe('gigReducer', () => {
   it('starts with empty gigs and the default filter', () => {
     const state = gigReducer(undefined, {})
-    expect(state).toEqual({ gigs: [], gig: null, filterBy: gigService.getDefaultFilter() })
+    expect(state).toEqual({
+      gigs: [],
+      pageInfo: { total: 0, page: 1, pageCount: 0 },
+      gig: null,
+      filterBy: gigService.getDefaultFilter(),
+    })
+  })
+
+  it('SET_GIGS_PAGE sets the gigs of the page and the page info', () => {
+    const gigsPage = { gigs, total: 14, page: 2, pageCount: 2 }
+    const state = gigReducer(undefined, { type: SET_GIGS_PAGE, gigsPage })
+    expect(state.gigs).toEqual(gigs)
+    expect(state.pageInfo).toEqual({ total: 14, page: 2, pageCount: 2 })
   })
 
   it('SET_GIGS replaces the gigs', () => {

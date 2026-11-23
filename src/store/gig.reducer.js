@@ -1,6 +1,7 @@
 import { gigService } from '../services/gig.service'
 
 export const SET_GIGS = 'SET_GIGS'
+export const SET_GIGS_PAGE = 'SET_GIGS_PAGE'
 export const SET_GIG = 'SET_GIG'
 export const ADD_GIG = 'ADD_GIG'
 export const UPDATE_GIG = 'UPDATE_GIG'
@@ -9,6 +10,8 @@ export const SET_FILTER_BY = 'SET_FILTER_BY'
 
 const initialState = {
   gigs: [],
+  // Explore's current page: the total of all matching gigs, not only this page
+  pageInfo: { total: 0, page: 1, pageCount: 0 },
   gig: null,
   filterBy: gigService.getDefaultFilter(),
 }
@@ -17,6 +20,10 @@ export function gigReducer(state = initialState, action = {}) {
   switch (action.type) {
     case SET_GIGS:
       return { ...state, gigs: action.gigs }
+    case SET_GIGS_PAGE: {
+      const { gigs, total, page, pageCount } = action.gigsPage
+      return { ...state, gigs, pageInfo: { total, page, pageCount } }
+    }
     case SET_GIG:
       return { ...state, gig: action.gig }
     case ADD_GIG:
