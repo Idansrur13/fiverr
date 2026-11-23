@@ -1,14 +1,8 @@
 import { Star } from 'lucide-react'
-
-const BADGE_MAP = {
-  NEW: 'New seller',
-  LEVEL_1: 'Level 1 Seller',
-  LEVEL_2: 'Level 2 Seller',
-  TOP_RATED: 'Top Rated Seller',
-}
+import { userService } from '../services/user.service'
 
 export function SellerBadge({ level, rating, reviewsCount, showReviews = true }) {
-  const badgeLabel = BADGE_MAP[level] || level
+  const badgeLabel = userService.getLevelLabel(level) || level
 
   return (
     <div className="seller-badge">

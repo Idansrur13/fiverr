@@ -1,9 +1,10 @@
+import { Link } from 'react-router-dom'
 import { SellerBadge } from './SellerBadge'
 
 export function AboutSeller({ owner, rating, reviewsCount }) {
   if (!owner) return null
 
-  const { fullname, imgUrl, level, country, languages, responseTime, about } = owner
+  const { id, fullname, imgUrl, level, country, languages, responseTime, about } = owner
   const hasDetails = country || (languages && languages.length > 0) || responseTime || about
 
   return (
@@ -13,7 +14,11 @@ export function AboutSeller({ owner, rating, reviewsCount }) {
       <div className="about-seller-info">
         <img src={imgUrl} alt={fullname} className="about-seller-avatar" />
         <div className="about-seller-header">
-          <h3>{fullname}</h3>
+          <h3>
+            <Link to={`/user/${id}`} className="about-seller-link">
+              {fullname}
+            </Link>
+          </h3>
           <SellerBadge level={level} rating={rating} reviewsCount={reviewsCount} />
         </div>
       </div>

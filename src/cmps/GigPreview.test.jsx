@@ -40,9 +40,20 @@ describe('GigPreview', () => {
 
   it('links to the gig details page', () => {
     renderPreview()
-    const links = screen.getAllByRole('link')
-    expect(links.length).toBeGreaterThan(0)
-    links.forEach((link) => expect(link).toHaveAttribute('href', `/gig/${gig.id}`))
+    const gigLinks = screen
+      .getAllByRole('link')
+      .filter((link) => !link.closest('.gig-preview-seller'))
+    expect(gigLinks.length).toBeGreaterThan(0)
+    gigLinks.forEach((link) => expect(link).toHaveAttribute('href', `/gig/${gig.id}`))
+  })
+
+  it('links the seller to their profile, outside the gig link', () => {
+    renderPreview()
+    const sellerLink = screen.getByRole('link', { name: gig.owner.fullname })
+
+    expect(sellerLink).toHaveAttribute('href', `/user/${gig.owner.id}`)
+    expect(sellerLink.parentElement.closest('a')).toBeNull()
+    expect(sellerLink.querySelector('a')).toBeNull()
   })
 
   it('keeps the carousel buttons outside the links', () => {
