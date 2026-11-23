@@ -1,29 +1,100 @@
-.package-selector {
+.package-selector-tabs {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  border-bottom: 1px solid var(--clr-border);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
   background-color: var(--clr-bg-light);
+  border-bottom: 1px solid var(--clr-border);
 }
 
-.package-selector button {
+.package-selector-tabs button {
+  min-width: 0;
   padding: var(--space-md) 12px;
-  font-size: 0.95rem;
+  overflow: hidden;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--clr-text-light);
   background: transparent;
   border: none;
   border-right: 1px solid var(--clr-border);
   border-bottom: 3px solid transparent;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.package-selector button:last-child {
+.package-selector-tabs button:last-child {
   border-right: none;
 }
 
-.package-selector button[aria-pressed='true'] {
+.package-selector-tabs button[aria-selected='true'] {
   background-color: var(--clr-bg);
   color: var(--clr-text-dark);
   border-bottom-color: var(--clr-text-dark);
+}
+
+.package-selector-tabs button:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: -2px;
+}
+
+.package-selector-details {
+  padding: var(--space-lg);
+}
+
+.package-selector-title {
+  margin: 0 0 var(--space-md);
+  font-size: var(--fs-lg);
+  color: var(--clr-text-dark);
+}
+
+.package-selector-price {
+  margin: 0 0 var(--space-md);
+  font-size: var(--fs-xl);
+  line-height: 1;
+  font-weight: 700;
+  color: var(--clr-text-dark);
+}
+
+.package-selector-description,
+.package-selector-revisions {
+  color: var(--clr-text-light);
+}
+
+.package-selector-description {
+  margin: 0 0 var(--space-md);
+  line-height: 1.6;
+}
+
+.package-selector-delivery {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-xs);
+  color: var(--clr-text);
+}
+
+.package-selector-revisions {
+  margin: 0 0 var(--space-md);
+  font-size: var(--fs-sm);
+}
+
+.package-selector-features {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.package-selector-features li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--clr-text);
+  font-size: var(--fs-sm);
+}
+
+.package-selector-features svg {
+  flex-shrink: 0;
+  color: var(--clr-primary);
 }

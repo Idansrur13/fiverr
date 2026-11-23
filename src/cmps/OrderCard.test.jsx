@@ -36,13 +36,18 @@ const baseGig = gigs.find((gig) => gig.id === 'g101')
 const gigWithPackages = { ...baseGig, packages: PACKAGES }
 
 function CheckoutStub() {
-  const { state } = useLocation()
-  return <h1>Checkout {state?.packageId}</h1>
+  const { state, search } = useLocation()
+  return (
+    <>
+      <h1>Checkout {state?.packageId}</h1>
+      <p>{search}</p>
+    </>
+  )
 }
 
-function renderOrderCard(gig = gigWithPackages) {
+function renderOrderCard(gig = gigWithPackages, path = `/gig/${gig.id}`) {
   return render(
-    <MemoryRouter initialEntries={[`/gig/${gig.id}`]}>
+    <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/gig/:gigId" element={<OrderCard gig={gig} />} />
         <Route path="/checkout/:gigId" element={<CheckoutStub />} />
@@ -60,12 +65,21 @@ describe('OrderCard', () => {
     renderOrderCard(baseGig)
     expect(screen.getByText(`$${baseGig.price}`)).toBeInTheDocument()
     expect(screen.getByText(`${baseGig.daysToMake}-day delivery`)).toBeInTheDocument()
-    expect(screen.queryByRole('group', { name: 'Packages' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('tablist', { name: 'Packages' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument()
+    expect(screen.queryByText(/revision/)).not.toBeInTheDocument()
+  })
+
+  it('selects the package from the url', () => {
+    renderOrderCard(gigWithPackages, `/gig/${gigWithPackages.id}?package=PREMIUM`)
+
+    expect(screen.getByRole('tab', { name: 'Premium' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText('$150')).toBeInTheDocument()
   })
 
   it('shows the first package by default', () => {
     renderOrderCard()
-    expect(screen.getByRole('button', { name: 'Basic' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('tab', { name: 'Basic' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('$40')).toBeInTheDocument()
     expect(screen.getByText('2-day delivery')).toBeInTheDocument()
     expect(screen.getByText('1 logo concept')).toBeInTheDocument()
@@ -73,22 +87,23 @@ describe('OrderCard', () => {
 
   it('switches price, delivery time and features when another package is selected', () => {
     renderOrderCard()
-    fireEvent.click(screen.getByRole('button', { name: 'Premium' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Premium' }))
 
-    expect(screen.getByRole('button', { name: 'Premium' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('tab', { name: 'Premium' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('$150')).toBeInTheDocument()
     expect(screen.getByText('5-day delivery')).toBeInTheDocument()
     expect(screen.getByText('Brand guide')).toBeInTheDocument()
     expect(screen.queryByText('1 logo concept')).not.toBeInTheDocument()
   })
 
-  it('goes to checkout with the id of the selected package', () => {
+  it('sends the selected package id when ordering', () => {
     renderOrderCard()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Standard' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Standard' }))
     fireEvent.click(getContinueBtn())
 
     expect(screen.getByRole('heading', { name: 'Checkout p2' })).toBeInTheDocument()
+    expect(screen.getByText('?package=STANDARD')).toBeInTheDocument()
   })
 
   it('does not let the seller order their own gig', () => {

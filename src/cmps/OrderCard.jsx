@@ -1,53 +1,42 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Check, Clock } from 'lucide-react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import { userService } from '../services/user.service'
+import { findPackage } from '../services/package.service'
 import { PackageSelector } from './PackageSelector'
 
 export function OrderCard({ gig }) {
   const navigate = useNavigate()
-  const [selectedIdx, setSelectedIdx] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
 
   if (!gig) return null
 
   const buyer = userService.getLoggedinUser()
   const isOwnGig = buyer.id === gig.owner?.id
   const packages = gig.packages || []
-  const selectedPkg = packages[selectedIdx] ?? packages[0] ?? null
-  const { price, daysToMake, features = [] } = selectedPkg || gig
+  const selectedPkg = findPackage(packages, searchParams.get('package')) || packages[0] || null
+  const shownPackages = packages.length
+    ? packages
+    : [{ price: gig.price, daysToMake: gig.daysToMake }]
+  const selectedIdx = selectedPkg ? packages.indexOf(selectedPkg) : 0
 
   function onSelectPackage(idx) {
-    setSelectedIdx(idx)
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set('package', packages[idx].tier)
+    setSearchParams(nextParams, { replace: true })
   }
 
   function handleContinue() {
-    navigate(`/checkout/${gig.id}`, { state: { packageId: selectedPkg?.id } })
+    const query = selectedPkg ? `?package=${selectedPkg.tier}` : ''
+    navigate(`/checkout/${gig.id}${query}`, { state: { packageId: selectedPkg?.id } })
   }
 
   return (
     <div className="order-card">
-      {packages.length > 1 && (
-        <PackageSelector packages={packages} selectedIdx={selectedIdx} onSelect={onSelectPackage} />
-      )}
-      <div className="order-card-header">
-        <span className="order-card-price">${price}</span>
-      </div>
-
-      <div className="order-card-time">
-        <Clock size={16} />
-        <span>{daysToMake}-day delivery</span>
-      </div>
-
-      {features.length > 0 && (
-        <ul className="order-card-features">
-          {features.map((feature, idx) => (
-            <li key={feature + idx}>
-              <Check size={16} />
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <PackageSelector
+        packages={shownPackages}
+        selectedIdx={selectedIdx}
+        onSelect={onSelectPackage}
+      />
 
       {isOwnGig && <p className="order-card-note">You can&apos;t order your own gig</p>}
       <button
