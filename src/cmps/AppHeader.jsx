@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { ChevronDown, Globe, Menu, Sparkles } from 'lucide-react'
+import { LoginModal } from './LoginModal'
 import { UserMenu } from './UserMenu'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
@@ -18,6 +19,10 @@ export function AppHeader() {
     setIsMenuOpen(false)
     if (returnFocus) menuBtnRef.current?.focus()
   }, [])
+
+  const isLoggedIn = useSelector((storeState) => Boolean(storeState.userModule.user))
+  const [loginMode, setLoginMode] = useState(null)
+  const closeLogin = useCallback(() => setLoginMode(null), [])
 
   return (
     <header className="app-header full main-layout">
@@ -53,17 +58,14 @@ export function AppHeader() {
             EN
           </button>
           <span className="nav-divider" aria-hidden="true" />
-          <button type="button" className="nav-sign-in">
-            Sign in
-          </button>
-          <button type="button" className="btn-join">
-            Join
-          </button>
+          <UserMenu onOpenLogin={setLoginMode} />
         </nav>
-        <UserMenu />
       </div>
       <CategoryBar />
-      {isMenuOpen && <MobileMenu onClose={closeMenu} />}
+      {isMenuOpen && (
+        <MobileMenu onClose={closeMenu} isLoggedIn={isLoggedIn} onOpenLogin={setLoginMode} />
+      )}
+      {loginMode && <LoginModal mode={loginMode} onClose={closeLogin} />}
     </header>
   )
 }

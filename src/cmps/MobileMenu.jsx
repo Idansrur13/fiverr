@@ -7,8 +7,7 @@ import { utilService } from '../services/util.service'
 const CATEGORIES = categoryService.getCategories()
 const DESKTOP_QUERY = '(min-width: 769px)'
 
-// Sign in / Join are placeholders until Idan's login (#33) is merged
-export function MobileMenu({ onClose }) {
+export function MobileMenu({ onClose, isLoggedIn = false, onOpenLogin = () => {} }) {
   const panelRef = useRef(null)
 
   // Close on a click outside the panel, or on Escape (focus goes back to the hamburger)
@@ -51,6 +50,11 @@ export function MobileMenu({ onClose }) {
     panelRef.current?.querySelector('button, a')?.focus()
   }, [])
 
+  function openLogin(mode) {
+    onClose()
+    onOpenLogin(mode)
+  }
+
   return (
     <div className="mobile-menu">
       <div className="mobile-menu-backdrop" aria-hidden="true" />
@@ -69,14 +73,20 @@ export function MobileMenu({ onClose }) {
         >
           <X size={24} />
         </button>
-        <div className="mobile-menu-auth">
-          <button type="button" className="btn-join">
-            Join Fiverr
-          </button>
-          <button type="button" className="mobile-menu-sign-in">
-            Sign in
-          </button>
-        </div>
+        {!isLoggedIn && (
+          <div className="mobile-menu-auth">
+            <button type="button" className="btn-join" onClick={() => openLogin('signup')}>
+              Join Fiverr
+            </button>
+            <button
+              type="button"
+              className="mobile-menu-sign-in"
+              onClick={() => openLogin('login')}
+            >
+              Sign in
+            </button>
+          </div>
+        )}
         <nav aria-label="Mobile">
           <ul className="mobile-menu-links">
             <li>

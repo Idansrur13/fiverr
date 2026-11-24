@@ -25,6 +25,8 @@
 @import './cmps/seller-badge.css';
 @import './cmps/order-card.css';
 @import './cmps/package-selector.css';
+@import './cmps/user-menu.css';
+@import './cmps/login-modal.css';
 
 @import './pages/home-page.css';
 @import './pages/explore-page.css';
