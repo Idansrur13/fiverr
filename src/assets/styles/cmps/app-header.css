@@ -1,10 +1,7 @@
 .app-header {
   background-color: var(--clr-bg);
   border-bottom: 1px solid var(--clr-border);
-  transition:
-    background-color 0.3s,
-    border-color 0.3s,
-    box-shadow 0.3s;
+  transition: box-shadow 0.3s;
 }
 
 .app-header .header-content {
@@ -12,7 +9,6 @@
   align-items: center;
   gap: var(--space-xl);
   min-height: var(--header-height);
-  transition: padding-inline 0.3s;
 }
 
 .logo {
@@ -21,7 +17,6 @@
   line-height: 1;
   letter-spacing: -0.06em;
   color: var(--clr-text);
-  transition: color 0.3s;
 }
 
 .logo-dot {
@@ -37,7 +32,6 @@
   font-weight: 500;
   color: var(--clr-text);
   white-space: nowrap;
-  transition: color 0.3s;
 }
 
 .app-header .main-nav button {
@@ -78,49 +72,26 @@
 .app-header .btn-menu {
   display: none;
   color: var(--clr-text-dark);
-  transition: color 0.3s;
-}
-
-.app-header .user-menu:empty {
-  display: none;
 }
 
 .app-header.home-header {
-  position: fixed;
-  inset-inline: 0;
+  position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom-color: transparent;
+}
+
+.app-header.home-header.scrolled {
   box-shadow: var(--shadow-card);
 }
 
-.app-header.transparent {
-  background-color: transparent;
-  box-shadow: none;
+.app-header.home-header .search-bar {
+  animation: header-search-in 0.2s ease-out;
 }
 
-.app-header.transparent .header-content {
-  padding-inline: var(--space-lg);
-}
-
-.app-header.transparent .logo,
-.app-header.transparent .main-nav,
-.app-header.transparent .btn-menu {
-  color: var(--clr-bg);
-}
-
-.app-header.transparent .nav-divider {
-  background-color: color-mix(in srgb, var(--clr-bg) 40%, transparent);
-}
-
-.app-header.transparent .main-nav .btn-join {
-  border: 1px solid var(--clr-bg);
-  background-color: transparent;
-}
-
-.app-header.transparent .main-nav .btn-join:hover {
-  background-color: var(--clr-bg);
-  color: var(--clr-text-dark);
+@keyframes header-search-in {
+  from {
+    opacity: 0;
+  }
 }
 
 @media (max-width: 1400px) {
