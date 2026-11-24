@@ -28,6 +28,7 @@
 @import './cmps/package-selector.css';
 @import './cmps/user-menu.css';
 @import './cmps/login-modal.css';
+@import './cmps/protected-route.css';
 
 @import './pages/home-page.css';
 @import './pages/explore-page.css';

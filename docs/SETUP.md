@@ -189,7 +189,8 @@ copy .env.example .env
 ```
 
 הקובץ כבר מכוון ל-DB המקומי ב-Docker, אין צורך לשנות בו כלום כרגע.
-את המפתחות של Supabase (`SUPABASE_URL`, `SUPABASE_ANON_KEY` ו-`VITE_...`) תקבלו מעידן כשנגיע להתחברות.
+את המפתחות של Supabase (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `VITE_SUPABASE_URL` ו-`VITE_SUPABASE_ANON_KEY`) מקבלים מעידן, ומעתיקים ל-`.env`.
+בלי המפתחות האלה אי אפשר להתחבר, ולכן גם אי אפשר להיכנס לעמודים שדורשים התחברות: `/orders`, `/profile`, `/checkout` וכל `/seller/*`. אחרי שינוי ב-`.env` מפעילים מחדש את `npm run dev`.
 
 **לעולם לא מעלים את `.env` ל-Git** – הוא כבר נמצא ב-`.gitignore`.
 
