@@ -1,0 +1,135 @@
+.orders-dropdown {
+  position: relative;
+}
+
+.orders-dropdown .orders-dropdown-btn:hover,
+.orders-dropdown .orders-dropdown-btn[aria-expanded='true'] {
+  color: var(--clr-primary);
+}
+
+.orders-dropdown-panel {
+  position: absolute;
+  top: calc(100% + var(--space-md));
+  right: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - 2 * var(--layout-gutter)));
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  background-color: var(--clr-bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  color: var(--clr-text);
+  font-size: var(--fs-md);
+  font-weight: 400;
+  white-space: normal;
+  overflow: hidden;
+}
+
+.orders-dropdown-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.orders-dropdown-list li + li {
+  border-top: 1px solid var(--clr-border);
+}
+
+.orders-dropdown-item {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+
+.orders-dropdown-item:hover {
+  background-color: var(--clr-bg-light);
+}
+
+.orders-dropdown-img {
+  flex-shrink: 0;
+  width: 72px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.orders-dropdown-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.orders-dropdown-gig-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+  color: var(--clr-text-dark);
+}
+
+.orders-dropdown-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--fs-xs);
+}
+
+.orders-dropdown-price {
+  font-weight: 600;
+  color: var(--clr-text-dark);
+}
+
+.orders-dropdown-status {
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.orders-dropdown-status[data-status='PENDING'] {
+  background-color: color-mix(in srgb, var(--clr-star) 20%, transparent);
+  color: #a15c00;
+}
+
+.orders-dropdown-status[data-status='IN_PROGRESS'] {
+  background-color: #e8f0fe;
+  color: #1a5fd1;
+}
+
+.orders-dropdown-status[data-status='DELIVERED'] {
+  background-color: #f1eafd;
+  color: #6b3fd1;
+}
+
+.orders-dropdown-status[data-status='COMPLETED'] {
+  background-color: color-mix(in srgb, var(--clr-primary) 15%, transparent);
+  color: var(--clr-primary-dark);
+}
+
+.orders-dropdown-status[data-status='CANCELLED'] {
+  background-color: color-mix(in srgb, var(--clr-error) 12%, transparent);
+  color: var(--clr-error);
+}
+
+.orders-dropdown-message {
+  padding: var(--space-lg) var(--space-md);
+  text-align: center;
+  color: var(--clr-text-light);
+}
+
+.orders-dropdown-all {
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--clr-border);
+  text-align: center;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--clr-text-dark);
+}
+
+.orders-dropdown-all:hover {
+  color: var(--clr-primary);
+}

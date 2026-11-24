@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { ChevronDown, Globe, Menu, Sparkles } from 'lucide-react'
 import { UserMenu } from './UserMenu'
+import { OrdersDropdown } from './OrdersDropdown'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
 import { MobileMenu } from './MobileMenu'
@@ -45,9 +46,7 @@ export function AppHeader() {
           <NavLink to="/seller/dashboard" className="nav-freelance">
             Freelance on Fiverr
           </NavLink>
-          <NavLink to="/orders" className="nav-orders">
-            Orders
-          </NavLink>
+          <OrdersDropdown />
           <button type="button" className="nav-lang">
             <Globe size={18} />
             EN
