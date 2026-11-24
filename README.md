@@ -37,17 +37,20 @@ npm run dev
 
 ## פקודות
 
-| פקודה                               | מה היא עושה                        |
-| ----------------------------------- | ---------------------------------- |
-| `npm run dev`                       | הרצת הפרונט                        |
-| `vercel dev`                        | הרצת הפרונט וה-API יחד             |
-| `npm test`                          | הרצת כל הטסטים (Docker צריך לרוץ)  |
-| `npm run lint`                      | בדיקת ESLint                       |
-| `npm run check`                     | lint + test + build – חובה לפני PR |
-| `npm run db:up` / `npm run db:down` | הרמה וכיבוי של ה-DB המקומי         |
-| `npm run db:migrate`                | יצירה והרצה של migration           |
-| `npm run db:seed`                   | טעינת נתוני דמו                    |
-| `npm run db:studio`                 | צפייה בנתונים ב-Prisma Studio      |
+| פקודה                               | מה היא עושה                              |
+| ----------------------------------- | ---------------------------------------- |
+| `npm run dev`                       | הרצת הפרונט ו-`GET /api/gigs/:id` מקומי  |
+| `vercel dev`                        | הרצת הפרונט וכל פונקציות ה-API של Vercel |
+| `npm test`                          | הרצת כל הטסטים (Docker צריך לרוץ)        |
+| `npm run lint`                      | בדיקת ESLint                             |
+| `npm run check`                     | lint + test + build – חובה לפני PR       |
+| `npm run db:up` / `npm run db:down` | הרמה וכיבוי של ה-DB המקומי               |
+| `npm run db:migrate`                | יצירה והרצה של migration                 |
+| `npm run db:seed`                   | טעינת נתוני דמו                          |
+| `npm run db:studio`                 | צפייה בנתונים ב-Prisma Studio            |
+
+בפיתוח מקומי, `npm run dev` מפעיל middleware ל-`GET /api/gigs/:id` מול ה-DB שמוגדר ב-`.env`.
+לבדיקת שאר פונקציות ה-API השתמשו ב-`vercel dev` מתוך פרויקט Vercel מקושר.
 
 ## מבנה הפרויקט
 

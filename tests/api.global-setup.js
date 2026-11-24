@@ -1,4 +1,17 @@
 import { execSync } from 'node:child_process'
+import { loadEnv } from 'vite'
+
+const inheritedDatabaseUrls = {
+  DATABASE_URL: process.env.DATABASE_URL,
+  DIRECT_URL: process.env.DIRECT_URL,
+}
+delete process.env.DATABASE_URL
+delete process.env.DIRECT_URL
+const testEnv = loadEnv('test', process.cwd(), '')
+for (const key of ['DATABASE_URL', 'DIRECT_URL']) {
+  const value = testEnv[key] || inheritedDatabaseUrls[key]
+  if (value) process.env[key] = value
+}
 
 function getDatabaseName(url) {
   try {

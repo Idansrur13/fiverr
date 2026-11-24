@@ -56,18 +56,34 @@ describe('GigDetailsPage', () => {
   })
 
   it('shows a not found message for an unknown gig id', async () => {
-    gigService.getById.mockRejectedValue(new Error('Cannot find unknown-id in gigDB'))
+    gigService.getById.mockRejectedValue(
+      Object.assign(new Error('Gig not found'), { code: 'NOT_FOUND' }),
+    )
     renderWithRoute('unknown-id')
     expect(await screen.findByText('Gig not found')).toBeInTheDocument()
   })
 
   it('does not show a gig left in the store for a different id', async () => {
     store.dispatch({ type: SET_GIG, gig })
-    gigService.getById.mockRejectedValue(new Error('Cannot find unknown-id in gigDB'))
+    gigService.getById.mockRejectedValue(
+      Object.assign(new Error('Gig not found'), { code: 'NOT_FOUND' }),
+    )
 
     renderWithRoute('unknown-id')
     expect(await screen.findByText('Gig not found')).toBeInTheDocument()
     expect(screen.queryByText(gig.title)).not.toBeInTheDocument()
+  })
+
+  it('shows a load error when the request fails for a reason other than not found', async () => {
+    gigService.getById.mockRejectedValue(
+      Object.assign(new Error('Unable to connect'), { code: 'NETWORK_ERROR' }),
+    )
+
+    renderWithRoute('g101')
+
+    expect(
+      await screen.findByText('Failed to load gig. Please try again later.'),
+    ).toBeInTheDocument()
   })
 
   it('renders the title, description and category breadcrumb', async () => {

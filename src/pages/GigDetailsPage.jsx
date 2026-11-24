@@ -26,12 +26,16 @@ export function GigDetailsPage() {
   const { gigId } = useParams()
   const gig = useSelector((state) => state.gigModule.gig)
   const [loadedGigId, setLoadedGigId] = useState(null)
+  const [loadError, setLoadError] = useState(null)
 
   useEffect(() => {
     let isCancelled = false
 
     loadGig(gigId)
-      .catch(() => null)
+      .catch((error) => {
+        if (!isCancelled) setLoadError({ gigId, error })
+        return null
+      })
       .finally(() => {
         if (!isCancelled) setLoadedGigId(gigId)
       })
@@ -43,7 +47,14 @@ export function GigDetailsPage() {
   }, [gigId])
 
   if (loadedGigId !== gigId) return <div className="loader">Loading...</div>
-  if (gig?.id !== gigId) return <div className="error-msg">Gig not found</div>
+  if (gig?.id !== gigId) {
+    const currentLoadError = loadError?.gigId === gigId ? loadError.error : null
+    const message =
+      currentLoadError?.code === 'NOT_FOUND' || currentLoadError?.code === 'INVALID_ID'
+        ? 'Gig not found'
+        : 'Failed to load gig. Please try again later.'
+    return <div className="error-msg">{message}</div>
+  }
 
   const { title, description, category, owner, images } = gig
   const demoReviews = demoGigs.find((demoGig) => demoGig.id === gigId)?.reviews

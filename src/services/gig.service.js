@@ -1,5 +1,6 @@
 import { storageService } from './storage.service'
 import { userService } from './user.service'
+import { httpService } from './http.service'
 
 const STORAGE_KEY = 'gigDB'
 const PAGE_SIZE = 12
@@ -67,8 +68,33 @@ function getAvgRating(gig) {
   return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
 }
 
-function getById(gigId) {
-  return storageService.get(STORAGE_KEY, gigId)
+async function getById(gigId) {
+  try {
+    return await httpService.get(`gigs/${encodeURIComponent(gigId)}`)
+  } catch (cause) {
+    const status = cause?.response?.status
+    const error = new Error(
+      cause?.response?.data?.error ||
+        (status === 400
+          ? 'Invalid gig id'
+          : status === 404
+            ? 'Gig not found'
+            : status
+              ? 'Failed to load gig'
+              : 'Unable to connect while loading gig'),
+      { cause },
+    )
+    error.status = status
+    error.code =
+      status === 400
+        ? 'INVALID_ID'
+        : status === 404
+          ? 'NOT_FOUND'
+          : status
+            ? 'HTTP_ERROR'
+            : 'NETWORK_ERROR'
+    throw error
+  }
 }
 
 function save(gig) {

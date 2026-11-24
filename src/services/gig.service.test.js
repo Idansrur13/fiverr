@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { gigService } from './gig.service'
+import { httpService } from './http.service'
 import demoGigs from '../data/gigs.json'
 
 const testGigs = [
@@ -40,6 +41,7 @@ function ids(gigs) {
 describe('gigService', () => {
   beforeEach(() => {
     localStorage.clear()
+    vi.restoreAllMocks()
   })
 
   it('loads demo gigs on first query when storage is empty', async () => {
@@ -79,12 +81,41 @@ describe('gigService', () => {
     })
 
     it('getById returns the matching gig', async () => {
-      const gig = await gigService.getById('g2')
-      expect(gig).toEqual(testGigs[1])
+      const expectedGig = testGigs[1]
+      const getSpy = vi.spyOn(httpService, 'get').mockResolvedValue(expectedGig)
+
+      await expect(gigService.getById('g2')).resolves.toEqual(expectedGig)
+      expect(getSpy).toHaveBeenCalledWith('gigs/g2')
     })
 
     it('getById rejects for an unknown id', async () => {
-      await expect(gigService.getById('no-such-id')).rejects.toThrow()
+      vi.spyOn(httpService, 'get').mockRejectedValue({
+        response: { status: 404, data: { error: 'Gig not found' } },
+      })
+
+      await expect(gigService.getById('no-such-id')).rejects.toMatchObject({
+        status: 404,
+        code: 'NOT_FOUND',
+        message: 'Gig not found',
+      })
+    })
+
+    it('getById reports invalid ids and network failures clearly', async () => {
+      const getSpy = vi.spyOn(httpService, 'get')
+      getSpy.mockRejectedValueOnce({
+        response: { status: 400, data: { error: 'Invalid gig id' } },
+      })
+      getSpy.mockRejectedValueOnce(new Error('Network unavailable'))
+
+      await expect(gigService.getById('invalid')).rejects.toMatchObject({
+        status: 400,
+        code: 'INVALID_ID',
+        message: 'Invalid gig id',
+      })
+      await expect(gigService.getById('g2')).rejects.toMatchObject({
+        code: 'NETWORK_ERROR',
+        message: 'Unable to connect while loading gig',
+      })
     })
 
     it('save creates a gig with a new id', async () => {
@@ -93,7 +124,7 @@ describe('gigService', () => {
       expect(ids(testGigs)).not.toContain(savedGig.id)
       const gigs = await gigService.query()
       expect(gigs).toHaveLength(5)
-      expect(await gigService.getById(savedGig.id)).toMatchObject({
+      expect(gigs.find((gig) => gig.id === savedGig.id)).toMatchObject({
         title: 'I will draw your portrait',
         price: 40,
       })
@@ -101,7 +132,7 @@ describe('gigService', () => {
 
     it('save updates an existing gig', async () => {
       await gigService.save({ ...testGigs[0], price: 80 })
-      const gig = await gigService.getById('g1')
+      const [gig] = (await gigService.query()).filter((item) => item.id === 'g1')
       expect(gig.price).toBe(80)
       expect(gig.title).toBe(testGigs[0].title)
       expect(await gigService.query()).toHaveLength(4)
