@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, act, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { UserMenu } from './UserMenu'
 import { store } from '../store/store'
@@ -29,13 +29,20 @@ const loggedinUser = {
   imgUrl: 'maya.jpg',
 }
 
+function LocationStub() {
+  return <p>Page {useLocation().pathname}</p>
+}
+
 function renderMenu() {
   const onOpenLogin = vi.fn()
   const user = userEvent.setup()
   render(
     <Provider store={store}>
-      <MemoryRouter>
+      <MemoryRouter initialEntries={['/orders']}>
         <UserMenu onOpenLogin={onOpenLogin} />
+        <Routes>
+          <Route path="*" element={<LocationStub />} />
+        </Routes>
       </MemoryRouter>
     </Provider>,
   )
@@ -105,6 +112,7 @@ describe('UserMenu', () => {
 
     expect(auth.signOut).toHaveBeenCalled()
     expect(store.getState().userModule.user).toBeNull()
+    expect(await screen.findByText('Page /')).toBeInTheDocument()
     expect(await screen.findByRole('button', { name: 'Sign in' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Join' })).toBeInTheDocument()
   })
@@ -121,5 +129,6 @@ describe('UserMenu', () => {
       'Could not log out. Please try again.',
     )
     expect(store.getState().userModule.user).toEqual(loggedinUser)
+    expect(screen.getByText('Page /orders')).toBeInTheDocument()
   })
 })

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { logout } from '../store/user.actions'
 
 export function UserMenu({ onOpenLogin }) {
   const user = useSelector((storeState) => storeState.userModule.user)
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const menuRef = useRef(null)
@@ -39,6 +40,7 @@ export function UserMenu({ onOpenLogin }) {
     try {
       await logout()
       setIsOpen(false)
+      navigate('/')
     } catch {
       setErrorMsg('Could not log out. Please try again.')
     }
