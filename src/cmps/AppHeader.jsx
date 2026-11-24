@@ -6,13 +6,26 @@ import { UserMenu } from './UserMenu'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
 import { MobileMenu } from './MobileMenu'
+import { useScrollPast } from '../customHooks/useScrollPast'
+
+const SOLID_HEADER_SCROLL_Y = 150
 
 export function AppHeader() {
   const { pathname } = useLocation()
   const filterTxt = useSelector((storeState) => storeState.gigModule.filterBy.txt)
   const isHomePage = pathname === '/'
+  const isScrolledPast = useScrollPast(SOLID_HEADER_SCROLL_Y)
+  const isTransparent = isHomePage && !isScrolledPast
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuBtnRef = useRef(null)
+
+  const headerClassName = [
+    'app-header full main-layout',
+    isHomePage && 'home-header',
+    isTransparent && 'transparent',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const closeMenu = useCallback(({ returnFocus = false } = {}) => {
     setIsMenuOpen(false)
@@ -20,7 +33,7 @@ export function AppHeader() {
   }, [])
 
   return (
-    <header className="app-header full main-layout">
+    <header className={headerClassName}>
       <div className="header-content">
         <button
           type="button"
@@ -35,7 +48,7 @@ export function AppHeader() {
         <Link to="/" className="logo">
           fiverr<span className="logo-dot">.</span>
         </Link>
-        {!isHomePage && <SearchBar key={filterTxt} />}
+        {!isTransparent && <SearchBar key={filterTxt} />}
         <nav className="main-nav">
           <button type="button" className="nav-ai">
             Connect to your AI
@@ -62,7 +75,7 @@ export function AppHeader() {
         </nav>
         <UserMenu />
       </div>
-      <CategoryBar />
+      {!isTransparent && <CategoryBar />}
       {isMenuOpen && <MobileMenu onClose={closeMenu} />}
     </header>
   )
