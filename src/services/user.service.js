@@ -1,5 +1,6 @@
 import { storageService } from './storage.service'
 import { reviewService } from './review.service'
+import { getSupabase, isSupabaseConfigured } from './supabase.service'
 
 const DEMO_USER = {
   id: 'u100',
@@ -19,14 +20,100 @@ const LEVEL_LABELS = {
   TOP_RATED: 'Top Rated',
 }
 
+let loggedinUser = null
+
 export const userService = {
   getLoggedinUser,
+  login,
+  signup,
+  logout,
+  getSessionUser,
+  onAuthChange,
+  getAccessToken,
   getById,
   getLevelLabel,
 }
 
 function getLoggedinUser() {
-  return { ...DEMO_USER }
+  return { ...(loggedinUser || DEMO_USER) }
+}
+
+async function login({ email, password }) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) throw error
+  return _setLoggedinUser(data.user)
+}
+
+async function signup({ fullname, email, password }) {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { fullname } },
+  })
+  if (error) throw error
+  if (!data.session) throw new Error('Check your email to confirm your account, then sign in.')
+  return _setLoggedinUser(data.user)
+}
+
+async function logout() {
+  if (isSupabaseConfigured()) {
+    const supabase = await getSupabase()
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+  }
+  _setLoggedinUser(null)
+}
+
+async function getSessionUser() {
+  if (!isSupabaseConfigured()) return null
+  const supabase = await getSupabase()
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
+  return _setLoggedinUser(data.session?.user)
+}
+
+function onAuthChange(onChange) {
+  if (!isSupabaseConfigured()) return () => {}
+  let subscription = null
+  let isStopped = false
+
+  getSupabase().then((supabase) => {
+    if (isStopped) return
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      onChange(_setLoggedinUser(session?.user))
+    })
+    subscription = data.subscription
+  })
+
+  return () => {
+    isStopped = true
+    subscription?.unsubscribe()
+  }
+}
+
+async function getAccessToken() {
+  if (!isSupabaseConfigured()) return null
+  const supabase = await getSupabase()
+  const { data } = await supabase.auth.getSession()
+  return data.session?.access_token ?? null
+}
+
+function _setLoggedinUser(authUser) {
+  loggedinUser = authUser ? _toUser(authUser) : null
+  return loggedinUser && { ...loggedinUser }
+}
+
+function _toUser({ id, email, user_metadata: metadata = {} }) {
+  return {
+    id,
+    email,
+    fullname: metadata.fullname || (email || '').split('@')[0],
+    imgUrl: metadata.imgUrl || '',
+    level: 'NEW',
+    rating: 0,
+  }
 }
 
 function getLevelLabel(level) {
