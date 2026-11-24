@@ -65,9 +65,9 @@ describe('AppHeader', () => {
     expect(screen.getByRole('search')).toBeInTheDocument()
   })
 
-  it('links to the orders page and the seller dashboard', () => {
+  it('shows the orders button and links to the seller dashboard', () => {
     renderHeaderAt('/')
-    expect(screen.getByRole('link', { name: 'Orders' })).toHaveAttribute('href', '/orders')
+    expect(screen.getByRole('button', { name: 'Orders' })).toHaveAttribute('aria-expanded', 'false')
     expect(screen.getByRole('link', { name: 'Freelance on Fiverr' })).toHaveAttribute(
       'href',
       '/seller/dashboard',
