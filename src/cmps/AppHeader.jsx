@@ -4,16 +4,30 @@ import { useSelector } from 'react-redux'
 import { ChevronDown, Globe, Menu, Sparkles } from 'lucide-react'
 import { LoginModal } from './LoginModal'
 import { UserMenu } from './UserMenu'
+import { OrdersDropdown } from './OrdersDropdown'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
 import { MobileMenu } from './MobileMenu'
+import { useScrollPast } from '../customHooks/useScrollPast'
+
+const SOLID_HEADER_SCROLL_Y = 150
 
 export function AppHeader() {
   const { pathname } = useLocation()
   const filterTxt = useSelector((storeState) => storeState.gigModule.filterBy.txt)
   const isHomePage = pathname === '/'
+  const isScrolledPast = useScrollPast(SOLID_HEADER_SCROLL_Y)
+  const isTransparent = isHomePage && !isScrolledPast
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuBtnRef = useRef(null)
+
+  const headerClassName = [
+    'app-header full main-layout',
+    isHomePage && 'home-header',
+    isTransparent && 'transparent',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const closeMenu = useCallback(({ returnFocus = false } = {}) => {
     setIsMenuOpen(false)
@@ -25,7 +39,7 @@ export function AppHeader() {
   const closeLogin = useCallback(() => setLoginMode(null), [])
 
   return (
-    <header className="app-header full main-layout">
+    <header className={headerClassName}>
       <div className="header-content">
         <button
           type="button"
@@ -40,7 +54,7 @@ export function AppHeader() {
         <Link to="/" className="logo">
           fiverr<span className="logo-dot">.</span>
         </Link>
-        {!isHomePage && <SearchBar key={filterTxt} />}
+        {!isTransparent && <SearchBar key={filterTxt} />}
         <nav className="main-nav">
           <button type="button" className="nav-ai">
             Connect to your AI
@@ -50,9 +64,7 @@ export function AppHeader() {
           <NavLink to="/seller/dashboard" className="nav-freelance">
             Freelance on Fiverr
           </NavLink>
-          <NavLink to="/orders" className="nav-orders">
-            Orders
-          </NavLink>
+          <OrdersDropdown />
           <button type="button" className="nav-lang">
             <Globe size={18} />
             EN
@@ -61,11 +73,8 @@ export function AppHeader() {
           <UserMenu onOpenLogin={setLoginMode} />
         </nav>
       </div>
-      <CategoryBar />
-      {isMenuOpen && (
-        <MobileMenu onClose={closeMenu} isLoggedIn={isLoggedIn} onOpenLogin={setLoginMode} />
-      )}
-      {loginMode && <LoginModal mode={loginMode} onClose={closeLogin} />}
+      {!isTransparent && <CategoryBar />}
+      {isMenuOpen && <MobileMenu onClose={closeMenu} />}
     </header>
   )
 }

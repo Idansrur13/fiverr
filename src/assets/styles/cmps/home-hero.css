@@ -3,8 +3,9 @@
   flex-direction: column;
   justify-content: center;
   gap: var(--space-lg);
-  min-height: 520px;
+  min-height: calc(520px + var(--header-height));
   padding: var(--space-xl) clamp(var(--space-lg), 7vw, 110px);
+  padding-top: calc(var(--header-height) + var(--space-lg));
   border-radius: calc(var(--radius-md) * 2);
   background:
     radial-gradient(
@@ -71,7 +72,8 @@
 
 @media (max-width: 600px) {
   .home-hero {
-    min-height: 420px;
+    min-height: calc(420px + var(--header-height));
     padding: var(--space-xl) var(--space-lg);
+    padding-top: calc(var(--header-height) + var(--space-lg));
   }
 }

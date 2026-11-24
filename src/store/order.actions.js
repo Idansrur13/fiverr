@@ -1,6 +1,6 @@
 import { orderService } from '../services/order.service'
 import { store } from './store'
-import { ADD_ORDER, SET_ORDERS, UPDATE_ORDER } from './order.reducer'
+import { ADD_ORDER, SET_BUYER_ORDERS, SET_ORDERS, UPDATE_ORDER } from './order.reducer'
 
 export async function loadOrders(filterBy) {
   const orders = await orderService.query(filterBy)
@@ -18,4 +18,10 @@ export async function updateOrderStatus(orderId, status) {
   const order = await orderService.updateStatus(orderId, status)
   store.dispatch({ type: UPDATE_ORDER, order })
   return order
+}
+
+export async function loadBuyerOrders(buyerId) {
+  const buyerOrders = await orderService.query({ buyerId })
+  store.dispatch({ type: SET_BUYER_ORDERS, buyerOrders })
+  return buyerOrders
 }
