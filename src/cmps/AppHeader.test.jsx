@@ -29,31 +29,37 @@ describe('AppHeader', () => {
     scrollWindowTo(0)
   })
 
-  it('is transparent at the top of the home page', () => {
+  it('hides only the search at the top of the home page', () => {
     renderHeaderAt('/')
-    expect(screen.getByRole('banner')).toHaveClass('home-header', 'transparent')
+    const header = screen.getByRole('banner')
+    expect(header).toHaveClass('home-header')
+    expect(header).not.toHaveClass('scrolled')
     expect(screen.queryByRole('search')).not.toBeInTheDocument()
-    expect(screen.queryByRole('navigation', { name: 'Categories' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'fiverr.' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Orders' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Join' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Categories' })).toBeInTheDocument()
   })
 
-  it('becomes solid after scrolling on the home page', () => {
+  it('shows the search after scrolling on the home page', () => {
     renderHeaderAt('/')
 
     scrollWindowTo(200)
-    expect(screen.getByRole('banner')).not.toHaveClass('transparent')
+    expect(screen.getByRole('banner')).toHaveClass('scrolled')
     expect(screen.getByRole('search')).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Categories' })).toBeInTheDocument()
 
     scrollWindowTo(0)
-    expect(screen.getByRole('banner')).toHaveClass('transparent')
+    expect(screen.getByRole('banner')).not.toHaveClass('scrolled')
     expect(screen.queryByRole('search')).not.toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Categories' })).toBeInTheDocument()
   })
 
-  it('is always solid on other pages', () => {
+  it('always shows the search on other pages', () => {
     renderHeaderAt('/explore')
     const header = screen.getByRole('banner')
-    expect(header).not.toHaveClass('transparent')
     expect(header).not.toHaveClass('home-header')
+    expect(header).not.toHaveClass('scrolled')
     expect(screen.getByRole('search')).toBeInTheDocument()
   })
 

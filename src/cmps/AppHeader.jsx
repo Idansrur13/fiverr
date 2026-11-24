@@ -10,21 +10,21 @@ import { CategoryBar } from './CategoryBar'
 import { MobileMenu } from './MobileMenu'
 import { useScrollPast } from '../customHooks/useScrollPast'
 
-const SOLID_HEADER_SCROLL_Y = 150
+const SHOW_SEARCH_SCROLL_Y = 150
 
 export function AppHeader() {
   const { pathname } = useLocation()
   const filterTxt = useSelector((storeState) => storeState.gigModule.filterBy.txt)
   const isHomePage = pathname === '/'
-  const isScrolledPast = useScrollPast(SOLID_HEADER_SCROLL_Y)
-  const isTransparent = isHomePage && !isScrolledPast
+  const isScrolledPast = useScrollPast(SHOW_SEARCH_SCROLL_Y)
+  const isSearchShown = !isHomePage || isScrolledPast
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuBtnRef = useRef(null)
 
   const headerClassName = [
     'app-header full main-layout',
     isHomePage && 'home-header',
-    isTransparent && 'transparent',
+    isHomePage && isScrolledPast && 'scrolled',
   ]
     .filter(Boolean)
     .join(' ')
@@ -54,7 +54,7 @@ export function AppHeader() {
         <Link to="/" className="logo">
           fiverr<span className="logo-dot">.</span>
         </Link>
-        {!isTransparent && <SearchBar key={filterTxt} />}
+        {isSearchShown && <SearchBar key={filterTxt} />}
         <nav className="main-nav">
           <button type="button" className="nav-ai">
             Connect to your AI
@@ -73,7 +73,7 @@ export function AppHeader() {
           <UserMenu onOpenLogin={setLoginMode} />
         </nav>
       </div>
-      {!isTransparent && <CategoryBar />}
+      <CategoryBar />
       {isMenuOpen && (
         <MobileMenu onClose={closeMenu} isLoggedIn={isLoggedIn} onOpenLogin={setLoginMode} />
       )}
