@@ -74,7 +74,10 @@ export function AppHeader() {
         </nav>
       </div>
       {!isTransparent && <CategoryBar />}
-      {isMenuOpen && <MobileMenu onClose={closeMenu} />}
+      {isMenuOpen && (
+        <MobileMenu onClose={closeMenu} isLoggedIn={isLoggedIn} onOpenLogin={setLoginMode} />
+      )}
+      {loginMode && <LoginModal mode={loginMode} onClose={closeLogin} />}
     </header>
   )
 }
