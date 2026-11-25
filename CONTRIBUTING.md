@@ -6,18 +6,18 @@
 
 ## הסטאק
 
-| שכבה          | טכנולוגיה                                   |
-| ------------- | ------------------------------------------- |
-| Frontend      | React + Vite, Redux, CSS                    |
-| Backend       | Vercel Serverless Functions (תיקיית `api/`) |
-| Database      | Supabase Postgres                           |
-| ORM           | Prisma                                      |
-| Auth          | Supabase Auth (מייל וסיסמה)                 |
-| קבצים ותמונות | Supabase Storage                            |
-| סביבה מקומית  | Docker (Postgres מקומי לפיתוח ולטסטים)      |
-| טסטים         | Vitest, React Testing Library               |
-| CI            | GitHub Actions                              |
-| Deploy        | Vercel                                      |
+| שכבה          | טכנולוגיה                                              |
+| ------------- | ------------------------------------------------------ |
+| Frontend      | React + Vite, Redux, CSS                               |
+| Backend       | Node + Express (שרת ב-`server/`, ה-endpoints ב-`api/`) |
+| Database      | Supabase Postgres                                      |
+| ORM           | Prisma                                                 |
+| Auth          | Supabase Auth (מייל וסיסמה)                            |
+| קבצים ותמונות | Supabase Storage                                       |
+| סביבה מקומית  | Docker (Postgres מקומי לפיתוח ולטסטים)                 |
+| טסטים         | Vitest, React Testing Library                          |
+| CI            | GitHub Actions                                         |
+| Deploy        | Render                                                 |
 
 ---
 
@@ -167,7 +167,7 @@ git push --force-with-lease
 
 טסטים של ה-API רצים מול DB מקומי ב-Docker (`fiverr_test`), **לא** מול Supabase. לכן Docker צריך לרוץ לפני `npm test`.
 
-טסטים של ה-API נמצאים ב-`tests/api` ולא בתוך `api/`, כי כל קובץ בתוך `api/` הופך ב-Vercel ל-endpoint.
+טסטים של ה-API נמצאים ב-`tests/api` ולא בתוך `api/`, כי כל קובץ בתוך `api/` הופך ל-endpoint.
 
 ### לפני כל PR
 
@@ -196,7 +196,7 @@ npm run check
 
 - כל PR צריך **אישור אחד לפחות** מחבר צוות אחר
 - review תוך 24 שעות
-- בשינויי UI – פותחים את ה-Preview של Vercel ובודקים בעצמנו
+- בשינויי UI – מושכים את הבראנץ', מריצים `npm run dev` ובודקים בעצמנו
 - הערות נסגרות על ידי מי שפתח את ה-PR, אחרי תיקון או הסבר
 
 ### מיזוג
@@ -260,16 +260,16 @@ npx prisma migrate dev
 npm run db:seed
 ```
 
-הרצת האפליקציה עם ה-API (צריך התחברות ל-Vercel וקישור לפרויקט פעם אחת עם `vercel link`):
+הרצת האפליקציה – הפרונט (פורט `5173`) וה-API (פורט `3000`) יחד. Vite מעביר כל בקשה ל-`/api` לשרת, והשרת עולה מחדש לבד אחרי כל שינוי ב-`api/` או ב-`server/`:
 
 ```bash
-vercel dev
+npm run dev
 ```
 
 הרצת הפרונט בלבד:
 
 ```bash
-npm run dev
+npm run dev:web
 ```
 
 כיבוי:
@@ -293,19 +293,32 @@ docker compose down
 
 ### חיבור ל-Supabase
 
-| משתנה          | שימוש                                                                                         |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| `DATABASE_URL` | חיבור דרך ה-pooler (פורט `6543`, `?pgbouncer=true&connection_limit=1`) – לפונקציות serverless |
-| `DIRECT_URL`   | חיבור ישיר (פורט `5432`) – ל-migrations                                                       |
+| משתנה          | שימוש                                                                         |
+| -------------- | ----------------------------------------------------------------------------- |
+| `DATABASE_URL` | חיבור דרך ה-pooler (פורט `6543`, `?pgbouncer=true&connection_limit=5`) – לשרת |
+| `DIRECT_URL`   | חיבור ישיר (פורט `5432`) – ל-migrations                                       |
 
 ---
 
-## Vercel
+## Render
 
-- כל PR מקבל **Preview Deployment** אוטומטי – משתמשים בו ל-review
-- Production עולה **רק** מ-`main`
-- Preview מחובר לפרויקט ה-dev של Supabase, Production לפרויקט ה-prod
-- קבצי עזר של ה-API נמצאים ב-`api/_lib/` (קבצים שמתחילים ב-`_` לא הופכים ל-endpoint)
+- האתר רץ ב-Render כ-Web Service אחד: השרת ב-`server/` מריץ את ה-endpoints מ-`api/` ומגיש את הפרונט מ-`dist/`
+- כל ההגדרות נמצאות ב-`render.yaml`
+- Production עולה **רק** מ-`main`, ורק אחרי שה-CI עבר
+- endpoint חדש = קובץ חדש ב-`api/`, השרת מוצא אותו לבד:
+  - `api/health.js` → `/api/health`
+  - `api/gigs/index.js` → `/api/gigs`
+  - `api/users/[id].js` → `/api/users/:id`, וה-`id` מגיע ב-`req.query.id`
+- קבצי עזר של ה-API נמצאים ב-`api/_lib/` (קבצים ותיקיות שמתחילים ב-`_` לא הופכים ל-endpoint)
+- ה-handler מקבל `req.query`, `req.body` (JSON) ו-`req.headers`, ועונה עם `res.status(...).json(...)`
+- בתוכנית החינמית השרת נרדם אחרי 15 דקות בלי בקשות, והבקשה הראשונה אחרי זה לוקחת קרוב לדקה
+
+### הקמה (פעם אחת)
+
+1. ב-Render: **New** → **Blueprint**, ובוחרים את ה-repo. Render קורא את `render.yaml` ויוצר את השירות.
+2. ממלאים את משתני הסביבה ש-Render מבקש: `DATABASE_URL`, `DIRECT_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+3. ב-Supabase: **Authentication** → **URL Configuration**, ומעדכנים את **Site URL** לכתובת של Render (`https://<name>.onrender.com`).
+4. משנים משתנה שמתחיל ב-`VITE_`? צריך deploy חדש, כי הוא נכנס לפרונט בזמן ה-build.
 
 ---
 
@@ -313,7 +326,7 @@ docker compose down
 
 - `.env` **לעולם** לא נכנס ל-Git (נמצא ב-`.gitignore`)
 - `.env.example` מתעדכן בכל משתנה חדש – שם בלבד, בלי ערך
-- ערכים אמיתיים נשמרים ב-Vercel וב-GitHub Secrets
+- ערכים אמיתיים נשמרים ב-Render וב-GitHub Secrets
 - מפתחות `service_role` של Supabase רק בצד השרת, אף פעם לא בקוד הפרונט
 
 ---

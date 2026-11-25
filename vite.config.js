@@ -8,6 +8,9 @@ for (const [key, value] of Object.entries(testEnv)) {
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: { '/api': 'http://localhost:3000' },
+  },
   test: {
     projects: [
       {
