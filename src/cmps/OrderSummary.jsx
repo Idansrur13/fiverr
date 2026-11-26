@@ -1,4 +1,4 @@
-import { SERVICE_FEE_RATE } from '../services/pricing.service'
+import { SERVICE_FEE_RATE } from '../../shared/pricing.service'
 
 const SERVICE_FEE_LABEL = new Intl.NumberFormat('en-US', {
   style: 'percent',

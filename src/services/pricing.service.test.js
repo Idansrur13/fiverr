@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calcOrderTotal, roundToCents } from './pricing.service'
+import { calcOrderTotal, roundToCents } from '../../shared/pricing.service'
 
 describe('pricingService', () => {
   it('calcOrderTotal adds a 5.5% service fee', () => {

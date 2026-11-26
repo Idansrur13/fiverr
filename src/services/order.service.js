@@ -1,7 +1,11 @@
-import { getNextStatuses, isValidStatusTransition } from '../../api/_lib/order-status.js'
-import { httpService } from './http.service'
+import { getNextStatuses, isValidStatusTransition } from '../../shared/order-status'
+import { calcOrderTotal } from '../../shared/pricing.service'
+import { storageService } from './storage.service'
+import { userService } from './user.service'
 
 export { getNextStatuses, isValidStatusTransition }
+
+const STORAGE_KEY = 'orderDB'
 
 export const orderService = {
   query,
@@ -10,56 +14,68 @@ export const orderService = {
   updateStatus,
 }
 
-function query({ sellerId, role, status } = {}) {
+async function query({ buyerId, sellerId, role, status } = {}) {
+  const orders = await storageService.query(STORAGE_KEY)
   const resolvedRole = role || (sellerId ? 'seller' : 'buyer')
-  const params = { role: resolvedRole }
-  if (status) params.status = status
-  return request(() => httpService.get('orders', params))
+  if (!['buyer', 'seller'].includes(resolvedRole)) throw new Error('Invalid order role')
+  const userId =
+    (resolvedRole === 'seller' ? sellerId : buyerId) || userService.getLoggedinUser()?.id
+  const filteredOrders = orders.filter(
+    (order) =>
+      (resolvedRole === 'seller'
+        ? (order.sellerId || order.seller?.id) === userId
+        : (order.buyerId || order.buyer?.id) === userId) &&
+      (!status || order.status === status),
+  )
+
+  return filteredOrders.sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt))
 }
 
-function add({ gig, pkg, gigId = gig?.id, packageId = pkg?.id }) {
-  return request(() => httpService.post('orders', { gigId, packageId }))
+async function add({ gig, buyer, pkg = null }) {
+  const now = Date.now()
+  const orderPrice = Number((pkg || gig).price)
+  const totals = calcOrderTotal(orderPrice)
+  const daysToMake = Number((pkg || gig).daysToMake)
+  const order = {
+    buyer,
+    buyerId: buyer.id,
+    seller: gig.owner,
+    sellerId: gig.owner?.id,
+    gig: {
+      id: gig.id,
+      title: gig.title,
+      imgUrl: gig.images?.[0] || '',
+    },
+    gigId: gig.id,
+    package: pkg,
+    packageId: pkg?.id,
+    ...totals,
+    status: 'PENDING',
+    createdAt: now,
+    dueAt: now + daysToMake * 24 * 60 * 60 * 1000,
+  }
+
+  return storageService.post(STORAGE_KEY, order)
 }
 
 function getById(orderId) {
-  return request(() => httpService.get(`orders/${encodeURIComponent(orderId)}`))
+  return storageService.get(STORAGE_KEY, orderId)
 }
 
-function updateStatus(orderId, status) {
-  return request(() =>
-    httpService.patch(`orders/${encodeURIComponent(orderId)}/status`, { status }),
-  )
-}
-
-async function request(apiCall) {
-  try {
-    return await apiCall()
-  } catch (cause) {
-    const status = cause?.response?.status
-    const error = new Error(
-      cause?.response?.data?.error ||
-        (status === 401
-          ? 'Please log in to continue'
-          : status === 403
-            ? 'You are not allowed to perform this action'
-            : status === 404
-              ? 'Order or gig not found'
-              : status
-                ? 'Could not complete the order request'
-                : 'Unable to connect to the orders service'),
-      { cause },
-    )
-    error.status = status
-    error.code =
-      status === 401
-        ? 'UNAUTHORIZED'
-        : status === 403
-          ? 'FORBIDDEN'
-          : status === 404
-            ? 'NOT_FOUND'
-            : status
-              ? 'HTTP_ERROR'
-              : 'NETWORK_ERROR'
-    throw error
+async function updateStatus(orderId, status) {
+  const order = await getById(orderId)
+  if (!isValidStatusTransition(order.status, status)) {
+    throw new Error(`Cannot change order status from ${order.status} to ${status}`)
   }
+
+  return storageService.put(STORAGE_KEY, {
+    ...order,
+    status,
+    ...(status === 'DELIVERED' ? { deliveredAt: Date.now() } : {}),
+  })
+}
+
+function getTimestamp(value) {
+  const timestamp = new Date(value).getTime()
+  return Number.isNaN(timestamp) ? 0 : timestamp
 }

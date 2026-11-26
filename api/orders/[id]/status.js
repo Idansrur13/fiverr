@@ -1,8 +1,8 @@
 import { requireAppUser } from '../../_lib/auth.js'
 import { createHandler, HttpError } from '../../_lib/http.js'
 import { ORDER_INCLUDE, toOrderResponse } from '../../_lib/order-response.js'
-import { isValidStatusTransition } from '../../_lib/order-status.js'
 import { prisma } from '../../_lib/prisma.js'
+import { isValidStatusTransition } from '../../../shared/order-status.js'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
