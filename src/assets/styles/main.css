@@ -38,6 +38,7 @@
 @import './pages/seller-orders-page.css';
 @import './pages/checkout-page.css';
 @import './pages/order-pages.css';
+@import './pages/order-details-page.css';
 
 /*gig-details-page*/
 @import './pages/gig-details-page.css';
