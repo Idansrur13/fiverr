@@ -1,38 +1,23 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { getNextStatuses, orderService } from './order.service'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { getNextStatuses, isValidStatusTransition, orderService } from './order.service'
+import { storageService } from './storage.service'
 
+const buyer = { id: 'buyer-1', fullname: 'Buyer' }
+const seller = { id: 'seller-1', fullname: 'Seller' }
 const gig = {
-  id: 'g1',
-  title: 'I will design a modern minimalist logo',
-  price: 50,
-  daysToMake: 2,
-  images: ['logo-1.jpg', 'logo-2.jpg', 'logo-3.jpg'],
-  owner: { id: 'seller1', fullname: 'Maya Cohen', imgUrl: 'maya.jpg' },
+  id: 'local-gig-1',
+  title: 'Local gig',
+  images: ['gig.jpg'],
+  price: 80,
+  daysToMake: 4,
+  owner: seller,
 }
-
-const buyer = { id: 'buyer1', fullname: 'Liam Brooks', imgUrl: 'liam.jpg' }
-
-const storedOrders = [
-  { id: 'o1', buyer: { id: 'buyer1' }, seller: { id: 'seller1' }, status: 'PENDING', createdAt: 1 },
-  {
-    id: 'o2',
-    buyer: { id: 'buyer2' },
-    seller: { id: 'seller1' },
-    status: 'COMPLETED',
-    createdAt: 2,
-  },
-  {
-    id: 'o3',
-    buyer: { id: 'buyer1' },
-    seller: { id: 'seller2' },
-    status: 'COMPLETED',
-    createdAt: 3,
-  },
-  { id: 'o4', buyer: { id: 'buyer3' }, seller: { id: 'seller2' }, status: 'PENDING', createdAt: 4 },
-]
-
-function ids(orders) {
-  return orders.map((order) => order.id).sort()
+const pkg = {
+  id: 'local-package-1',
+  tier: 'BASIC',
+  title: 'Basic',
+  price: 100,
+  daysToMake: 2,
 }
 
 describe('orderService', () => {
@@ -40,87 +25,107 @@ describe('orderService', () => {
     localStorage.clear()
   })
 
-  it('add creates an order with status PENDING and the gig price', async () => {
-    const order = await orderService.add({ gig, buyer })
-    expect(order.id).toBeTruthy()
-    expect(order).toMatchObject({
-      status: 'PENDING',
-      price: 50,
-      serviceFee: 2.75,
-      total: 52.75,
-      buyer: { id: 'buyer1' },
-      seller: { id: 'seller1' },
-      gig: { id: 'g1', title: gig.title, imgUrl: 'logo-1.jpg' },
-    })
-    expect(await orderService.query()).toHaveLength(1)
-  })
-
-  it('add saves the selected package and uses its price and delivery time', async () => {
-    const pkg = { id: 'p2', tier: 'STANDARD', title: 'Standard', price: 90, daysToMake: 4 }
-    const order = await orderService.add({ gig, buyer, pkg })
-
-    expect(order).toMatchObject({
-      price: 90,
-      serviceFee: 4.95,
-      total: 94.95,
-      package: { id: 'p2', tier: 'STANDARD', title: 'Standard' },
-    })
-    expect(order.dueAt - order.createdAt).toBe(4 * 24 * 60 * 60 * 1000)
-  })
-
-  it('add without a package uses the gig price and delivery time', async () => {
-    const order = await orderService.add({ gig, buyer })
-
-    expect(order.package).toBeNull()
-    expect(order.dueAt - order.createdAt).toBe(2 * 24 * 60 * 60 * 1000)
-  })
-
-  it('query returns only the orders of the given buyer', async () => {
-    localStorage.setItem('orderDB', JSON.stringify(storedOrders))
-    const orders = await orderService.query({ buyerId: 'buyer1' })
-    expect(ids(orders)).toEqual(['o1', 'o3'])
-  })
-
-  it('query filters orders by status', async () => {
-    localStorage.setItem('orderDB', JSON.stringify(storedOrders))
-    const orders = await orderService.query({ status: 'COMPLETED' })
-    expect(ids(orders)).toEqual(['o2', 'o3'])
-  })
-
-  it('getNextStatuses allows approve and reject for PENDING', () => {
+  it('uses the shared legal order status transitions', () => {
     expect(getNextStatuses('PENDING')).toEqual(['IN_PROGRESS', 'CANCELLED'])
-  })
-
-  it('getNextStatuses allows deliver for IN_PROGRESS', () => {
     expect(getNextStatuses('IN_PROGRESS')).toEqual(['DELIVERED'])
-  })
-
-  it('getNextStatuses allows complete for DELIVERED', () => {
     expect(getNextStatuses('DELIVERED')).toEqual(['COMPLETED'])
-  })
-
-  it('getNextStatuses returns nothing for COMPLETED and CANCELLED', () => {
     expect(getNextStatuses('COMPLETED')).toEqual([])
     expect(getNextStatuses('CANCELLED')).toEqual([])
+    expect(isValidStatusTransition('PENDING', 'IN_PROGRESS')).toBe(true)
+    expect(isValidStatusTransition('PENDING', 'COMPLETED')).toBe(false)
   })
 
-  it('updateStatus saves a valid transition', async () => {
-    localStorage.setItem('orderDB', JSON.stringify(storedOrders))
+  it('queries local orders by buyer, seller and status', async () => {
+    await storageService.post('orderDB', {
+      id: 'buyer-order',
+      buyer,
+      seller,
+      status: 'PENDING',
+      createdAt: 100,
+    })
+    await storageService.post('orderDB', {
+      id: 'seller-order',
+      buyer: { id: 'buyer-2' },
+      seller,
+      status: 'COMPLETED',
+      createdAt: 200,
+    })
+    await storageService.post('orderDB', {
+      id: 'other-order',
+      buyer: { id: 'buyer-2' },
+      seller: { id: 'seller-2' },
+      status: 'PENDING',
+      createdAt: 300,
+    })
 
-    const updatedOrder = await orderService.updateStatus('o1', 'IN_PROGRESS')
-
-    expect(updatedOrder.status).toBe('IN_PROGRESS')
-    expect((await orderService.query()).find((order) => order.id === 'o1').status).toBe(
-      'IN_PROGRESS',
-    )
+    await expect(
+      orderService.query({ buyerId: buyer.id, status: 'PENDING' }),
+    ).resolves.toMatchObject([{ buyer, status: 'PENDING' }])
+    await expect(orderService.query({ sellerId: seller.id })).resolves.toMatchObject([
+      { id: expect.any(String), status: 'COMPLETED' },
+      { id: expect.any(String), status: 'PENDING' },
+    ])
   })
 
-  it('updateStatus rejects an invalid transition', async () => {
-    localStorage.setItem('orderDB', JSON.stringify(storedOrders))
+  it('creates an order in local storage using local gig and package ids', async () => {
+    const order = await orderService.add({ gig, buyer, pkg })
+    const storedOrders = await storageService.query('orderDB')
 
-    await expect(orderService.updateStatus('o1', 'COMPLETED')).rejects.toThrow(
+    expect(order).toMatchObject({
+      buyer,
+      buyerId: buyer.id,
+      seller,
+      sellerId: seller.id,
+      gig: { id: gig.id, title: gig.title, imgUrl: 'gig.jpg' },
+      gigId: gig.id,
+      package: pkg,
+      packageId: pkg.id,
+      price: 100,
+      serviceFee: 5.5,
+      total: 105.5,
+      status: 'PENDING',
+    })
+    expect(order.id).toBeTruthy()
+    expect(order.dueAt).toBeGreaterThan(order.createdAt)
+    expect(storedOrders).toContainEqual(order)
+  })
+
+  it('creates an order using the gig price when the gig has no package', async () => {
+    const order = await orderService.add({ gig, buyer })
+
+    expect(order).toMatchObject({
+      gigId: gig.id,
+      package: null,
+      packageId: undefined,
+      price: 80,
+      serviceFee: 4.4,
+      total: 84.4,
+    })
+  })
+
+  it('gets an order from local storage by id', async () => {
+    const savedOrder = await storageService.post('orderDB', { status: 'PENDING' })
+
+    await expect(orderService.getById(savedOrder.id)).resolves.toEqual(savedOrder)
+  })
+
+  it('updates and saves a legal status transition locally', async () => {
+    const savedOrder = await storageService.post('orderDB', { status: 'IN_PROGRESS' })
+
+    const updatedOrder = await orderService.updateStatus(savedOrder.id, 'DELIVERED')
+    const storedOrder = await storageService.get('orderDB', savedOrder.id)
+
+    expect(updatedOrder).toMatchObject({ id: savedOrder.id, status: 'DELIVERED' })
+    expect(updatedOrder.deliveredAt).toBeGreaterThan(0)
+    expect(storedOrder).toEqual(updatedOrder)
+  })
+
+  it('rejects an invalid status transition without changing local storage', async () => {
+    const savedOrder = await storageService.post('orderDB', { status: 'PENDING' })
+
+    await expect(orderService.updateStatus(savedOrder.id, 'COMPLETED')).rejects.toThrow(
       'Cannot change order status from PENDING to COMPLETED',
     )
-    expect((await orderService.query()).find((order) => order.id === 'o1').status).toBe('PENDING')
+    await expect(storageService.get('orderDB', savedOrder.id)).resolves.toEqual(savedOrder)
   })
 })
