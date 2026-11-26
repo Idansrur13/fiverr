@@ -1,4 +1,4 @@
-import { getNextStatuses, isValidStatusTransition } from '../../api/_lib/order-status.js'
+import { getNextStatuses, isValidStatusTransition } from '../../shared/order-status.js'
 import { httpService } from './http.service'
 
 export { getNextStatuses, isValidStatusTransition }

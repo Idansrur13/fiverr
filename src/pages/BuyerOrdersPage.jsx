@@ -1,34 +1,51 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { OrderTable } from '../cmps/OrderTable'
+import { OrderList } from '../cmps/OrderList'
 import { userService } from '../services/user.service'
 import { loadOrders } from '../store/order.actions'
 
 const STATUS_TABS = [
-  { status: 'ALL', label: 'All' },
-  { status: 'PENDING', label: 'Pending' },
-  { status: 'IN_PROGRESS', label: 'In progress' },
+  { status: 'ACTIVE', label: 'Active' },
   { status: 'DELIVERED', label: 'Delivered' },
   { status: 'COMPLETED', label: 'Completed' },
   { status: 'CANCELLED', label: 'Cancelled' },
+  { status: 'ALL', label: 'All' },
 ]
+
+function getOrderUserId(order, role) {
+  return order[`${role}Id`] || order[role]?.id
+}
+
+function getTimestamp(value) {
+  const timestamp = new Date(value).getTime()
+  return Number.isNaN(timestamp) ? 0 : timestamp
+}
 
 export function BuyerOrdersPage() {
   const loggedinUser = userService.getLoggedinUser()
   const orders = useSelector((state) => state.orderModule.orders)
-  const [selectedStatus, setSelectedStatus] = useState('ALL')
-  const [isLoading, setIsLoading] = useState(true)
-  const [errorMsg, setErrorMsg] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('ACTIVE')
+  const [loadState, setLoadState] = useState({
+    userId: null,
+    isLoading: true,
+    error: '',
+  })
 
   useEffect(() => {
     let isCancelled = false
 
     loadOrders({ buyerId: loggedinUser.id })
-      .catch(() => {
-        if (!isCancelled) setErrorMsg('Could not load your orders. Please try again.')
+      .then(() => {
+        if (!isCancelled) setLoadState({ userId: loggedinUser.id, isLoading: false, error: '' })
       })
-      .finally(() => {
-        if (!isCancelled) setIsLoading(false)
+      .catch(() => {
+        if (!isCancelled) {
+          setLoadState({
+            userId: loggedinUser.id,
+            isLoading: false,
+            error: 'Could not load your orders. Please try again.',
+          })
+        }
       })
 
     return () => {
@@ -36,19 +53,32 @@ export function BuyerOrdersPage() {
     }
   }, [loggedinUser.id])
 
-  const visibleOrders =
-    selectedStatus === 'ALL' ? orders : orders.filter((order) => order.status === selectedStatus)
+  const isLoading = loadState.userId !== loggedinUser.id || loadState.isLoading
+  const errorMsg = loadState.userId === loggedinUser.id ? loadState.error : ''
+  const buyerOrders = orders
+    .filter((order) => getOrderUserId(order, 'buyer') === loggedinUser.id)
+    .sort((first, second) => getTimestamp(second.createdAt) - getTimestamp(first.createdAt))
+  const visibleOrders = buyerOrders.filter((order) => {
+    if (selectedStatus === 'ACTIVE') return ['PENDING', 'IN_PROGRESS'].includes(order.status)
+    return selectedStatus === 'ALL' || order.status === selectedStatus
+  })
   const selectedTab = STATUS_TABS.find((tab) => tab.status === selectedStatus)
 
   function getOrdersCount(status) {
+    if (status === 'ACTIVE') {
+      return buyerOrders.filter((order) => ['PENDING', 'IN_PROGRESS'].includes(order.status)).length
+    }
     return status === 'ALL'
-      ? orders.length
-      : orders.filter((order) => order.status === status).length
+      ? buyerOrders.length
+      : buyerOrders.filter((order) => order.status === status).length
   }
 
   return (
     <section className="orders-page buyer-orders-page">
-      <h1>My Orders</h1>
+      <header className="buyer-orders-header">
+        <h1>My Orders</h1>
+      </header>
+
       <div className="status-tabs order-status-tabs" role="tablist" aria-label="Order status">
         {STATUS_TABS.map(({ status, label }) => (
           <button
@@ -80,9 +110,11 @@ export function BuyerOrdersPage() {
       >
         <h2 className="orders-panel-title">{selectedTab.label} orders</h2>
         {isLoading ? (
-          <p className="orders-panel-message">Loading orders...</p>
+          <p className="orders-panel-message" role="status">
+            Loading orders...
+          </p>
         ) : visibleOrders.length ? (
-          <OrderTable orders={visibleOrders} viewer="buyer" />
+          <OrderList orders={visibleOrders} />
         ) : (
           <p className="orders-panel-message">
             No {selectedTab.label.toLowerCase()} orders to show
