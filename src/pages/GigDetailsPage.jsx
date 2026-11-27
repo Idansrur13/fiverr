@@ -72,13 +72,13 @@ export function GigDetailsPage() {
           <p>{description}</p>
         </section>
 
-        <section className="gig-reviews" aria-labelledby="gig-reviews-title">
+        <AboutSeller owner={owner} rating={rating} reviewsCount={reviewsCount} />
+
+        <section id="gig-reviews" className="gig-reviews" aria-labelledby="gig-reviews-title">
           <h2 id="gig-reviews-title">Reviews</h2>
           <ReviewStats reviews={reviews} />
           <ReviewList reviews={reviews} />
         </section>
-
-        <AboutSeller owner={owner} rating={rating} reviewsCount={reviewsCount} />
       </div>
       <aside className="gig-details-sidebar">
         <OrderCard gig={gig} />

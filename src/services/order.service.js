@@ -1,5 +1,20 @@
-import { getNextStatuses, isValidStatusTransition } from '../../api/_lib/order-status.js'
 import { httpService } from './http.service'
+
+const NEXT_STATUSES_BY_STATUS = {
+  PENDING: ['IN_PROGRESS', 'CANCELLED'],
+  IN_PROGRESS: ['DELIVERED'],
+  DELIVERED: ['COMPLETED'],
+  COMPLETED: [],
+  CANCELLED: [],
+}
+
+function getNextStatuses(status) {
+  return NEXT_STATUSES_BY_STATUS[status] || []
+}
+
+function isValidStatusTransition(currentStatus, nextStatus) {
+  return getNextStatuses(currentStatus).includes(nextStatus)
+}
 
 export { getNextStatuses, isValidStatusTransition }
 

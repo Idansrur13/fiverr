@@ -83,9 +83,27 @@ describe('GigDetailsPage', () => {
 
     expect(screen.getAllByText('Top Rated')).toHaveLength(2)
     expect(screen.getAllByText('5.0')).toHaveLength(3)
-    expect(screen.getAllByText(`(${gig.reviews.length})`)).toHaveLength(2)
+    expect(screen.getAllByText(`(${gig.reviews.length} reviews)`)).toHaveLength(2)
+    expect(screen.getByRole('link', { name: `(${gig.reviews.length} reviews)` })).toHaveAttribute(
+      'href',
+      '#gig-reviews',
+    )
     expect(screen.getByRole('heading', { name: 'Reviews' })).toBeInTheDocument()
     expect(screen.getByText(gig.reviews[0].txt)).toBeInTheDocument()
+  })
+
+  it('renders About the seller before the reviews', async () => {
+    gigService.getById.mockResolvedValue(gig)
+
+    renderWithRoute('g101')
+
+    const aboutSeller = await screen.findByRole('heading', {
+      name: `Get to know ${gig.owner.fullname}`,
+    })
+    const reviews = screen.getByRole('heading', { name: 'Reviews' })
+    expect(
+      aboutSeller.compareDocumentPosition(reviews) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('renders the order card inside the sidebar without a nested aside', async () => {

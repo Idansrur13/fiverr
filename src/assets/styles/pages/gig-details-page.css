@@ -1,60 +1,99 @@
 .gig-details-page {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 5%;
+  width: 100%;
+  max-width: 1304px;
+  min-width: 0;
+  margin-inline: auto;
+  padding: 32px 32px 0;
   background-color: var(--clr-bg);
   color: var(--clr-text);
+}
+
+.gig-details-main {
+  flex: 0 1 57%;
+  min-width: 0;
+}
+
+.gig-details-sidebar {
+  flex: 0 1 33%;
+  min-width: 0;
 }
 
 .gig-breadcrumbs {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: var(--fs-sm);
+  font-size: 14px;
   margin-bottom: 1.5rem;
 }
 
 .gig-breadcrumbs a {
   display: inline-flex;
   align-items: center;
-  color: inherit;
+  color: #222325;
 }
 
 .gig-breadcrumbs .separator {
-  color: var(--clr-text-light);
+  color: #c5c6c9;
 }
 
 .gig-details-page h1 {
-  font-size: var(--fs-xl);
-  font-weight: 600;
-  line-height: 1.3;
-  margin-bottom: 1.25rem;
+  padding-bottom: 16px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 36px;
+  color: #222325;
+}
+
+.gig-details-page h2 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+  color: #404145;
 }
 
 .gig-about {
-  margin-block: 2rem;
-  padding-bottom: 1.5rem;
+  margin-block: var(--space-xl);
+  padding-bottom: var(--space-lg);
   border-bottom: 1px solid var(--clr-border);
 }
 
 .gig-about h2 {
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-md);
 }
 
 .gig-about p {
   line-height: 1.6;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 901px) {
   .gig-details-page {
-    grid-template-columns: minmax(0, 1fr) 380px;
-    align-items: start;
+    display: flex;
   }
 
   .gig-details-sidebar {
     position: sticky;
     top: var(--space-lg);
+  }
+}
+
+@media (max-width: 900px) {
+  .gig-details-page {
+    flex-direction: column;
+    gap: var(--space-xl);
+    padding: var(--space-lg) var(--space-md) 0;
+  }
+
+  .gig-details-main,
+  .gig-details-sidebar {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  .gig-details-sidebar {
+    position: static;
   }
 }

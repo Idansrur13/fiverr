@@ -17,7 +17,7 @@ describe('AboutSeller', () => {
     expect(screen.getByRole('heading', { name: owner.fullname })).toBeInTheDocument()
     expect(screen.getByText('Top Rated')).toBeInTheDocument()
     expect(screen.getByText(owner.rating.toFixed(1))).toBeInTheDocument()
-    expect(screen.getByText(`(${reviews.length})`)).toBeInTheDocument()
+    expect(screen.getByText(`(${reviews.length} reviews)`)).toBeInTheDocument()
   })
 
   it('links the seller name to the seller profile', () => {
