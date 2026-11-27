@@ -8,7 +8,12 @@ export function SellerOverview({ owner, rating, reviewsCount }) {
       <img src={imgUrl} alt={fullname} className="seller-overview-avatar" />
       <div className="seller-overview-info">
         <strong className="seller-overview-name">{fullname}</strong>
-        <SellerBadge level={level} rating={rating} reviewsCount={reviewsCount} />
+        <SellerBadge
+          level={level}
+          rating={rating}
+          reviewsCount={reviewsCount}
+          reviewsHref="#gig-reviews"
+        />
       </div>
     </section>
   )

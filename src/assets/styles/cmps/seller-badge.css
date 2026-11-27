@@ -9,7 +9,6 @@
   padding: 2px var(--space-sm);
   border-radius: var(--radius-sm);
   font-weight: 600;
-  text-transform: uppercase;
   font-size: 11px;
 }
 
@@ -19,10 +18,25 @@
 }
 
 .seller-badge .badge-label.level-1,
-.seller-badge .badge-label.level-2,
-.seller-badge .badge-label.top-rated {
+.seller-badge .badge-label.level-2 {
   background-color: var(--clr-text-dark);
   color: #fff;
+}
+
+.seller-badge .badge-label.top-rated {
+  position: relative;
+  padding: 0 6px;
+  border-radius: 4px;
+  background-color: #ffe0b3;
+  color: #421300;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.seller-badge .badge-label.top-rated::after {
+  margin-left: var(--space-xs);
+  content: '◆◆◆';
 }
 
 .seller-badge .badge-rating {
@@ -31,14 +45,24 @@
   gap: var(--space-xs);
 }
 
+.seller-badge .badge-stars {
+  display: inline-flex;
+  align-items: center;
+  color: #222325;
+}
+
 .seller-badge .star-icon {
-  color: var(--clr-star);
+  color: #222325;
 }
 
 .seller-badge .rating-value {
-  color: var(--clr-star);
+  color: #222325;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .seller-badge .reviews-count {
   color: var(--clr-text-light);
+  font-size: 16px;
+  text-decoration: underline;
 }

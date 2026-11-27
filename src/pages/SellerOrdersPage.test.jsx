@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
@@ -7,6 +7,7 @@ import { SellerOrdersPage } from './SellerOrdersPage'
 import { store } from '../store/store'
 import { SET_ORDERS } from '../store/order.reducer'
 import { userService } from '../services/user.service'
+import { orderService } from '../services/order.service'
 
 const seller = userService.getLoggedinUser()
 
@@ -75,6 +76,11 @@ describe('SellerOrdersPage', () => {
     localStorage.clear()
     localStorage.setItem('orderDB', JSON.stringify(testOrders))
     store.dispatch({ type: SET_ORDERS, orders: [] })
+    vi.spyOn(orderService, 'query').mockResolvedValue(testOrders)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it('shows only the orders of the logged in seller', async () => {

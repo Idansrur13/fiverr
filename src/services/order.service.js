@@ -1,14 +1,4 @@
-import { storageService } from './storage.service'
-import { calcOrderTotal } from './pricing.service'
-
-const STORAGE_KEY = 'orderDB'
-const DAY = 24 * 60 * 60 * 1000
-
-export const orderService = {
-  query,
-  add,
-  updateStatus,
-}
+import { httpService } from './http.service'
 
 const NEXT_STATUSES_BY_STATUS = {
   PENDING: ['IN_PROGRESS', 'CANCELLED'],
@@ -18,42 +8,73 @@ const NEXT_STATUSES_BY_STATUS = {
   CANCELLED: [],
 }
 
-export function getNextStatuses(status) {
+function getNextStatuses(status) {
   return NEXT_STATUSES_BY_STATUS[status] || []
 }
 
-async function query({ buyerId, sellerId, status } = {}) {
-  const orders = await storageService.query(STORAGE_KEY)
-  return orders
-    .filter(
-      (order) =>
-        (!buyerId || order.buyer.id === buyerId) &&
-        (!sellerId || order.seller.id === sellerId) &&
-        (!status || order.status === status),
+function isValidStatusTransition(currentStatus, nextStatus) {
+  return getNextStatuses(currentStatus).includes(nextStatus)
+}
+
+export { getNextStatuses, isValidStatusTransition }
+
+export const orderService = {
+  query,
+  add,
+  getById,
+  updateStatus,
+}
+
+function query({ sellerId, role, status } = {}) {
+  const resolvedRole = role || (sellerId ? 'seller' : 'buyer')
+  const params = { role: resolvedRole }
+  if (status) params.status = status
+  return request(() => httpService.get('orders', params))
+}
+
+function add({ gig, pkg, gigId = gig?.id, packageId = pkg?.id }) {
+  return request(() => httpService.post('orders', { gigId, packageId }))
+}
+
+function getById(orderId) {
+  return request(() => httpService.get(`orders/${encodeURIComponent(orderId)}`))
+}
+
+function updateStatus(orderId, status) {
+  return request(() =>
+    httpService.patch(`orders/${encodeURIComponent(orderId)}/status`, { status }),
+  )
+}
+
+async function request(apiCall) {
+  try {
+    return await apiCall()
+  } catch (cause) {
+    const status = cause?.response?.status
+    const error = new Error(
+      cause?.response?.data?.error ||
+        (status === 401
+          ? 'Please log in to continue'
+          : status === 403
+            ? 'You are not allowed to perform this action'
+            : status === 404
+              ? 'Order or gig not found'
+              : status
+                ? 'Could not complete the order request'
+                : 'Unable to connect to the orders service'),
+      { cause },
     )
-    .sort((a, b) => b.createdAt - a.createdAt)
-}
-
-async function updateStatus(orderId, status) {
-  const order = await storageService.get(STORAGE_KEY, orderId)
-  if (!getNextStatuses(order.status).includes(status)) {
-    throw new Error(`Cannot change order status from ${order.status} to ${status}`)
+    error.status = status
+    error.code =
+      status === 401
+        ? 'UNAUTHORIZED'
+        : status === 403
+          ? 'FORBIDDEN'
+          : status === 404
+            ? 'NOT_FOUND'
+            : status
+              ? 'HTTP_ERROR'
+              : 'NETWORK_ERROR'
+    throw error
   }
-  return storageService.put(STORAGE_KEY, { ...order, status })
-}
-
-function add({ gig, buyer, pkg = null }) {
-  const createdAt = Date.now()
-  const { price, daysToMake } = pkg || gig
-  const order = {
-    buyer: { id: buyer.id, fullname: buyer.fullname, imgUrl: buyer.imgUrl },
-    seller: { id: gig.owner.id, fullname: gig.owner.fullname, imgUrl: gig.owner.imgUrl },
-    gig: { id: gig.id, title: gig.title, imgUrl: gig.images[0] },
-    package: pkg && { id: pkg.id, tier: pkg.tier, title: pkg.title },
-    ...calcOrderTotal(price),
-    status: 'PENDING',
-    createdAt,
-    dueAt: createdAt + daysToMake * DAY,
-  }
-  return storageService.post(STORAGE_KEY, order)
 }

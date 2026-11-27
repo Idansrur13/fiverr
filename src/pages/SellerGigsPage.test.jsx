@@ -7,6 +7,7 @@ import { SellerGigsPage } from './SellerGigsPage'
 import { gigService } from '../services/gig.service'
 import { userService } from '../services/user.service'
 import { store } from '../store/store'
+import { orderService } from '../services/order.service'
 
 const seller = userService.getLoggedinUser()
 const otherSeller = {
@@ -94,6 +95,7 @@ describe('SellerGigsPage', () => {
     localStorage.clear()
     localStorage.setItem('gigDB', JSON.stringify(testGigs))
     localStorage.setItem('orderDB', JSON.stringify(testOrders))
+    vi.spyOn(orderService, 'query').mockResolvedValue(testOrders)
   })
 
   afterEach(() => {
