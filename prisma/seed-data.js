@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { calcOrderTotal, roundToCents } from '../src/services/pricing.service.js'
+import { calcOrderTotal, roundToCents } from '../shared/pricing.service.js'
 
 const DAY = 24 * 60 * 60 * 1000
 

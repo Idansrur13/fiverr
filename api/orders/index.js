@@ -3,7 +3,7 @@ import { createHandler, HttpError } from '../_lib/http.js'
 import { ORDER_INCLUDE, toOrderResponse } from '../_lib/order-response.js'
 import { ORDER_STATUSES } from '../../shared/order-status.js'
 import { prisma } from '../_lib/prisma.js'
-import { calcOrderTotal } from '../../src/services/pricing.service.js'
+import { calcOrderTotal } from '../../shared/pricing.service.js'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

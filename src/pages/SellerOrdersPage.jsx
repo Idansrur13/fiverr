@@ -22,7 +22,7 @@ export function SellerOrdersPage() {
   useEffect(() => {
     let isCancelled = false
 
-    loadOrders({ sellerId: loggedinUser.id })
+    loadOrders({ sellerId: loggedinUser.id }, () => !isCancelled)
       .catch(() => {
         if (!isCancelled) setErrorMsg('Could not load your orders. Please try again.')
       })

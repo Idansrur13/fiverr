@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -160,5 +160,36 @@ describe('BuyerOrdersPage', () => {
     await user.click(within(orderRow).getByRole('link', { name: 'Order again' }))
 
     expect(await screen.findByRole('heading', { name: 'Gig route' })).toBeInTheDocument()
+  })
+
+  it('does not navigate to order details when Order again is activated with Enter', async () => {
+    const user = userEvent.setup()
+    renderBuyerOrdersPage()
+
+    await user.click(await screen.findByRole('tab', { name: 'Completed 1' }))
+    const orderRow = screen.getByRole('row', { name: /Completed gig/ })
+    const orderAgainLink = within(orderRow).getByRole('link', { name: 'Order again' })
+    orderAgainLink.focus()
+    await user.keyboard('{Enter}')
+
+    expect(await screen.findByRole('heading', { name: 'Gig route' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Order details route' })).not.toBeInTheDocument()
+  })
+
+  it('does not update the store when orders finish loading after unmount', async () => {
+    let resolveOrders
+    orderService.query.mockReturnValue(
+      new Promise((resolve) => {
+        resolveOrders = resolve
+      }),
+    )
+    const { unmount } = renderBuyerOrdersPage()
+    unmount()
+
+    await act(async () => {
+      resolveOrders([orders[0]])
+    })
+
+    expect(store.getState().orderModule.orders).toEqual([])
   })
 })

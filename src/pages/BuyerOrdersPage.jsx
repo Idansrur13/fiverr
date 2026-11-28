@@ -34,7 +34,7 @@ export function BuyerOrdersPage() {
   useEffect(() => {
     let isCancelled = false
 
-    loadOrders({ buyerId: loggedinUser.id })
+    loadOrders({ buyerId: loggedinUser.id }, () => !isCancelled)
       .then(() => {
         if (!isCancelled) setLoadState({ userId: loggedinUser.id, isLoading: false, error: '' })
       })

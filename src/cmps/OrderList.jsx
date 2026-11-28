@@ -40,6 +40,8 @@ export function OrderList({ orders }) {
   }
 
   function handleRowKeyDown(event, orderId) {
+    if (event.target !== event.currentTarget) return
+
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       openOrder(orderId)

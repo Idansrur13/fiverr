@@ -4,7 +4,7 @@ import { ORDER_INCLUDE } from '../../api/_lib/order-response.js'
 import { prisma } from '../../api/_lib/prisma.js'
 import { seed } from '../../prisma/seed.js'
 import { loadDemoGigs, toUuid } from '../../prisma/seed-data.js'
-import { calcOrderTotal } from '../../src/services/pricing.service.js'
+import { calcOrderTotal } from '../../shared/pricing.service.js'
 import { clearSeededTables, createMockReq, createMockRes } from './helpers.js'
 import ordersHandler from '../../api/orders/index.js'
 import orderHandler from '../../api/orders/[id].js'
@@ -216,6 +216,30 @@ describe('/api/orders', () => {
     expect(res.body).toEqual({
       error: 'Cannot change order status from PENDING to COMPLETED',
     })
+  })
+
+  it('returns a conflict when the order status changes concurrently', async () => {
+    const order = await createOrder()
+    signInAs(SELLER_ID)
+    const originalUpdateMany = prisma.order.updateMany
+    const updateManySpy = vi.spyOn(prisma.order, 'updateMany').mockResolvedValue({ count: 0 })
+
+    try {
+      const res = await callApi(updateStatusHandler, {
+        method: 'PATCH',
+        query: { id: order.id },
+        body: { status: 'IN_PROGRESS' },
+      })
+
+      expect(res.statusCode).toBe(409)
+      expect(res.body).toEqual({ error: 'Order status changed by another request' })
+      expect(updateManySpy).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: order.id, status: 'PENDING' } }),
+      )
+    } finally {
+      updateManySpy.mockRestore()
+      prisma.order.updateMany = originalUpdateMany
+    }
   })
 
   it('rejects a status change by the buyer', async () => {

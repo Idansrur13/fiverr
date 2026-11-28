@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
@@ -137,5 +137,22 @@ describe('SellerOrdersPage', () => {
 
     expect(screen.getByText('No cancelled orders to show')).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('does not update the store when orders finish loading after unmount', async () => {
+    let resolveOrders
+    orderService.query.mockReturnValue(
+      new Promise((resolve) => {
+        resolveOrders = resolve
+      }),
+    )
+    const { unmount } = renderPage()
+    unmount()
+
+    await act(async () => {
+      resolveOrders(testOrders)
+    })
+
+    expect(store.getState().orderModule.orders).toEqual([])
   })
 })

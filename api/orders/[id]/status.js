@@ -23,15 +23,19 @@ export default createHandler({
       throw new HttpError(400, `Cannot change order status from ${order.status} to ${nextStatus}`)
     }
 
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
+    const result = await prisma.order.updateMany({
+      where: { id: orderId, status: order.status },
       data: {
         status: nextStatus,
         ...(nextStatus === 'DELIVERED' ? { deliveredAt: new Date() } : {}),
       },
+    })
+    if (result.count === 0) throw new HttpError(409, 'Order status changed by another request')
+
+    const updatedOrder = await prisma.order.findUnique({
+      where: { id: orderId },
       include: ORDER_INCLUDE,
     })
-
     return res.status(200).json(toOrderResponse(updatedOrder))
   },
 })
