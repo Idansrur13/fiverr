@@ -5,7 +5,8 @@ import { categoryService } from '../services/category.service'
 import { utilService } from '../services/util.service'
 
 const CATEGORIES = categoryService.getCategories()
-const DESKTOP_QUERY = '(min-width: 769px)'
+// The same width where the header shows ☰ (app-header.css)
+const DESKTOP_QUERY = '(min-width: 1161px)'
 
 export function MobileMenu({ onClose, isLoggedIn = false, onOpenLogin = () => {} }) {
   const panelRef = useRef(null)
@@ -96,7 +97,7 @@ export function MobileMenu({ onClose, isLoggedIn = false, onOpenLogin = () => {}
             </li>
             <li>
               <Link to="/seller/dashboard" onClick={() => onClose()}>
-                Become a Seller
+                Freelance on Fiverr
               </Link>
             </li>
             <li>

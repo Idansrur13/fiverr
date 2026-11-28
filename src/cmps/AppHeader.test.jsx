@@ -78,14 +78,18 @@ describe('AppHeader', () => {
     expect(screen.getByRole('button', { name: 'Orders' })).toHaveAttribute('aria-expanded', 'false')
   })
 
-  it('renders Become a Seller in the nav', () => {
+  it('renders Freelance on Fiverr in the nav', () => {
     renderHeaderAt('/')
     const nav = screen.getByRole('banner').querySelector('.main-nav')
-    expect(within(nav).getByRole('link', { name: 'Become a Seller' })).toHaveAttribute(
+    expect(within(nav).getByRole('link', { name: 'Freelance on Fiverr' })).toHaveAttribute(
       'href',
       '/seller/dashboard',
     )
-    expect(screen.queryByText('Freelance on Fiverr')).not.toBeInTheDocument()
+  })
+
+  it('does not render Connect to your AI', () => {
+    renderHeaderAt('/')
+    expect(screen.queryByText('Connect to your AI')).not.toBeInTheDocument()
   })
 
   it('links the logo to the home page', () => {

@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { ChevronDown, Globe, Menu, Sparkles } from 'lucide-react'
+import { Globe, Menu } from 'lucide-react'
 import { LoginModal } from './LoginModal'
 import { AppLogo } from './AppLogo'
 import { UserMenu } from './UserMenu'
@@ -50,22 +50,17 @@ export function AppHeader() {
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen(true)}
         >
-          <Menu size={24} />
+          <Menu size={20} />
         </button>
         <AppLogo />
         {isSearchShown && <SearchBar key={filterTxt} />}
         <nav className="main-nav">
-          <button type="button" className="nav-ai">
-            Connect to your AI
-            <Sparkles size={16} className="nav-ai-icon" />
-            <ChevronDown size={18} />
-          </button>
           <NavLink to="/seller/dashboard" className="nav-freelance">
-            Become a Seller
+            Freelance on Fiverr
           </NavLink>
           <OrdersDropdown />
           <button type="button" className="nav-lang">
-            <Globe size={18} />
+            <Globe size={16} aria-hidden="true" />
             EN
           </button>
           <span className="nav-divider" aria-hidden="true" />

@@ -1,11 +1,8 @@
-.category-bar {
-  border-top: 1px solid var(--clr-border);
-}
-
+/* The header's second row (fiverr.com sub-nav): ghost links, like the header buttons.
+   The padding and the 1px line come from app-header.css. */
 .category-bar ul {
   display: flex;
-  justify-content: space-between;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -19,28 +16,21 @@
 }
 
 .category-bar button {
-  padding-block: var(--space-sm);
-  border-bottom: 3px solid transparent;
-  color: var(--clr-text-light);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-md);
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--clr-text-dark);
   white-space: nowrap;
+  transition: background-color 0.07s cubic-bezier(0.75, 0, 0.25, 1);
 }
 
 .category-bar button:hover {
-  color: var(--clr-text-dark);
+  background-color: var(--clr-bg-hover);
 }
 
 .category-bar button.active {
   color: var(--clr-primary);
-  border-bottom-color: var(--clr-primary);
-}
-
-@media (max-width: 600px) {
-  .category-bar ul {
-    justify-content: flex-start;
-    gap: var(--space-md);
-  }
-
-  .category-bar button {
-    font-size: var(--fs-sm);
-  }
 }

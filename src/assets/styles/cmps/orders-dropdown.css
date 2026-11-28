@@ -10,7 +10,7 @@
 
 .orders-dropdown .orders-dropdown-btn:hover,
 .orders-dropdown .orders-dropdown-btn[aria-expanded='true'] {
-  background-color: var(--clr-bg-light);
+  background-color: var(--clr-bg-hover);
   color: var(--clr-text-dark);
 }
 
