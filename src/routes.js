@@ -10,6 +10,7 @@ import { ProfilePage } from './pages/ProfilePage'
 import { SellerDashboardPage } from './pages/SellerDashboardPage'
 import { SellerGigsPage } from './pages/SellerGigsPage'
 import { GigEditPage } from './pages/GigEditPage'
+import { WishlistPage } from './pages/WishlistPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 export const routes = [
@@ -19,6 +20,7 @@ export const routes = [
   { path: '/gig/:gigId', component: GigDetailsPage },
   { path: '/checkout/:gigId', component: CheckoutPage, isProtected: true },
   { path: '/orders', component: BuyerOrdersPage, isProtected: true },
+  { path: '/wishlist', component: WishlistPage, isProtected: true },
   { path: '/orders/:orderId', component: OrderDetailsPage, isProtected: true },
   { path: '/seller/orders', component: SellerOrdersPage, isProtected: true },
   { path: '/profile', component: ProfilePage, isProtected: true },

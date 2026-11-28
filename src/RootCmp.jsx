@@ -1,10 +1,20 @@
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { AppHeader } from './cmps/AppHeader'
 import { AppFooter } from './cmps/AppFooter'
 import { ProtectedRoute } from './cmps/ProtectedRoute'
 import { routes } from './routes'
+import { loadWishlist } from './store/wishlist.actions'
 
 export function RootCmp() {
+  const userId = useSelector((storeState) => storeState.userModule.user?.id)
+
+  // The hearts need the user's saved gigs on every page, so they reload on login / logout
+  useEffect(() => {
+    loadWishlist().catch(() => {})
+  }, [userId])
+
   return (
     <section className="app main-layout">
       <AppHeader />

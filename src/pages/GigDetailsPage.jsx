@@ -11,6 +11,7 @@ import { GigGallery } from '../cmps/GigGallery'
 import { SellerOverview } from '../cmps/SellerOverview'
 import { AboutSeller } from '../cmps/AboutSeller'
 import { OrderCard } from '../cmps/OrderCard'
+import { WishlistButton } from '../cmps/WishlistButton'
 import { ReviewList } from '../cmps/ReviewList'
 import { ReviewStats } from '../cmps/ReviewStats'
 import { reviewService } from '../services/review.service'
@@ -63,7 +64,10 @@ export function GigDetailsPage() {
           </nav>
         )}
 
-        <h1>{title}</h1>
+        <div className="gig-details-title-row">
+          <h1>{title}</h1>
+          <WishlistButton gigId={gig.id} />
+        </div>
         <SellerOverview owner={owner} rating={rating} reviewsCount={reviewsCount} />
         <GigGallery images={images} />
 

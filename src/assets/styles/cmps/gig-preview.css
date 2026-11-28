@@ -4,6 +4,16 @@
   gap: var(--space-sm);
 }
 
+.gig-preview-media {
+  position: relative;
+}
+
+.gig-preview-media .wishlist-button {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+}
+
 .gig-preview-link {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,23 @@
+.wishlist-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--clr-bg);
+  color: var(--clr-text-dark);
+  box-shadow: var(--shadow-card);
+  transition: color 0.2s;
+}
+
+.wishlist-button:hover {
+  color: var(--clr-error);
+}
+
+.wishlist-button.saved {
+  color: var(--clr-error);
+}
+
+.wishlist-button.saved svg {
+  fill: currentColor;
+}

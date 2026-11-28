@@ -1,16 +1,20 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
 import { GigPreview } from './GigPreview'
+import { store } from '../store/store'
 import demoGigs from '../data/gigs.json'
 
 const gig = demoGigs.find((demoGig) => demoGig.id === 'g101')
 
 function renderPreview(gigToRender = gig) {
   render(
-    <MemoryRouter>
-      <GigPreview gig={gigToRender} />
-    </MemoryRouter>,
+    <Provider store={store}>
+      <MemoryRouter>
+        <GigPreview gig={gigToRender} />
+      </MemoryRouter>
+    </Provider>,
   )
 }
 

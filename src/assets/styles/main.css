@@ -19,6 +19,7 @@
 @import './cmps/gig-form.css';
 @import './cmps/gig-list.css';
 @import './cmps/gig-preview.css';
+@import './cmps/wishlist-button.css';
 @import './cmps/img-carousel.css';
 @import './cmps/gig-filter.css';
 @import './cmps/sort-by.css';
@@ -33,6 +34,7 @@
 @import './pages/home-page.css';
 @import './pages/explore-page.css';
 @import './pages/seller-profile-page.css';
+@import './pages/wishlist-page.css';
 @import './pages/not-found-page.css';
 @import './pages/seller-gigs-page.css';
 @import './pages/seller-orders-page.css';

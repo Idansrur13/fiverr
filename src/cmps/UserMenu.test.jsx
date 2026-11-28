@@ -84,7 +84,7 @@ describe('UserMenu', () => {
     expect(screen.getByRole('img', { name: 'Maya Cohen' })).toHaveTextContent('M')
   })
 
-  it('opens the menu with Profile, Orders and Logout', async () => {
+  it('opens the menu with Profile, Orders, Wishlist and Logout', async () => {
     const { user } = renderMenu()
     setUser(loggedinUser)
 
@@ -95,6 +95,7 @@ describe('UserMenu', () => {
     expect(screen.getByText('maya@test.com')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/profile')
     expect(screen.getByRole('link', { name: 'Orders' })).toHaveAttribute('href', '/orders')
+    expect(screen.getByRole('link', { name: 'Wishlist' })).toHaveAttribute('href', '/wishlist')
     expect(screen.getByRole('link', { name: 'Switch to selling' })).toHaveAttribute(
       'href',
       '/seller/dashboard',

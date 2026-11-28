@@ -104,6 +104,13 @@ export function MobileMenu({ onClose, isLoggedIn = false, onOpenLogin = () => {}
                 Orders
               </Link>
             </li>
+            {isLoggedIn && (
+              <li>
+                <Link to="/wishlist" onClick={() => onClose()}>
+                  Wishlist
+                </Link>
+              </li>
+            )}
           </ul>
           <h3 className="mobile-menu-title">Categories</h3>
           <ul className="mobile-menu-links">

@@ -96,6 +96,11 @@ export function UserMenu({ onOpenLogin }) {
               </Link>
             </li>
             <li>
+              <Link to="/wishlist" onClick={() => setIsOpen(false)}>
+                Wishlist
+              </Link>
+            </li>
+            <li>
               <Link to="/seller/dashboard" onClick={() => setIsOpen(false)}>
                 Switch to selling
               </Link>
