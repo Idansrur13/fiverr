@@ -1,11 +1,7 @@
+/* The November 2026 fiverr.com home hero (#87): a full-width background, the content
+   stays inside the container. A static gradient instead of their video. */
 .home-hero {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--space-lg);
-  min-height: 520px;
-  padding: var(--space-xl) clamp(var(--space-lg), 7vw, 110px);
-  border-radius: calc(var(--radius-md) * 2);
+  padding-block: 176px var(--space-xl);
   background:
     radial-gradient(
       circle at 85% 20%,
@@ -16,62 +12,160 @@
   color: var(--clr-bg);
 }
 
+.home-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
 .home-hero h1 {
-  max-width: 17ch;
-  font-size: clamp(2.25rem, 5vw, 4rem);
-  line-height: 1.1;
+  font-size: 54px;
+  font-weight: 300;
+  line-height: 120%;
   color: var(--clr-bg);
 }
 
+/* Search (hero version): the dark button sits inside the field, 6px from its edge */
 .home-hero .search-bar {
-  order: 0;
+  position: relative;
   flex: none;
   width: 100%;
-  max-width: 640px;
-  border: none;
-  border-radius: var(--radius-md);
+  max-width: none;
+  height: 52px;
+  border: 1px solid var(--clr-border-input);
+  border-radius: calc(var(--radius-sm) * 3);
   background-color: var(--clr-bg);
 }
 
 .home-hero .search-bar input {
-  padding: var(--space-md) var(--space-lg);
+  height: 100%;
+  padding: 10px 58px 10px var(--space-md);
+  border-radius: inherit;
+  font-size: var(--fs-md);
+  line-height: 24px;
+  color: var(--clr-text-dark);
+}
+
+.home-hero .search-bar input::placeholder {
+  color: var(--clr-text-placeholder);
 }
 
 .home-hero .search-bar button {
-  margin: var(--space-sm);
-  padding-inline: var(--space-md);
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border-radius: var(--radius-md);
-  background-color: var(--clr-bg-dark);
+  background-color: var(--clr-text-dark);
+  color: var(--clr-bg);
+  transform: translateY(-50%);
 }
 
 .home-hero .search-bar button:hover {
-  background-color: var(--clr-primary-dark);
+  background-color: var(--clr-text);
 }
 
+/* Tags: one row that scrolls sideways on mobile */
 .home-hero-tags {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: var(--space-md);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.home-hero-tags::-webkit-scrollbar {
+  display: none;
+}
+
+.home-hero-tags li {
+  flex-shrink: 0;
 }
 
 .home-hero-tag {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-md);
-  border: 1px solid color-mix(in srgb, var(--clr-bg) 60%, transparent);
+  gap: var(--space-sm);
+  height: 42px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--clr-bg);
   border-radius: var(--radius-md);
+  background-color: color-mix(in srgb, var(--clr-bg) 10%, transparent);
+  font-size: var(--fs-md);
+  line-height: 24px;
+  font-weight: 600;
   color: var(--clr-bg);
-  font-size: var(--fs-sm);
+  white-space: nowrap;
 }
 
 .home-hero-tag:hover {
-  background-color: color-mix(in srgb, var(--clr-bg) 15%, transparent);
+  background-color: color-mix(in srgb, var(--clr-bg) 20%, transparent);
 }
 
-@media (max-width: 600px) {
+/* Trusted by: the company names as muted text wordmarks */
+.home-hero-trusted {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md) 32px;
+  margin-block-start: 80px;
+  color: color-mix(in srgb, var(--clr-bg) 60%, transparent);
+}
+
+.home-hero-trusted ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md) 32px;
+}
+
+.home-hero-trusted li {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 899px) {
   .home-hero {
-    min-height: 420px;
-    padding: var(--space-xl) var(--space-lg);
+    padding-block-start: 64px;
+  }
+}
+
+@media (min-width: 600px) {
+  .home-hero-content {
+    max-width: 512px;
+  }
+}
+
+@media (min-width: 900px) {
+  .home-hero-content {
+    max-width: 705px;
+  }
+
+  .home-hero h1 {
+    font-size: 72px;
+  }
+
+  /* Wider screens: the tags can wrap instead of scrolling */
+  .home-hero-tags {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+@media (min-width: 1160px) {
+  .home-hero-content {
+    max-width: 80%;
+  }
+
+  .home-hero .search-bar {
+    height: 60px;
+  }
+
+  .home-hero .search-bar button {
+    width: 48px;
+    height: 48px;
   }
 }

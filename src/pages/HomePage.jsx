@@ -3,7 +3,7 @@ import { PopularServices } from '../cmps/PopularServices'
 
 export function HomePage() {
   return (
-    <section className="home-page">
+    <section className="home-page full main-layout">
       <HomeHero />
       <PopularServices />
     </section>
