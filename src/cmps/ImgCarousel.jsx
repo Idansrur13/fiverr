@@ -9,9 +9,11 @@ export function ImgCarousel({ images = [], alt = '', linkTo }) {
   const touchStartX = useRef(null)
   const isSwiping = useRef(false)
   const hasManyImages = images.length > 1
+  const lastIdx = images.length - 1
 
+  // Like Fiverr, no loop: the carousel stops at the first and the last image
   function showImage(idx) {
-    setCurrentIdx((idx + images.length) % images.length)
+    setCurrentIdx(Math.min(Math.max(idx, 0), lastIdx))
   }
 
   function onControlClick(ev, idx) {
@@ -30,6 +32,7 @@ export function ImgCarousel({ images = [], alt = '', linkTo }) {
     const distance = ev.changedTouches[0].clientX - touchStartX.current
     touchStartX.current = null
     if (!hasManyImages || Math.abs(distance) < SWIPE_MIN_DISTANCE) return
+    // Still a swipe at the edge, so it doesn't open the gig even though the image stays
     isSwiping.current = true
     showImage(distance < 0 ? currentIdx + 1 : currentIdx - 1)
   }
@@ -58,22 +61,26 @@ export function ImgCarousel({ images = [], alt = '', linkTo }) {
 
       {hasManyImages && (
         <>
-          <button
-            type="button"
-            className="img-carousel-arrow prev"
-            aria-label="Previous image"
-            onClick={(ev) => onControlClick(ev, currentIdx - 1)}
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            type="button"
-            className="img-carousel-arrow next"
-            aria-label="Next image"
-            onClick={(ev) => onControlClick(ev, currentIdx + 1)}
-          >
-            <ChevronRight size={18} />
-          </button>
+          {currentIdx > 0 && (
+            <button
+              type="button"
+              className="img-carousel-arrow prev"
+              aria-label="Previous image"
+              onClick={(ev) => onControlClick(ev, currentIdx - 1)}
+            >
+              <ChevronLeft size={18} />
+            </button>
+          )}
+          {currentIdx < lastIdx && (
+            <button
+              type="button"
+              className="img-carousel-arrow next"
+              aria-label="Next image"
+              onClick={(ev) => onControlClick(ev, currentIdx + 1)}
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
           <div className="img-carousel-dots">
             {images.map((image, idx) => (
               <button
