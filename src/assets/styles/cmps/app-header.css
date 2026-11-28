@@ -1,91 +1,151 @@
+/* Measured on fiverr.com: plans/reference-fiverr-header-css.md (1440 / 1024 / 768 / 375) */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   background-color: var(--clr-bg);
-  border-bottom: 1px solid var(--clr-border);
-  transition: box-shadow 0.3s;
 }
 
 .app-header .header-content {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
-  min-height: var(--header-height);
+  justify-content: space-between;
+  gap: 32px;
+  /* fiverr's row is 54px tall + 16px above and below = 86px */
+  min-height: 86px;
+  padding-block: var(--space-md);
 }
 
-.logo {
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.06em;
+/* Logo (shared with the footer): no hover change */
+.app-logo {
+  display: inline-flex;
+  flex-shrink: 0;
   color: var(--clr-text);
 }
 
-.logo-dot {
-  color: var(--clr-primary);
+.app-logo-text {
+  font-family: var(--font-main);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  fill: currentColor;
 }
 
+.app-logo-dot {
+  fill: var(--clr-primary);
+}
+
+/* Nav */
 .app-header .main-nav {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
-  margin-inline-start: auto;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--clr-text);
+  gap: var(--space-sm);
+  font-size: var(--fs-md);
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--clr-text-dark);
   white-space: nowrap;
 }
 
-.app-header .main-nav button {
-  display: flex;
+/* One ghost button style for every header button and link.
+   The Orders button gets the same padding and hover in orders-dropdown.css. */
+.app-header .main-nav > a,
+.app-header .main-nav > button {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
-  color: inherit;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-md);
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--clr-text-dark);
+  white-space: nowrap;
+  transition: background-color 0.07s cubic-bezier(0.75, 0, 0.25, 1);
 }
 
 .app-header .main-nav > a:hover,
-.app-header .main-nav > a.active,
-.app-header .main-nav > button:not(.btn-join):hover {
-  color: var(--clr-primary);
+.app-header .main-nav > button:hover {
+  background-color: var(--clr-bg-hover);
 }
 
-.app-header .nav-ai-icon {
-  color: var(--clr-primary);
+/* Join: the dark primary, no visible hover change */
+.app-header .main-nav > .btn-join,
+.app-header .main-nav > .btn-join:hover {
+  background-color: var(--clr-text-dark);
+  color: var(--clr-bg);
 }
 
 .app-header .nav-divider {
   width: 1px;
-  height: 28px;
-  background-color: var(--clr-border);
-}
-
-.app-header .main-nav .btn-join {
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-md);
-  background-color: var(--clr-text-dark);
-  color: var(--clr-bg);
-  font-weight: 600;
-}
-
-.app-header .main-nav .btn-join:hover {
-  background-color: var(--clr-text);
+  height: 21px;
+  background-color: var(--clr-divider);
 }
 
 .app-header .btn-menu {
   display: none;
+  place-items: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
   color: var(--clr-text-dark);
 }
 
-.app-header.home-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
+.app-header .btn-menu:hover {
+  background-color: var(--clr-bg-hover);
 }
 
-.app-header.home-header.scrolled {
-  box-shadow: var(--shadow-card);
+/* Search (header version only; the Home hero styles its own) */
+.app-header .search-bar {
+  flex: 1;
+  max-width: none;
+  height: 42px;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
+.app-header .search-bar input {
+  height: 42px;
+  padding: 10px 2px 10px var(--space-md);
+  border: 1px solid var(--clr-border-input);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  background-color: var(--clr-bg);
+  font-size: var(--fs-md);
+  line-height: 24px;
+  color: var(--clr-text-muted);
+  transition: border-color 0.15s ease-in-out;
+}
+
+.app-header .search-bar input::placeholder {
+  color: var(--clr-text-placeholder);
+}
+
+.app-header .search-bar input:focus {
+  border-color: var(--clr-text-dark);
+}
+
+.app-header .search-bar button {
+  flex-shrink: 0;
+  width: 49px;
+  height: 42px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background-color: var(--clr-text-dark);
+  color: var(--clr-bg);
+}
+
+.app-header .search-bar button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Home: the search fades in after scrolling (Idan's #69 / #74) */
 .app-header.home-header .search-bar {
-  animation: header-search-in 0.2s ease-out;
+  animation: header-search-in 0.25s;
 }
 
 @keyframes header-search-in {
@@ -94,59 +154,94 @@
   }
 }
 
-@media (max-width: 1400px) {
-  .app-header .main-nav .nav-ai,
-  .app-header .main-nav .nav-lang,
+/* Second row: the category links, full width, with fiverr's 1px line */
+.app-header > .category-bar {
+  grid-column: 1 / -1;
+  padding-block: var(--space-sm) var(--space-md);
+  padding-inline: max(var(--layout-gutter), (100% - var(--layout-max-width)) / 2);
+  box-shadow: inset 0 -1px 0 var(--clr-border-light);
+}
+
+/* Below ~1160: no second row, ☰ shows, and the line moves to the header itself.
+   On inner pages the search becomes a full-width row under the header. */
+@media (max-width: 1160px) {
+  .app-header {
+    box-shadow: inset 0 -1px 0 var(--clr-border-light);
+  }
+
+  .app-header > .category-bar,
+  .app-header .main-nav .nav-freelance,
   .app-header .main-nav .nav-divider {
     display: none;
   }
-}
 
-@media (max-width: 1100px) {
+  .app-header .btn-menu {
+    display: grid;
+  }
+
   .app-header .header-content {
     flex-wrap: wrap;
-    gap: var(--space-sm) var(--space-lg);
-    padding-block: var(--space-sm);
+    gap: var(--space-md) 32px;
+  }
+
+  .app-header .main-nav {
+    margin-inline-start: auto;
   }
 
   .app-header .search-bar {
     order: 1;
     flex-basis: 100%;
-    max-width: none;
   }
 }
 
-@media (max-width: 800px) {
+/* 65px header: smaller buttons, and ☰ doesn't make the row taller */
+@media (max-width: 768px) {
   .app-header .header-content {
-    gap: var(--space-sm) var(--space-md);
-  }
-
-  .app-header .main-nav .btn-join {
-    padding: var(--space-xs) var(--space-md);
+    gap: var(--space-md);
+    min-height: 65px;
+    /* (65px - the 36px Join) / 2, so the header is 65px like fiverr's */
+    padding-block: 14.5px;
   }
 
   .app-header .main-nav {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    min-width: 0;
-    gap: var(--space-xs) var(--space-md);
     font-size: var(--fs-sm);
+    line-height: 22px;
+  }
+
+  .app-header .main-nav > a,
+  .app-header .main-nav > button,
+  .app-header .main-nav .orders-dropdown-btn {
+    padding: 6px 12px;
+    font-size: var(--fs-sm);
+    line-height: 22px;
+  }
+
+  .app-header .btn-menu {
+    margin-block: -5px;
   }
 }
 
-/* Under 768px the links move into MobileMenu: logo + hamburger + Join, like Fiverr */
-@media (max-width: 768px) {
+/* Phone: only ☰ · logo (centered) · Join */
+@media (max-width: 600px) {
+  .app-header .header-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
   .app-header .btn-menu {
-    display: flex;
+    justify-self: start;
+  }
+
+  .app-header .main-nav {
+    justify-self: end;
+    margin-inline-start: 0;
   }
 
   .app-header .main-nav > :not(.btn-join) {
     display: none;
   }
-}
 
-@media (max-width: 600px) {
-  .logo {
-    font-size: 1.75rem;
+  .app-header .search-bar {
+    grid-column: 1 / -1;
   }
 }

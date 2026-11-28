@@ -42,7 +42,7 @@ describe('MobileMenu', () => {
 
     expect(hamburger).toHaveAttribute('aria-expanded', 'true')
     expect(menu).toHaveTextContent('Sign in')
-    expect(menu).toHaveTextContent('Join Fiverr')
+    expect(menu).toHaveTextContent('Join makerr')
     expect(menu).toHaveTextContent('Explore')
     expect(menu).toHaveTextContent('Programming & Tech')
     // The page behind the menu doesn't scroll, and scrolls again once it closes

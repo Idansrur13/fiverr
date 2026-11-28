@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { AppHeader } from './AppHeader'
@@ -35,7 +35,7 @@ describe('AppHeader', () => {
     expect(header).toHaveClass('home-header')
     expect(header).not.toHaveClass('scrolled')
     expect(screen.queryByRole('search')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'fiverr.' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'makerr' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Orders' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Join' })).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Categories' })).toBeInTheDocument()
@@ -73,13 +73,30 @@ describe('AppHeader', () => {
     expect(screen.getByRole('search')).toBeInTheDocument()
   })
 
-  it('shows the orders button and links to the seller dashboard', () => {
+  it('shows the orders button', () => {
     renderHeaderAt('/')
     expect(screen.getByRole('button', { name: 'Orders' })).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.getByRole('link', { name: 'Freelance on Fiverr' })).toHaveAttribute(
+  })
+
+  it('renders Freelance on Fiverr in the nav', () => {
+    renderHeaderAt('/')
+    const nav = screen.getByRole('banner').querySelector('.main-nav')
+    expect(within(nav).getByRole('link', { name: 'Freelance on Fiverr' })).toHaveAttribute(
       'href',
       '/seller/dashboard',
     )
+  })
+
+  it('does not render Connect to your AI', () => {
+    renderHeaderAt('/')
+    expect(screen.queryByText('Connect to your AI')).not.toBeInTheDocument()
+  })
+
+  it('links the logo to the home page', () => {
+    renderHeaderAt('/explore')
+    const logo = screen.getByRole('link', { name: 'makerr' })
+    expect(logo).toHaveAttribute('href', '/')
+    expect(within(logo).getByRole('img', { name: 'makerr' })).toBeInTheDocument()
   })
 })
 
@@ -105,7 +122,7 @@ describe('AppHeader login', () => {
     renderHeaderAt('/')
 
     await user.click(screen.getByRole('button', { name: 'Open menu' }))
-    await user.click(screen.getByRole('button', { name: 'Join Fiverr' }))
+    await user.click(screen.getByRole('button', { name: 'Join makerr' }))
 
     expect(screen.queryByRole('dialog', { name: 'Menu' })).not.toBeInTheDocument()
     expect(screen.getByRole('dialog', { name: 'Create a new account' })).toBeInTheDocument()
@@ -123,7 +140,7 @@ describe('AppHeader login', () => {
     expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Open menu' }))
-    expect(screen.queryByRole('button', { name: 'Join Fiverr' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Join makerr' })).not.toBeInTheDocument()
 
     store.dispatch({ type: LOGOUT })
   })

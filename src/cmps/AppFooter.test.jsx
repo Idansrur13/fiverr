@@ -61,7 +61,7 @@ describe('AppFooter', () => {
     // A page that doesn't exist yet is shown without a link
     expect(screen.getByText('How it works')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'How it works' })).not.toBeInTheDocument()
-    expect(screen.getByText(/Fiverr clone/)).toBeInTheDocument()
+    expect(screen.getByText(/© \d{4} makerr/)).toBeInTheDocument()
   })
 
   it('navigates to explore filtered by category', async () => {

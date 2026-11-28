@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import { categoryService } from '../services/category.service'
 import { utilService } from '../services/util.service'
+import { AppLogo } from './AppLogo'
 
 const MOBILE_QUERY = '(max-width: 768px)'
 
@@ -90,10 +91,8 @@ export function AppFooter() {
         })}
       </div>
       <div className="footer-bottom">
-        <Link to="/" className="logo">
-          fiverr<span className="logo-dot">.</span>
-        </Link>
-        <p className="footer-copyright">© {new Date().getFullYear()} Fiverr clone</p>
+        <AppLogo className="footer-logo" />
+        <p className="footer-copyright">© {new Date().getFullYear()} makerr</p>
       </div>
     </footer>
   )

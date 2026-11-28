@@ -1,8 +1,10 @@
+/* Values from fiverr.com (#86). The border uses the closest existing variable until #82
+   adds fiverr's search border color (#c5c6c9). */
 .search-bar {
   display: flex;
   flex: 1;
   max-width: 560px;
-  border: 1px solid var(--clr-text-light);
+  border: 1px solid var(--clr-border);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
@@ -11,12 +13,15 @@
   border-color: var(--clr-text-dark);
 }
 
+/* 10px + 20px line + 10px + the 2px border = 42px, without a fixed height
+   (the home hero sets its own padding) */
 .search-bar input {
   flex: 1;
   min-width: 0;
-  padding: var(--space-sm) var(--space-md);
+  padding: 10px 2px 10px var(--space-md);
   border: none;
   outline: none;
+  line-height: 20px;
   color: var(--clr-text-dark);
 }
 

@@ -56,9 +56,13 @@
   border-top: 1px solid var(--clr-border);
 }
 
-.app-footer .logo {
-  font-size: 1.75rem;
+/* Like fiverr's footer: the whole logo in grey, dot included */
+.app-footer .footer-logo {
   color: var(--clr-text-light);
+}
+
+.app-footer .footer-logo .app-logo-dot {
+  fill: currentColor;
 }
 
 .app-footer .footer-copyright {
