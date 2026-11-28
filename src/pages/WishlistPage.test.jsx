@@ -1,17 +1,17 @@
 import { StrictMode } from 'react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { WishlistPage } from './WishlistPage'
 import { store } from '../store/store'
 import { loadWishlist } from '../store/wishlist.actions'
 import { SET_WISHLIST } from '../store/wishlist.reducer'
-import { userService } from '../services/user.service'
+import { SET_USER } from '../store/user.reducer'
 import { gigService } from '../services/gig.service'
 import demoGigs from '../data/gigs.json'
 
-const userId = userService.getLoggedinUser().id
+const loggedinUser = { id: 'auth-1', email: 'maya@test.com', fullname: 'Maya Cohen', imgUrl: '' }
 const savedGigs = demoGigs.filter((gig) => ['g101', 'g103'].includes(gig.id))
 
 function renderPage() {
@@ -27,14 +27,17 @@ function renderPage() {
 }
 
 async function saveGigs(gigIds) {
-  localStorage.setItem(`wishlist_${userId}`, JSON.stringify(gigIds))
+  localStorage.setItem(`wishlist_${loggedinUser.id}`, JSON.stringify(gigIds))
   await loadWishlist()
 }
 
 describe('WishlistPage', () => {
   beforeEach(() => {
     localStorage.clear()
-    store.dispatch({ type: SET_WISHLIST, gigIds: [] })
+    act(() => {
+      store.dispatch({ type: SET_USER, user: loggedinUser })
+      store.dispatch({ type: SET_WISHLIST, gigIds: [] })
+    })
   })
 
   afterEach(() => {

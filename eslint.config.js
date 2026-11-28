@@ -26,7 +26,7 @@ export default [
     },
   },
   {
-    files: ['api/**/*.js', 'prisma/**/*.js', 'tests/**/*.js', '*.config.js'],
+    files: ['api/**/*.js', 'server/**/*.js', 'prisma/**/*.js', 'tests/**/*.js', '*.config.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -36,6 +36,10 @@ export default [
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-console': 'error',
     },
+  },
+  {
+    files: ['server/index.js'],
+    rules: { 'no-console': 'off' },
   },
   {
     files: ['**/*.test.{js,jsx}', 'tests/**/*.{js,jsx}'],

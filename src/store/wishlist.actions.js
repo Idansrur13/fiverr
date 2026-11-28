@@ -1,19 +1,23 @@
 import { wishlistService } from '../services/wishlist.service'
-import { userService } from '../services/user.service'
 import { store } from './store'
 import { SET_WISHLIST } from './wishlist.reducer'
 
-// A logged-out user has an empty wishlist
+let lastLoadRequestId = 0
+
+// The logged-in user's saved gigs. A logged-out user has an empty wishlist.
+// Only the latest call writes to the store, so after a quick logout / login
+// the old user's list can't overwrite the new one.
 export async function loadWishlist() {
-  const user = userService.getLoggedinUser()
+  const requestId = ++lastLoadRequestId
+  const user = store.getState().userModule.user
   const gigIds = user ? await wishlistService.query(user.id) : []
-  store.dispatch({ type: SET_WISHLIST, gigIds })
+  if (requestId === lastLoadRequestId) store.dispatch({ type: SET_WISHLIST, gigIds })
   return gigIds
 }
 
 // Saves the gig, or removes it if it's already saved
 export async function toggleWishlist(gigId) {
-  const user = userService.getLoggedinUser()
+  const user = store.getState().userModule.user
   if (!user) throw new Error('Only a logged-in user can save gigs')
 
   const isSaved = store.getState().wishlistModule.gigIds.includes(gigId)

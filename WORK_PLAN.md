@@ -37,7 +37,7 @@
 | משימה                                                                            | אחראי  |
 | -------------------------------------------------------------------------------- | ------ |
 | Repo ב-GitHub, הגנה על `main`, dev-board, labels, תבניות issue ו-PR              | עידן   |
-| Supabase (פרויקט dev ופרויקט prod), Vercel, משתני סביבה                          | עידן   |
+| Supabase (פרויקט dev ופרויקט prod), Render, משתני סביבה                          | עידן   |
 | `docker-compose.yml` עם Postgres מקומי                                           | עידן   |
 | Prisma: schema ראשוני, migration ראשון, Prisma client                            | עידן   |
 | CI ב-GitHub Actions: lint, test, build                                           | עידן   |
@@ -74,7 +74,7 @@
 
 **תשתית**
 
-- Docker, Prisma schema ו-migrations, Supabase, Vercel, CI
+- Docker, Prisma schema ו-migrations, Supabase, Render, CI
 
 **טסטים**
 

@@ -14,6 +14,8 @@
 @import './cmps/home-hero.css';
 @import './cmps/popular-services.css';
 @import './cmps/app-footer.css';
+@import './cmps/mobile-menu.css';
+@import './cmps/orders-dropdown.css';
 @import './cmps/gig-form.css';
 @import './cmps/gig-list.css';
 @import './cmps/gig-preview.css';
@@ -25,6 +27,9 @@
 @import './cmps/seller-badge.css';
 @import './cmps/order-card.css';
 @import './cmps/package-selector.css';
+@import './cmps/user-menu.css';
+@import './cmps/login-modal.css';
+@import './cmps/protected-route.css';
 
 @import './pages/home-page.css';
 @import './pages/explore-page.css';

@@ -1,22 +1,60 @@
+import { useCallback, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { ChevronDown, Globe, Heart, Sparkles } from 'lucide-react'
+import { ChevronDown, Globe, Menu, Sparkles } from 'lucide-react'
+import { LoginModal } from './LoginModal'
 import { UserMenu } from './UserMenu'
+import { OrdersDropdown } from './OrdersDropdown'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
+import { MobileMenu } from './MobileMenu'
+import { useScrollPast } from '../customHooks/useScrollPast'
+
+const SHOW_SEARCH_SCROLL_Y = 150
 
 export function AppHeader() {
   const { pathname } = useLocation()
   const filterTxt = useSelector((storeState) => storeState.gigModule.filterBy.txt)
   const isHomePage = pathname === '/'
+  const isScrolledPast = useScrollPast(SHOW_SEARCH_SCROLL_Y)
+  const isSearchShown = !isHomePage || isScrolledPast
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menuBtnRef = useRef(null)
+
+  const headerClassName = [
+    'app-header full main-layout',
+    isHomePage && 'home-header',
+    isHomePage && isScrolledPast && 'scrolled',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const closeMenu = useCallback(({ returnFocus = false } = {}) => {
+    setIsMenuOpen(false)
+    if (returnFocus) menuBtnRef.current?.focus()
+  }, [])
+
+  const isLoggedIn = useSelector((storeState) => Boolean(storeState.userModule.user))
+  const [loginMode, setLoginMode] = useState(null)
+  const closeLogin = useCallback(() => setLoginMode(null), [])
 
   return (
-    <header className="app-header full main-layout">
+    <header className={headerClassName}>
       <div className="header-content">
+        <button
+          type="button"
+          className="btn-menu"
+          ref={menuBtnRef}
+          aria-label="Open menu"
+          aria-expanded={isMenuOpen}
+          onClick={() => setIsMenuOpen(true)}
+        >
+          <Menu size={24} />
+        </button>
         <Link to="/" className="logo">
           fiverr<span className="logo-dot">.</span>
         </Link>
-        {!isHomePage && <SearchBar key={filterTxt} />}
+        {isSearchShown && <SearchBar key={filterTxt} />}
         <nav className="main-nav">
           <button type="button" className="nav-ai">
             Connect to your AI
@@ -26,29 +64,20 @@ export function AppHeader() {
           <NavLink to="/seller/dashboard" className="nav-freelance">
             Freelance on Fiverr
           </NavLink>
-          <NavLink to="/orders" className="nav-orders">
-            Orders
-          </NavLink>
-          {/* Moves into UserMenu after #33 */}
-          <NavLink to="/wishlist" className="nav-wishlist">
-            <Heart size={18} aria-hidden="true" />
-            Wishlist
-          </NavLink>
+          <OrdersDropdown />
           <button type="button" className="nav-lang">
             <Globe size={18} />
             EN
           </button>
           <span className="nav-divider" aria-hidden="true" />
-          <button type="button" className="nav-sign-in">
-            Sign in
-          </button>
-          <button type="button" className="btn-join">
-            Join
-          </button>
+          <UserMenu onOpenLogin={setLoginMode} />
         </nav>
-        <UserMenu />
       </div>
       <CategoryBar />
+      {isMenuOpen && (
+        <MobileMenu onClose={closeMenu} isLoggedIn={isLoggedIn} onOpenLogin={setLoginMode} />
+      )}
+      {loginMode && <LoginModal mode={loginMode} onClose={closeLogin} />}
     </header>
   )
 }

@@ -1,20 +1,21 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Heart } from 'lucide-react'
 import { LoginModal } from './LoginModal'
 import { toggleWishlist } from '../store/wishlist.actions'
-import { userService } from '../services/user.service'
 
 export function WishlistButton({ gigId }) {
   const isSaved = useSelector((storeState) => storeState.wishlistModule.gigIds.includes(gigId))
+  const isLoggedIn = useSelector((storeState) => Boolean(storeState.userModule.user))
   const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const closeLogin = useCallback(() => setIsLoginOpen(false), [])
 
   function onToggle(ev) {
     // The heart sits on a gig card, so a click must never open the gig
     ev.preventDefault()
     ev.stopPropagation()
 
-    if (!userService.getLoggedinUser()) {
+    if (!isLoggedIn) {
       setIsLoginOpen(true)
       return
     }
@@ -33,7 +34,7 @@ export function WishlistButton({ gigId }) {
       >
         <Heart size={18} aria-hidden="true" />
       </button>
-      {isLoginOpen && <LoginModal onClose={() => setIsLoginOpen(false)} />}
+      {isLoginOpen && <LoginModal mode="login" onClose={closeLogin} />}
     </>
   )
 }

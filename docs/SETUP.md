@@ -189,7 +189,8 @@ copy .env.example .env
 ```
 
 הקובץ כבר מכוון ל-DB המקומי ב-Docker, אין צורך לשנות בו כלום כרגע.
-את המפתחות של Supabase (`SUPABASE_URL`, `SUPABASE_ANON_KEY` ו-`VITE_...`) תקבלו מעידן כשנגיע להתחברות.
+את המפתחות של Supabase (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `VITE_SUPABASE_URL` ו-`VITE_SUPABASE_ANON_KEY`) מקבלים מעידן, ומעתיקים ל-`.env`.
+בלי המפתחות האלה אי אפשר להתחבר, ולכן גם אי אפשר להיכנס לעמודים שדורשים התחברות: `/orders`, `/profile`, `/checkout` וכל `/seller/*`. אחרי שינוי ב-`.env` מפעילים מחדש את `npm run dev`.
 
 **לעולם לא מעלים את `.env` ל-Git** – הוא כבר נמצא ב-`.gitignore`.
 
@@ -267,36 +268,11 @@ npm run check
 npm run dev
 ```
 
+הפקודה מרימה יחד את הפרונט ואת ה-API. בטרמינל מופיעות שורות עם `[web]` ו-`[api]`, וכל בקשה ל-`/api` עוברת מ-Vite לשרת על פורט `3000`.
+
 פותחים בדפדפן את `http://localhost:5173`.
 
-✅ **בדיקה:** האתר עולה בלי שגיאות בקונסול של הדפדפן (`F12` → Console).
-
-### הרצה עם ה-API (כשנגיע לעבודה מול השרת)
-
-1. מבקשים מעידן הזמנה לצוות ב-Vercel.
-2. מתקינים את ה-CLI:
-
-```bash
-npm install -g vercel
-```
-
-3. מתחברים ומקשרים את הפרויקט (פעם אחת):
-
-```bash
-vercel login
-```
-
-```bash
-vercel link
-```
-
-4. מריצים:
-
-```bash
-vercel dev
-```
-
-✅ **בדיקה:** `http://localhost:3000/api/health` מחזיר `{"status":"ok"}`.
+✅ **בדיקה:** האתר עולה בלי שגיאות בקונסול של הדפדפן (`F12` → Console), ו-`http://localhost:5173/api/health` מחזיר `{"status":"ok"}`.
 
 ---
 

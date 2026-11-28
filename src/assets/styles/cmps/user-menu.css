@@ -1,0 +1,99 @@
+.user-menu {
+  position: relative;
+  display: flex;
+}
+
+.app-header .main-nav > .user-menu {
+  display: flex;
+}
+
+.user-menu-btn {
+  border-radius: 50%;
+}
+
+.user-menu-btn:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-avatar-initial {
+  display: grid;
+  place-items: center;
+  background-color: var(--clr-bg-dark);
+  color: var(--clr-bg);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.user-menu-panel {
+  position: absolute;
+  top: calc(100% + var(--space-md));
+  right: 0;
+  z-index: 25;
+  width: 240px;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  background-color: var(--clr-bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  color: var(--clr-text);
+  font-size: var(--fs-md);
+  font-weight: 400;
+  white-space: normal;
+  overflow: hidden;
+}
+
+.user-menu-header {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.user-menu-name {
+  font-weight: 600;
+  color: var(--clr-text-dark);
+}
+
+.user-menu-email {
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  color: var(--clr-text-light);
+  text-overflow: ellipsis;
+}
+
+.user-menu-links {
+  padding-block: var(--space-xs);
+}
+
+.user-menu-links a,
+.user-menu-links .user-menu-logout {
+  display: block;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  text-align: start;
+  color: var(--clr-text);
+}
+
+.user-menu-links a:hover,
+.user-menu-links .user-menu-logout:hover {
+  background-color: var(--clr-bg-light);
+  color: var(--clr-text-dark);
+}
+
+.user-menu-links li:last-child {
+  margin-block-start: var(--space-xs);
+  border-top: 1px solid var(--clr-border);
+  padding-block-start: var(--space-xs);
+}
+
+.user-menu-error {
+  padding: var(--space-sm) var(--space-md);
+  background-color: color-mix(in srgb, var(--clr-error) 10%, transparent);
+  font-size: var(--fs-sm);
+  color: var(--clr-error);
+}
