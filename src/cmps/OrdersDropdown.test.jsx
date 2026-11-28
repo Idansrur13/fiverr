@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, act, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
@@ -8,6 +8,8 @@ import { store } from '../store/store'
 import { SET_BUYER_ORDERS } from '../store/order.reducer'
 import { addOrder } from '../store/order.actions'
 import { userService } from '../services/user.service'
+import { orderService } from '../services/order.service'
+import { httpService } from '../services/http.service'
 
 const buyer = userService.getLoggedinUser()
 
@@ -72,6 +74,7 @@ function getPanel() {
 
 describe('OrdersDropdown', () => {
   beforeEach(() => {
+    vi.restoreAllMocks()
     localStorage.clear()
     store.dispatch({ type: SET_BUYER_ORDERS, buyerOrders: [] })
   })
@@ -93,7 +96,7 @@ describe('OrdersDropdown', () => {
   })
 
   it('renders the buyer orders with title, price and status', async () => {
-    localStorage.setItem('orderDB', JSON.stringify(storedOrders))
+    vi.spyOn(orderService, 'query').mockResolvedValue(storedOrders.slice(0, 2))
     const user = renderDropdown()
 
     await user.click(screen.getByRole('button', { name: 'Orders' }))
@@ -111,6 +114,7 @@ describe('OrdersDropdown', () => {
   })
 
   it('renders an empty state when there are no orders', async () => {
+    vi.spyOn(orderService, 'query').mockResolvedValue([])
     const user = renderDropdown()
 
     await user.click(screen.getByRole('button', { name: 'Orders' }))
@@ -119,6 +123,7 @@ describe('OrdersDropdown', () => {
   })
 
   it('closes on outside click', async () => {
+    vi.spyOn(orderService, 'query').mockResolvedValue([])
     const user = renderDropdown()
     await user.click(screen.getByRole('button', { name: 'Orders' }))
     await within(getPanel()).findByText('No orders yet')
@@ -132,14 +137,28 @@ describe('OrdersDropdown', () => {
   })
 
   it('shows a new order added to the store', async () => {
+    vi.spyOn(orderService, 'query').mockResolvedValue([])
+    const newOrder = {
+      id: 'new-order',
+      buyer: { id: buyer.id, fullname: buyer.fullname },
+      seller: { id: gig.owner.id, fullname: gig.owner.fullname },
+      gig: { id: gig.id, title: gig.title, imgUrl: gig.images[0] },
+      package: null,
+      price: 50,
+      serviceFee: 2.75,
+      total: 52.75,
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+    }
+    vi.spyOn(httpService, 'post').mockResolvedValue(newOrder)
     const user = renderDropdown()
     await user.click(screen.getByRole('button', { name: 'Orders' }))
     await within(getPanel()).findByText('No orders yet')
 
     await act(() => addOrder({ gig, buyer }))
 
-    const newOrder = screen.getByRole('link', { name: /professional male voice over/ })
-    expect(within(newOrder).getByText('Pending')).toBeInTheDocument()
+    const newOrderLink = screen.getByRole('link', { name: /professional male voice over/ })
+    expect(within(newOrderLink).getByText('Pending')).toBeInTheDocument()
     expect(screen.queryByText('No orders yet')).not.toBeInTheDocument()
   })
 })

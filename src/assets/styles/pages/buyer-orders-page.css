@@ -1,0 +1,221 @@
+.buyer-orders-page {
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.buyer-orders-header h1 {
+  font-weight: 400;
+}
+
+.buyer-orders-page .order-status-tabs {
+  display: flex;
+  gap: var(--space-lg);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.buyer-orders-page .status-tab {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-block: var(--space-md);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--clr-text-light);
+  border-bottom: 3px solid transparent;
+}
+
+.buyer-orders-page .status-tab:hover {
+  color: var(--clr-text-dark);
+}
+
+.buyer-orders-page .status-tab[aria-selected='true'] {
+  color: var(--clr-text-dark);
+  border-bottom-color: var(--clr-primary);
+}
+
+.buyer-orders-page .tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding-inline: var(--space-xs);
+  font-size: var(--fs-xs);
+  color: var(--clr-text);
+  background-color: var(--clr-border);
+  border-radius: var(--radius-md);
+}
+
+.buyer-orders-page .status-tab[aria-selected='true'] .tab-count {
+  color: var(--clr-bg);
+  background-color: var(--clr-primary);
+}
+
+.buyer-order-list {
+  min-width: 0;
+}
+
+.buyer-order-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.buyer-order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.buyer-order-table th {
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-align: start;
+  text-transform: uppercase;
+  color: var(--clr-text-light);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.buyer-order-table td {
+  padding: var(--space-md) var(--space-lg);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.buyer-order-table tbody tr {
+  cursor: pointer;
+}
+
+.buyer-order-table tbody tr:hover,
+.buyer-order-table tbody tr:focus-visible {
+  background-color: var(--clr-bg-light);
+  outline: none;
+}
+
+.buyer-order-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.buyer-order-gig {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 220px;
+}
+
+.buyer-order-gig img,
+.buyer-order-card-gig img {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.buyer-order-gig > span {
+  min-width: 0;
+}
+
+.buyer-order-status {
+  display: inline-flex;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--clr-text-dark);
+  background-color: var(--clr-bg-light);
+  border-radius: var(--radius-md);
+}
+
+.buyer-order-again {
+  flex: 0 0 auto;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--clr-primary);
+}
+
+.buyer-order-again:hover {
+  text-decoration: underline;
+}
+
+.buyer-order-cards {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .buyer-orders-page {
+    padding-block: var(--space-lg);
+  }
+
+  .buyer-order-table-wrapper {
+    display: none;
+  }
+
+  .buyer-order-cards {
+    display: grid;
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .buyer-order-card {
+    display: grid;
+    gap: var(--space-md);
+    min-width: 0;
+    padding: var(--space-md);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+  }
+
+  .buyer-order-card:focus-visible {
+    outline: 2px solid var(--clr-primary);
+    outline-offset: 2px;
+  }
+
+  .buyer-order-card-gig {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
+  }
+
+  .buyer-order-card-gig h3 {
+    min-width: 0;
+    font-size: var(--fs-sm);
+    overflow-wrap: anywhere;
+  }
+
+  .buyer-order-card-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md);
+    margin: 0;
+  }
+
+  .buyer-order-card-details > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .buyer-order-card-details dt {
+    margin-bottom: var(--space-xs);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--clr-text-light);
+  }
+
+  .buyer-order-card-details dd {
+    margin: 0;
+  }
+
+  .buyer-order-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+}

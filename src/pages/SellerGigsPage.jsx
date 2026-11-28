@@ -25,7 +25,7 @@ export function SellerGigsPage() {
   useEffect(() => {
     let isCancelled = false
 
-    Promise.all([loadGigs({}), loadOrders({ sellerId: loggedinUser.id })])
+    Promise.all([loadGigs({}), loadOrders({ sellerId: loggedinUser.id }, () => !isCancelled)])
       .catch(() => {
         if (!isCancelled) setErrorMsg('Could not load your gigs, please try again')
       })

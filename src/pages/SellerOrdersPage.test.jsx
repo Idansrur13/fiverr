@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
@@ -7,6 +7,7 @@ import { SellerOrdersPage } from './SellerOrdersPage'
 import { store } from '../store/store'
 import { SET_ORDERS } from '../store/order.reducer'
 import { userService } from '../services/user.service'
+import { orderService } from '../services/order.service'
 
 const seller = userService.getLoggedinUser()
 
@@ -75,6 +76,11 @@ describe('SellerOrdersPage', () => {
     localStorage.clear()
     localStorage.setItem('orderDB', JSON.stringify(testOrders))
     store.dispatch({ type: SET_ORDERS, orders: [] })
+    vi.spyOn(orderService, 'query').mockResolvedValue(testOrders)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it('shows only the orders of the logged in seller', async () => {
@@ -131,5 +137,22 @@ describe('SellerOrdersPage', () => {
 
     expect(screen.getByText('No cancelled orders to show')).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('does not update the store when orders finish loading after unmount', async () => {
+    let resolveOrders
+    orderService.query.mockReturnValue(
+      new Promise((resolve) => {
+        resolveOrders = resolve
+      }),
+    )
+    const { unmount } = renderPage()
+    unmount()
+
+    await act(async () => {
+      resolveOrders(testOrders)
+    })
+
+    expect(store.getState().orderModule.orders).toEqual([])
   })
 })

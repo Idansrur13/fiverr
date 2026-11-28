@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
@@ -7,6 +7,8 @@ import { BuyerOrdersPage } from './BuyerOrdersPage'
 import { SellerOrdersPage } from './SellerOrdersPage'
 import { store } from '../store/store'
 import { SET_ORDERS } from '../store/order.reducer'
+import { orderService } from '../services/order.service'
+import { userService } from '../services/user.service'
 
 const order = {
   id: 'order-1',
@@ -31,12 +33,14 @@ function renderOrdersPage(page) {
 
 describe('Orders pages', () => {
   beforeEach(() => {
+    vi.restoreAllMocks()
     localStorage.clear()
     store.dispatch({ type: SET_ORDERS, orders: [] })
   })
 
   it('moves an updated seller order to its new status tab and persists the status', async () => {
-    localStorage.setItem('orderDB', JSON.stringify([order]))
+    vi.spyOn(orderService, 'query').mockResolvedValue([order])
+    vi.spyOn(orderService, 'updateStatus').mockResolvedValue({ ...order, status: 'IN_PROGRESS' })
     const user = userEvent.setup()
     renderOrdersPage(<SellerOrdersPage />)
 
@@ -49,21 +53,21 @@ describe('Orders pages', () => {
       'true',
     )
     expect(screen.getByRole('row', { name: /Logo design/ })).toHaveTextContent('In progress')
-    expect(JSON.parse(localStorage.getItem('orderDB'))[0].status).toBe('IN_PROGRESS')
+    expect(orderService.updateStatus).toHaveBeenCalledWith('order-1', 'IN_PROGRESS')
   })
 
   it('shows the updated order status in the buyer order list and status tab', async () => {
-    localStorage.setItem(
-      'orderDB',
-      JSON.stringify([{ ...order, buyer: { id: 'u100' }, status: 'DELIVERED' }]),
-    )
+    vi.spyOn(userService, 'getLoggedinUser').mockReturnValue({ id: 'u100' })
+    vi.spyOn(orderService, 'query').mockResolvedValue([
+      { ...order, buyer: { id: 'u100' }, status: 'DELIVERED' },
+    ])
     const user = userEvent.setup()
     renderOrdersPage(<BuyerOrdersPage />)
 
+    await user.click(await screen.findByRole('tab', { name: 'Delivered 1' }))
     const deliveredRow = await screen.findByRole('row', { name: /Logo design/ })
     expect(within(deliveredRow).getByText('Delivered')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('tab', { name: 'Delivered 1' }))
     expect(screen.getByRole('heading', { name: 'Delivered orders' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Delivered 1' })).toHaveAttribute(
       'aria-selected',
