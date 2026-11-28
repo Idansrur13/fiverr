@@ -1,8 +1,9 @@
 import { useCallback, useRef, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { ChevronDown, Globe, Menu, Sparkles } from 'lucide-react'
 import { LoginModal } from './LoginModal'
+import { AppLogo } from './AppLogo'
 import { UserMenu } from './UserMenu'
 import { OrdersDropdown } from './OrdersDropdown'
 import { SearchBar } from './SearchBar'
@@ -51,9 +52,7 @@ export function AppHeader() {
         >
           <Menu size={24} />
         </button>
-        <Link to="/" className="logo">
-          fiverr<span className="logo-dot">.</span>
-        </Link>
+        <AppLogo />
         {isSearchShown && <SearchBar key={filterTxt} />}
         <nav className="main-nav">
           <button type="button" className="nav-ai">
@@ -62,7 +61,7 @@ export function AppHeader() {
             <ChevronDown size={18} />
           </button>
           <NavLink to="/seller/dashboard" className="nav-freelance">
-            Freelance on Fiverr
+            Become a Seller
           </NavLink>
           <OrdersDropdown />
           <button type="button" className="nav-lang">

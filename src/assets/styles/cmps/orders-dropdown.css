@@ -2,9 +2,16 @@
   position: relative;
 }
 
+/* Like the other header nav items (fiverr.com): grey background on hover, the text stays dark */
+.orders-dropdown .orders-dropdown-btn {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+}
+
 .orders-dropdown .orders-dropdown-btn:hover,
 .orders-dropdown .orders-dropdown-btn[aria-expanded='true'] {
-  color: var(--clr-primary);
+  background-color: var(--clr-bg-light);
+  color: var(--clr-text-dark);
 }
 
 .orders-dropdown-panel {

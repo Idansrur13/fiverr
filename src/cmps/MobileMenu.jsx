@@ -76,7 +76,7 @@ export function MobileMenu({ onClose, isLoggedIn = false, onOpenLogin = () => {}
         {!isLoggedIn && (
           <div className="mobile-menu-auth">
             <button type="button" className="btn-join" onClick={() => openLogin('signup')}>
-              Join Fiverr
+              Join makerr
             </button>
             <button
               type="button"
@@ -96,7 +96,7 @@ export function MobileMenu({ onClose, isLoggedIn = false, onOpenLogin = () => {}
             </li>
             <li>
               <Link to="/seller/dashboard" onClick={() => onClose()}>
-                Freelance on Fiverr
+                Become a Seller
               </Link>
             </li>
             <li>

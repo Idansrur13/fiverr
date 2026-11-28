@@ -1,3 +1,5 @@
+/* Values from fiverr.com (#86). Colors use the closest existing variables until #82 adds
+   fiverr's border (#dadbdd) and hover (#f5f5f5) colors. */
 .app-header {
   background-color: var(--clr-bg);
   border-bottom: 1px solid var(--clr-border);
@@ -7,30 +9,39 @@
 .app-header .header-content {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
-  min-height: var(--header-height);
+  gap: 32px;
+  padding-block: var(--space-md);
 }
 
-.logo {
-  font-size: 2.5rem;
+/* Logo (shared with the footer) */
+.app-logo {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--clr-text-dark);
+}
+
+.app-logo-text {
+  font-family: var(--font-main);
+  font-size: 26px;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.06em;
-  color: var(--clr-text);
+  letter-spacing: -0.04em;
+  fill: currentColor;
 }
 
-.logo-dot {
-  color: var(--clr-primary);
+.app-logo-dot {
+  fill: var(--clr-primary);
 }
 
+/* Nav items. The Orders button is styled the same way in orders-dropdown.css */
 .app-header .main-nav {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
+  gap: var(--space-sm);
   margin-inline-start: auto;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--clr-text);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--clr-text-dark);
   white-space: nowrap;
 }
 
@@ -41,10 +52,19 @@
   color: inherit;
 }
 
+.app-header .main-nav > a,
+.app-header .main-nav > button {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Hover = a grey background, the text stays dark (no green) */
 .app-header .main-nav > a:hover,
-.app-header .main-nav > a.active,
 .app-header .main-nav > button:not(.btn-join):hover {
-  color: var(--clr-primary);
+  background-color: var(--clr-bg-light);
+  color: var(--clr-text-dark);
 }
 
 .app-header .nav-ai-icon {
@@ -53,16 +73,13 @@
 
 .app-header .nav-divider {
   width: 1px;
-  height: 28px;
+  height: 22px;
   background-color: var(--clr-border);
 }
 
 .app-header .main-nav .btn-join {
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-md);
   background-color: var(--clr-text-dark);
   color: var(--clr-bg);
-  font-weight: 600;
 }
 
 .app-header .main-nav .btn-join:hover {
@@ -106,7 +123,6 @@
   .app-header .header-content {
     flex-wrap: wrap;
     gap: var(--space-sm) var(--space-lg);
-    padding-block: var(--space-sm);
   }
 
   .app-header .search-bar {
@@ -116,37 +132,28 @@
   }
 }
 
-@media (max-width: 800px) {
+/* Under 768px the links move into MobileMenu: hamburger, the logo in the middle, Join */
+@media (max-width: 768px) {
   .app-header .header-content {
-    gap: var(--space-sm) var(--space-md);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: var(--space-sm);
   }
 
-  .app-header .main-nav .btn-join {
-    padding: var(--space-xs) var(--space-md);
+  .app-header .btn-menu {
+    display: flex;
+    justify-self: start;
   }
 
   .app-header .main-nav {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    min-width: 0;
-    gap: var(--space-xs) var(--space-md);
-    font-size: var(--fs-sm);
-  }
-}
-
-/* Under 768px the links move into MobileMenu: logo + hamburger + Join, like Fiverr */
-@media (max-width: 768px) {
-  .app-header .btn-menu {
-    display: flex;
+    justify-self: end;
   }
 
   .app-header .main-nav > :not(.btn-join) {
     display: none;
   }
-}
 
-@media (max-width: 600px) {
-  .logo {
-    font-size: 1.75rem;
+  .app-header .search-bar {
+    grid-column: 1 / -1;
   }
 }
