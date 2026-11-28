@@ -1,5 +1,6 @@
+/* Full width, so the hero can touch both edges of the screen. The hero starts right under
+   the header, so the top padding of main-content is cancelled here. */
 .home-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+  row-gap: var(--space-xl);
+  margin-block-start: calc(-1 * var(--space-xl));
 }
